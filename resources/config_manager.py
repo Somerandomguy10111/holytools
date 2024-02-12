@@ -2,27 +2,6 @@ import os.path
 from configparser import ConfigParser
 from enum import Enum
 
-
-
-# def get_client_token() -> str:
-#     return _get_value(key='client_auth', category=Category.CLIENT)
-#
-# def get_zenodo_access_token() -> str:
-#     return _get_value(key='zenodo_token', category=Category.ZENODO)
-#
-# def get_mail_password() -> str:
-#     return _get_value(key='mail_pwd', category=Category.MAIL)
-#
-# def get_google_key() -> str:
-#     return _get_value(key='google_key', category=Category.SEARCH_ENGINE)
-#
-# def get_searchengine_id() -> str:
-#     return _get_value(key='search_engine_id', category=Category.SEARCH_ENGINE)
-
-
-# ---------------------------------------------------------
-
-
 class StdCategories(Enum):
     GENERAL = 'GENERAL'
     APIS = 'APIS'
