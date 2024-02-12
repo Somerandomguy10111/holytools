@@ -1,5 +1,5 @@
 from __future__ import annotations
-from web.mail_addresses import get_mail_addresses_in_text
+from .mail_addresses import get_mail_addresses_in_text
 
 import threading
 import requests
@@ -125,7 +125,7 @@ class WebDriver:
 
 
 if __name__ == '__main__':
-    from resources import ConfigManager, StdCategories
+    from hollarek.resources import ConfigManager, StdCategories
 
     new_conf_manger = ConfigManager()
     google_api_key = new_conf_manger.get_value(key='google_key',category=StdCategories.APIS)
