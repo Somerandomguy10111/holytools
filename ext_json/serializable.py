@@ -2,8 +2,7 @@ from __future__ import annotations
 from datetime import datetime
 import json
 from typing import  get_type_hints
-from typing import get_origin, get_args, Union
-from types import NoneType
+from ext_typing import get_core_type
 
 # -------------------------------------------
 
@@ -60,18 +59,6 @@ class JsonDataclass:
         if isinstance(obj, datetime):
             return obj.isoformat()
         return json.JSONEncoder().default(obj)
-
-
-def get_core_type(the_type):
-    if get_origin(the_type) is Union:
-        types = get_args(the_type)
-
-        core_types = [t for t in types if not t is NoneType]
-        print(core_types)
-        if len(core_types) == 1:
-            return core_types[0]
-    else:
-        return the_type
 
 
 #

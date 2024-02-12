@@ -6,7 +6,7 @@ from pathlib import Path
 
 # -------------------------------------------
 
-def get_parentfile_path() -> Optional[str]:
+def get_caller_filepath() -> Optional[str]:
     try:
         frame = inspect.currentframe().f_back.f_back
         filename = frame.f_globals["__file__"]
