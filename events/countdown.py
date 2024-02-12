@@ -4,12 +4,13 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.job import Job
 from typing import Optional
 
-
 from .input_waiter import InputWaiter
+
 # ---------------------------------------------------------
 
 class Countdown:
-    def __init__(self, time_to_finish: float = 0.25, on_countdown_finish : Callable[[], None] = lambda *args,**kwargs : None):
+    def __init__(self, time_to_finish: float = 0.25,
+                 on_countdown_finish : callable = lambda *args,**kwargs : None):
         self.initial_time = time_to_finish
         self.scheduler = BackgroundScheduler()
         self.job: Optional[Job] = None
