@@ -2,7 +2,7 @@ import threading, logging
 import inspect
 from collections.abc import Iterable
 
-class ExtendedThread(threading.Thread):
+class LoggableThread(threading.Thread):
     def __init__(self, target: callable, is_daemon=True, args: Iterable = ()):
         super().__init__(target=target, daemon=is_daemon, args=args)
         frame_record = inspect.stack()[2]
@@ -21,6 +21,6 @@ class ExtendedThread(threading.Thread):
             if isinstance(thread,cls):
                 logging.info(thread.get_full_thread_info())
 
-class DaemonThread(ExtendedThread):
+class DaemonThread(LoggableThread):
     def __init__(self, target: callable, args: Iterable = ()):
         super().__init__(target=target, is_daemon=True, args=args)
