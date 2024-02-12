@@ -7,7 +7,7 @@ from types import NoneType
 
 # -------------------------------------------
 
-class SerializableDataclass:
+class JsonDataclass:
     @classmethod
     def from_str(cls, json_str: str):
         json_dict = json.loads(json_str, object_hook=cls.json_decode)
@@ -19,8 +19,9 @@ class SerializableDataclass:
     def to_json(self) -> dict:
         return {attr : self.get_json_entry(obj=value) for attr, value in self.__dict__.items()}
 
+
     @classmethod
-    def from_json(cls, json_dict : dict) -> SerializableDataclass:
+    def from_json(cls, json_dict : dict) -> JsonDataclass:
         obj = cls.__new__(cls)
         type_hints = get_type_hints(cls)
 
@@ -29,7 +30,7 @@ class SerializableDataclass:
             core_type = get_core_type(the_type=type_hints.get(key))
             print(f'key, value, type = {key}, {value}, {type_hints.get(key)}')
 
-            if issubclass(core_type, SerializableDataclass):
+            if issubclass(core_type, JsonDataclass):
                 if not value is None:
                     setattr(obj, key, core_type.from_json(json_dict=value))
             else:
@@ -39,7 +40,7 @@ class SerializableDataclass:
 
     @staticmethod
     def get_json_entry(obj):
-        is_composite = isinstance(obj, SerializableDataclass)
+        is_composite = isinstance(obj, JsonDataclass)
         if is_composite:
             return obj.to_json()
         return obj
@@ -59,9 +60,6 @@ class SerializableDataclass:
         if isinstance(obj, datetime):
             return obj.isoformat()
         return json.JSONEncoder().default(obj)
-
-
-
 
 
 def get_core_type(the_type):
