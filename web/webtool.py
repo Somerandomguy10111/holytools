@@ -1,5 +1,5 @@
 from __future__ import annotations
-from .mail_addresses import get_mail_addresses_in_text
+from web.mail_addresses import get_mail_addresses_in_text
 
 import threading
 import requests
@@ -22,17 +22,17 @@ class Webtool:
             cls._instance = super(Webtool, cls).__new__(cls)
         return cls._instance
 
-    def __init__(self,google_key : Optional[str],
-                 searchengine_id : Optional[str],
+    def __init__(self,google_key : Optional[str] = None,
+                 searchengine_id : Optional[str] = None,
                  webdriver_count: int = 4):
 
         if not Webtool._is_initialized:
             if google_key is None or searchengine_id is None:
                 raise ValueError(f'Google API key and search engine ID must be provided but one of the arguments is None \n'
                                  f'google_key : {google_key}; searchengine_id : {searchengine_id}')
-            
-            self.GOOGLE_API_KEY : str = google_key
-            self.SEARCHENGINE_ID : str = searchengine_id
+
+            self._GOOGLE_API_KEY : str = google_key
+            self._SEARCHENGINE_ID : str = searchengine_id
 
             self.drivers: list[WebDriver] = []
             for _ in range(webdriver_count):
@@ -45,8 +45,8 @@ class Webtool:
         url = "https://www.googleapis.com/customsearch/v1"
         params = {
             'q': f'{search_term}',
-            'key': self.GOOGLE_API_KEY,
-            'cx': self.SEARCHENGINE_ID,
+            'key': self._GOOGLE_API_KEY,
+            'cx': self._SEARCHENGINE_ID,
             'num' : num_results
         }
         response = requests.get(url, params=params)
@@ -125,5 +125,13 @@ class WebDriver:
 
 
 if __name__ == '__main__':
-    tool = Webtool()
+    from resources import ConfigManager, StdCategories
+
+    new_conf_manger = ConfigManager()
+    google_api_key = new_conf_manger.get_value(key='google_key',category=StdCategories.APIS)
+    engine_id = new_conf_manger.get_value(key='search_engine_id', category=StdCategories.APIS)
+
+    tool = Webtool(google_key=google_api_key, searchengine_id=engine_id)
+    urls = tool.get_urls('beavers')
+    print(urls)
     the_text = "Example emails: user@example.com and user[at]example.com user [at] example.com"
