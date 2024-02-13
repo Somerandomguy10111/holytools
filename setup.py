@@ -8,7 +8,7 @@ with open('requirements.txt','r') as file:
 
 setup(
     name='hollarek',
-    version='0.1.0',
+    version='0.3.0',
     author='Daniel Hollarek',
     author_email='daniel.hollarek@googlemail.com',
     description='A brief description of the hollarek package',
