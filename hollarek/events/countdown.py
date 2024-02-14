@@ -9,13 +9,12 @@ from typing import Optional
 # ---------------------------------------------------------
 
 class Countdown:
-    def __init__(self,
-                 time_to_finish: float = 0.25,
-                 on_countdown_finish : callable = lambda *args,**kwargs : None):
+    def __init__(self, time_to_finish: float = 0.25,
+                       expire_callback : callable = lambda *args, **kwargs : None):
         self.initial_time = time_to_finish
         self.scheduler = BackgroundScheduler()
         self.job: Optional[Job] = None
-        self.on_countdown_finsh : Callable[[], None] = on_countdown_finish
+        self.on_countdown_finsh : Callable[[], None] = expire_callback
 
         self.one_time_lock = InputWaiter()
         self.scheduler.start()
