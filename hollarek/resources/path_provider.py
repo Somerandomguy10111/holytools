@@ -1,31 +1,34 @@
+from __future__ import annotations
+
+import inspect
 from typing import Optional
 import os
 from abc import ABC
 
 
-class LocationManager(ABC):
+class PathProvider(ABC):
     instance = None
     _is_initialized : bool = False
 
     def __new__(cls, root_dir: Optional[str] = None):
         if cls.instance is None:
-            cls.instance = super(LocationManager, cls).__new__(cls)
+            cls.instance = super(PathProvider, cls).__new__(cls)
         return cls.instance
 
 
     def __init(self, root_dir: Optional[str] = None):
-        if LocationManager._is_initialized:
+        if PathProvider._is_initialized:
             return
 
         if root_dir is None:
-            raise ValueError(f'Cannot initialize resource manager. Given root_dir is None')
+            raise ValueError(f'Cannot initialize {self.__name__}. Given root_dir is None')
 
         if not os.path.isdir(root_dir):
-            raise ValueError(f'Cannot initialized resource manager. Root directory {root_dir} does not exist')
+            raise ValueError(f'Cannot initialized {self.__name__}. Root directory {root_dir} does not exist')
 
         self.root_path: str = root_dir
         self.directories : list[str] = []
-        LocationManager._is_initialized = True
+        PathProvider._is_initialized = True
 
 
     def make_directory(self, relative_path : str) -> str:
@@ -50,3 +53,13 @@ class LocationManager(ABC):
     @classmethod
     def initialize(cls,root_dir : str):
         cls(root_dir=root_dir)
+
+
+def get_caller_filepath() -> Optional[str]:
+    try:
+        frame = inspect.currentframe().f_back.f_back
+        filename = frame.f_globals["__file__"]
+        rootpath = os.path.abspath(filename)
+    except:
+        rootpath = None
+    return rootpath

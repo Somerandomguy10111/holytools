@@ -1,19 +1,9 @@
 from __future__ import annotations
-import inspect
 import os
 from typing import Optional
 from pathlib import Path
 
 # -------------------------------------------
-
-def get_caller_filepath() -> Optional[str]:
-    try:
-        frame = inspect.currentframe().f_back.f_back
-        filename = frame.f_globals["__file__"]
-        rootpath = os.path.abspath(filename)
-    except:
-        rootpath = None
-    return rootpath
 
 
 class FsysNode:
