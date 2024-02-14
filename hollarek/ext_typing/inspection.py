@@ -3,6 +3,9 @@ from typing import get_origin, get_args, Union
 from types import NoneType
 
 
+def get_function_body(func: callable) -> str:
+    return inspect.getsource(func)
+
 
 def get_function_args(func: callable) -> list[str]:
     func_sig = inspect.signature(func)
