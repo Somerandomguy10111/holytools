@@ -4,3 +4,4 @@ json-repair==0.8.1
 requests
 func-timeout
 selenium
+pathvalidate

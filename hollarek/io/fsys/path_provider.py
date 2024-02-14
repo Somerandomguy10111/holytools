@@ -1,9 +1,9 @@
 from __future__ import annotations
-
-import inspect
-from typing import Optional
 import os
+import inspect
 from abc import ABC
+from pathvalidate import sanitize_filepath
+from typing import Optional
 
 
 class PathProvider(ABC):
@@ -63,3 +63,12 @@ def get_caller_filepath() -> Optional[str]:
     except:
         rootpath = None
     return rootpath
+
+
+
+def get_path_is_valid(path) -> bool:
+    if os.path.exists(path):
+        return True
+    if path == sanitize_filepath(path):
+        return True
+    return False
