@@ -1,16 +1,5 @@
-import inspect
-from typing import get_origin, get_args, Union
 from types import NoneType
-
-
-def get_function_body(func: callable) -> str:
-    return inspect.getsource(func)
-
-
-def get_function_args(func: callable) -> list[str]:
-    func_sig = inspect.signature(func)
-    params = list(func_sig.parameters.keys())
-    return params
+from typing import get_origin, Union, get_args
 
 
 def get_core_type(the_type : type):

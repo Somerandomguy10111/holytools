@@ -1,2 +1,2 @@
-from .get_salvaged_json import get_salvaged_json
+from .get_salvaged_json import get_salvaged_json_str
 from .serializable import JsonDataclass
