@@ -1,6 +1,6 @@
 import re
 
-def get_mail_addresses_in_text(text: str):
+def get_mail_addresses_in_text(text: str) -> list[str]:
     username_part = r'[A-Za-z0-9._%+-]+'
     domain_part = r'[A-Za-z0-9.-]+'
     tld_part = r'[A-Z|a-z]{2,}'

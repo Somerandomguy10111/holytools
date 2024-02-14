@@ -2,7 +2,7 @@ from __future__ import annotations
 from datetime import datetime
 import json
 from typing import  get_type_hints
-from hollarek import get_core_type
+from hollarek.dev import get_core_type
 
 
 # -------------------------------------------
