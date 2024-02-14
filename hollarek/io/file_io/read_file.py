@@ -1,15 +1,24 @@
 from pypdf import PdfReader
 from enum import Enum
 
-class FileType(Enum):
-    TXT = 'TXT'
-    PDF = 'PDF'
+class TextFileType(Enum):
+    PLAINTEXT = 'plain'
+    PDF = 'pdf'
+
+    @classmethod
+    def from_str(cls, str_repr : str):
+        str_repr = str_repr.lower()
+        for file_type in cls:
+            if file_type.value == str_repr:
+                return file_type
+        return None
 
 
-def get_text_file_content(fpath: str, file_type : FileType) -> str:
-    if file_type == FileType.TXT:
+
+def get_text_file_content(fpath: str, file_type : TextFileType) -> str:
+    if file_type == TextFileType.PLAINTEXT:
         return _get_plain_text_content(file_path=fpath)
-    elif file_type == FileType.PDF:
+    elif file_type == TextFileType.PDF:
         return _get_pdf_file_content(file_path=fpath)
 
 
