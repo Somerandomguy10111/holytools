@@ -1,7 +1,7 @@
 from __future__ import annotations
 import os
 import inspect
-from abc import ABC
+from abc import ABC, abstractmethod
 from pathvalidate import sanitize_filepath
 from typing import Optional
 
@@ -9,6 +9,11 @@ from typing import Optional
 class PathProvider(ABC):
     instance = None
     _is_initialized : bool = False
+
+    @classmethod
+    def initialize(cls,root_dir : str):
+        cls(root_dir=root_dir)
+
 
     def __new__(cls, root_dir: Optional[str] = None):
         if cls.instance is None:
@@ -28,6 +33,8 @@ class PathProvider(ABC):
 
         self.root_path: str = root_dir
         self.directories : list[str] = []
+        self.setup_dirs()
+
         PathProvider._is_initialized = True
 
 
@@ -39,20 +46,10 @@ class PathProvider(ABC):
         return new_dir_path
 
 
-    @staticmethod
-    def get_env_variable(key : str) -> str:
-        try:
-            key = os.getenv(key)
-            if key is None:
-                raise KeyError
-            return key
-        except KeyError:
-            raise KeyError(f'Environment variable {key} not found')
+    @abstractmethod
+    def setup_dirs(self):
+        pass
 
-
-    @classmethod
-    def initialize(cls,root_dir : str):
-        cls(root_dir=root_dir)
 
 
 def get_caller_filepath() -> Optional[str]:
@@ -65,10 +62,16 @@ def get_caller_filepath() -> Optional[str]:
     return rootpath
 
 
+class PathChecker:
 
-def get_path_is_valid(path) -> bool:
-    if os.path.exists(path):
-        return True
-    if path == sanitize_filepath(path):
-        return True
-    return False
+    @staticmethod
+    def get_path_is_valid(path : str) -> bool:
+        if os.path.exists(path):
+            return True
+        if path == sanitize_filepath(path):
+            return True
+        return False
+
+    @staticmethod
+    def get_valid_path(path : str) -> str:
+        return sanitize_filepath(file_path=path)
