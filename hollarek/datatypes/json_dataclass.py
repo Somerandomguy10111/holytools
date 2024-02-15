@@ -3,11 +3,11 @@ from datetime import datetime
 import json
 from typing import  get_type_hints
 from hollarek.dev import get_core_type
-
+from abc import ABC
 
 # -------------------------------------------
 
-class JsonDataclass:
+class JsonDataclass(ABC):
     @classmethod
     def from_str(cls, json_str: str):
         json_dict = json.loads(json_str, object_hook=cls.json_decode)
@@ -44,6 +44,7 @@ class JsonDataclass:
         if is_composite:
             return obj.to_json()
         return obj
+
 
     @staticmethod
     def json_decode(json_dict):

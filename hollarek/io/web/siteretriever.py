@@ -13,20 +13,20 @@ from func_timeout import FunctionTimedOut
 
 # ---------------------------------------------------------
 
-class Webtool:
+class SiteRetriever:
     _instance = None
     _is_initialized = False
 
     def __new__(cls, *args, **kwargs):
         if not cls._instance:
-            cls._instance = super(Webtool, cls).__new__(cls)
+            cls._instance = super(SiteRetriever, cls).__new__(cls)
         return cls._instance
 
     def __init__(self,google_key : Optional[str] = None,
                  searchengine_id : Optional[str] = None,
                  webdriver_count: int = 4):
 
-        if not Webtool._is_initialized:
+        if not SiteRetriever._is_initialized:
             if google_key is None or searchengine_id is None:
                 raise ValueError(f'Google API key and search engine ID must be provided but one of the arguments is None \n'
                                  f'google_key : {google_key}; searchengine_id : {searchengine_id}')
@@ -63,6 +63,7 @@ class Webtool:
 
 
         return search_result_urls
+
 
     def get_mail_addresses(self, site_url : str) -> list[str]:
         return get_mail_addresses_in_text(text=self.get_html(site_url=site_url))
@@ -131,7 +132,7 @@ if __name__ == '__main__':
     google_api_key = new_conf_manger.get_value(key='google_key',category=StdCategories.APIS)
     engine_id = new_conf_manger.get_value(key='search_engine_id', category=StdCategories.APIS)
 
-    tool = Webtool(google_key=google_api_key, searchengine_id=engine_id)
+    tool = SiteRetriever(google_key=google_api_key, searchengine_id=engine_id)
     urls = tool.get_urls('beavers')
     print(urls)
     the_text = "Example emails: user@example.com and user[at]example.com user [at] example.com"
