@@ -38,6 +38,12 @@ class FsysNode:
     # -------------------------------------------
     # resource info
 
+    def get_path(self) -> str:
+        return self._path
+
+    def get_name(self) -> str:
+        return os.path.basename(self._path)
+
     def get_suffix(self) -> Optional[str]:
         try:
             suffix = self.get_name().split('.')[-1]
@@ -51,8 +57,6 @@ class FsysNode:
     def get_size_in_MB(self) -> float:
         return os.path.getsize(self._path) / (1024 * 1024)
 
-    def get_name(self) -> str:
-        return os.path.basename(self._path)
 
     def get_is_resource(self) -> bool:
         return self.get_is_dir() or self.get_is_file()
