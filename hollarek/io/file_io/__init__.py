@@ -1,1 +1,1 @@
-from .read_file import g
+from .read_file import get_text

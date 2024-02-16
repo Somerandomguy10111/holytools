@@ -14,8 +14,7 @@ class TextFileType(Enum):
         return None
 
 
-
-def get_text_file_content(fpath: str, file_type : TextFileType) -> str:
+def get_text(fpath: str, file_type : TextFileType = TextFileType.PLAINTEXT) -> str:
     if file_type == TextFileType.PLAINTEXT:
         return _get_plain_text_content(file_path=fpath)
     elif file_type == TextFileType.PDF:
