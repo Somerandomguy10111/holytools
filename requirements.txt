@@ -1,6 +1,6 @@
 apscheduler==3.10.4
 pypdf==4.0.1
-json_repair==0.8.1
+json-repair
 requests
 func-timeout
 selenium
