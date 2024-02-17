@@ -1,6 +1,6 @@
 from __future__ import annotations
 import logging
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from enum import Enum
 from typing import Optional
 
@@ -21,6 +21,8 @@ class LogSettings:
     _display_log_level: LogLevel = LogLevel.INFO
     _default_logfile_path: Optional[str] = None
     _use_timestamp: bool = False
+
+    _logger : Optional[logging.Logger] = None
 
     def __post_init__(self):
         self.set_display_level(display_log_level=self._display_log_level)
@@ -50,7 +52,17 @@ class LogSettings:
     @classmethod
     def get_log_func(cls, log_level : LogLevel,
                           log_file_path : Optional[str] = None) -> callable:
+        if not cls._logger:
+            cls._logger = cls.get_logger(log_file_path=log_file_path)
 
+        def log_func(msg : str):
+            cls._logger.log(msg=msg,level=log_level.value)
+        cls._log_func = log_func
+
+        return log_func
+
+    @classmethod
+    def get_logger(cls, log_file_path : str):
         settings = cls._instance
         logger = logging.getLogger(__name__)
         logger.propagate = False
@@ -61,11 +73,7 @@ class LogSettings:
             h.setLevel(settings._default_log_level.value)
             h.setFormatter(formatter)
             logger.addHandler(h)
-
-        def log_func(msg : str):
-            logger.log(msg=msg,level=log_level.value)
-
-        return log_func
+        return logger
 
 
     @staticmethod
