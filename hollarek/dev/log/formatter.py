@@ -1,7 +1,5 @@
 from __future__ import annotations
-
 import logging
-
 from hollarek.dev.log.log_settings import LogLevel, LogSettings
 
 
