@@ -3,10 +3,8 @@ from __future__ import annotations
 import logging
 from typing import Optional
 
-from hollarek.dev import LogSettings
 from hollarek.dev.log.formatter import ColoredFormatter
-from hollarek.dev.log.log_settings import LogLevel
-
+from hollarek.dev.log.log_settings import LogLevel, LogSettings
 
 # ---------------------------------------------------------
 

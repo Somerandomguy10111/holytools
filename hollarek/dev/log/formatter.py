@@ -18,6 +18,7 @@ class ColoredFormatter(logging.Formatter):
         self.settings : LogSettings = settings
         super().__init__()
 
+
     def format(self, record):
         log_fmt = "%(message)s"
 
