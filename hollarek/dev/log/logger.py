@@ -79,11 +79,11 @@ class LogSettings:
 
 class ColoredFormatter(logging.Formatter):
     colors: dict = {
-        LogLevel.DEBUG: '\033[94m',  # Blue
-        LogLevel.INFO: '\033[92m',  # Green
-        LogLevel.WARNING: '\033[93m',  # Yellow
-        LogLevel.ERROR: '\033[91m',  # Red
-        LogLevel.CRITICAL: '\033[95m'  # Magenta
+        LogLevel.DEBUG: '\033[20m',
+        LogLevel.INFO: '\033[20m',
+        LogLevel.WARNING: '\033[93m',
+        LogLevel.ERROR: '\033[91m',
+        LogLevel.CRITICAL: '\x1b[31;1m'  # Bold Red
     }
 
     def __init__(self, use_timestamp: bool = True,
@@ -129,4 +129,7 @@ if __name__ == "__main__":
     test_settings.use_timestamps(True)
     test_settings.set_level(LogLevel.DEBUG)
     log("This is a debug message", log_level=LogLevel.DEBUG)
-    log("This is an info message", log_level=LogLevel.WARNING)
+    log("This is an info message", log_level=LogLevel.INFO)
+    log("This is an warning message", log_level=LogLevel.WARNING)
+    log("This is an error message.", log_level=LogLevel.ERROR)
+    log("This is a critical error message!!", log_level=LogLevel.CRITICAL)
