@@ -24,7 +24,7 @@ class ColoredFormatter(logging.Formatter):
 
         if self.settings.use_timestamp:
             custom_time = self.formatTime(record, "%Y-%m-%d %H:%M:%S")
-            conditional_millis = f"{int(record.msecs)}ms" if self.settings.include_ms_in_timestamp else ""
+            conditional_millis = f" {int(record.msecs)}ms" if self.settings.include_ms_in_timestamp else ""
             timestamp = f"[{custom_time}{conditional_millis}]"
             log_fmt = f"{timestamp}: {log_fmt}"
 

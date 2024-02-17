@@ -1,4 +1,4 @@
 from .inspect import *
-from .pytypes import *
+from .typ import *
 from .log import *
 from .test import *

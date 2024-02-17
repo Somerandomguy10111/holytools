@@ -17,6 +17,11 @@ def log(msg : str,
     log_func(msg)
 
 
+def update_settings(new_settings : LogSettings):
+    LogHandler._settings = new_settings
+    LogHandler._logger = LogHandler.make_logger()
+
+
 class LogHandler:
     _instance : Optional[LogHandler] = None
     _logger : Optional[logging.Logger] = None
@@ -54,12 +59,6 @@ class LogHandler:
 
 
     @classmethod
-    def update_settings(cls, new_settings : LogSettings):
-        cls._settings = new_settings
-        cls._logger = cls.make_logger()
-
-
-    @classmethod
     def get_handlers(cls):
         console_handler = logging.StreamHandler()
         handlers = [console_handler]
@@ -69,8 +68,8 @@ class LogHandler:
 
 
 if __name__ == "__main__":
-    test_settings = LogSettings()
-    test_settings.use_timestamps(True)
+    update_settings(new_settings=LogSettings(use_timestamp=True,
+                                             include_ms_in_timestamp=True))
     log("This is a debug message", log_level=LogLevel.DEBUG)
     log("This is an info message", log_level=LogLevel.INFO)
     log("This is an warning message", log_level=LogLevel.WARNING)
