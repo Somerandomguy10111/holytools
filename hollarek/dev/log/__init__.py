@@ -1,1 +1,2 @@
-from .logger import  log, LogSettings
+from .logger import  log
+from .log_settings import LogSettings
