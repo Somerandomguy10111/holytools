@@ -16,7 +16,7 @@ class LogLevel(Enum):
 
 @dataclass
 class LogSettings:
-    _instance : Optional[LogSettings] = None
+    instance : Optional[LogSettings] = None
     default_log_level: LogLevel = LogLevel.INFO
     display_log_level: LogLevel = LogLevel.INFO
     default_logfile_path: Optional[str] = None
@@ -34,9 +34,9 @@ class LogSettings:
         self.set_display_level(display_log_level=self.display_log_level)
 
     def __new__(cls, *args, **kwargs):
-        if not cls._instance:
-            cls._instance = super(LogSettings, cls).__new__(cls)
-        return cls._instance
+        if not cls.instance:
+            cls.instance = super(LogSettings, cls).__new__(cls)
+        return cls.instance
 
     def set_level(self, log_level: LogLevel):
         self.default_log_level = log_level
@@ -56,41 +56,44 @@ class LogSettings:
 
 
     @classmethod
-    def get_log_func(cls, log_level : LogLevel, log_file_path : Optional[str] = None) -> callable:
-        settings = cls._instance
+    def get_log_func(cls, log_level : LogLevel,
+                     log_file_path : Optional[str] = None) -> callable:
 
+        settings = cls.instance
         logger = logging.getLogger(__name__)
+        logger.propagate = False
         logger.setLevel(settings.default_log_level.value)
-        effective_log_file_path = log_file_path or settings.default_logfile_path
-        if effective_log_file_path:
-            handler = logging.FileHandler(effective_log_file_path)
-            handler.setLevel(settings.default_log_level.value)
-            # handler.setFormatter(ColoredFormatter())
-            logger.addHandler(handler)
-            logger.addHandler(handler)
 
-        log_lvl_to_method = {
-            LogLevel.DEBUG: logger.debug,
-            LogLevel.INFO: logger.info,
-            LogLevel.WARNING: logger.warning,
-            LogLevel.ERROR: logger.error,
-            LogLevel.CRITICAL: logger.critical
-        }
+        formatter = ColoredFormatter()
+        for h in cls.get_handlers(log_file_path=log_file_path or settings.default_logfile_path):
+            h.setLevel(settings.default_log_level.value)
+            h.setFormatter(formatter)
+            logger.addHandler(h)
 
-        logging_func = log_lvl_to_method.get(log_level, logger.info)
+        def log_func(msg : str):
+            logger.log(msg=msg,level=log_level.value)
 
-        return lambda msg : logging_func(msg)
+        return log_func
 
 
-# class ColoredFormatter(logging.Formatter):
-#     def format(self, record):
-#         log_fmt = f"{LogSettings._instance.colors[LogLevel(record.levelno)]}%(levelname)s: %(message)s\033[0m"
-#         if LogSettings._instance.use_timestamp:
-#             log_fmt = f"%(asctime)s - {log_fmt}"
-#         if LogSettings._instance.default_logfile_path:
-#             log_fmt = f"{log_fmt} (%(filename)s:%(lineno)d)"
-#         self._style._fmt = log_fmt
-#         return super().format(record)
+    @staticmethod
+    def get_handlers(log_file_path : str):
+        console_handler = logging.StreamHandler()
+        handlers = [console_handler]
+        if log_file_path:
+            handlers.append(logging.FileHandler(log_file_path))
+        return handlers
+
+
+class ColoredFormatter(logging.Formatter):
+    def format(self, record):
+        log_fmt = f"{LogSettings.instance.colors[LogLevel(record.levelno)]}%(levelname)s: %(message)s\033[0m"
+        if LogSettings.instance.use_timestamp:
+            log_fmt = f"%(asctime)s - {log_fmt}"
+        if LogSettings.instance.default_logfile_path:
+            log_fmt = f"{log_fmt} (%(filename)s:%(lineno)d)"
+        self._style._fmt = log_fmt
+        return super().format(record)
 
 
 def log(msg : str,
