@@ -12,8 +12,8 @@ def log(msg : str,
         log_level: LogLevel = LogLevel.INFO,
         log_file_path: Optional[str] = None):
 
-    log_func = LogHandler.get_log_func(log_level=log_level,
-                                        log_file_path=log_file_path)
+    _ = log_file_path
+    log_func = LogHandler.get_log_func(log_level=log_level)
     log_func(msg)
 
 
@@ -28,10 +28,9 @@ class LogHandler:
         return cls._instance
 
     @classmethod
-    def get_log_func(cls, log_level: LogLevel,
-                     log_file_path: Optional[str] = None) -> callable:
+    def get_log_func(cls, log_level: LogLevel) -> callable:
         if not cls._logger:
-            cls._logger = cls.make_logger(log_file_path=log_file_path)
+            cls._logger = cls.make_logger()
 
         def log_func(msg: str):
             cls._logger.log(msg=msg, level=log_level.value)
