@@ -1,1 +1,1 @@
-from .get_timestamp import  get_timestamp
+from .logger import  get_timestamp
