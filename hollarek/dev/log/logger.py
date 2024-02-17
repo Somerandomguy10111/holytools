@@ -31,7 +31,7 @@ class LogHandler:
     def get_log_func(cls, log_level: LogLevel,
                      log_file_path: Optional[str] = None) -> callable:
         if not cls._logger:
-            cls._logger = cls.get_logger(log_file_path=log_file_path)
+            cls._logger = cls.make_logger(log_file_path=log_file_path)
 
         def log_func(msg: str):
             cls._logger.log(msg=msg, level=log_level.value)
@@ -41,18 +41,18 @@ class LogHandler:
 
 
     @classmethod
-    def get_logger(cls, log_file_path: str):
+    def make_logger(cls, log_file_path: str):
         settings = cls._settings
         logger = logging.getLogger(__name__)
         logger.propagate = False
-        logger.setLevel(cls._settings.default_log_level.value)
+        logger.setLevel(cls._settings.display_log_level.value)
 
         formatter = ColoredFormatter(settings=settings)
         for h in cls.get_handlers(log_file_path=log_file_path or settings.default_logfile_path):
-            h.setLevel(settings.default_log_level.value)
             h.setFormatter(formatter)
             logger.addHandler(h)
         return logger
+
 
     @staticmethod
     def get_handlers(log_file_path: str):
@@ -66,7 +66,6 @@ class LogHandler:
 if __name__ == "__main__":
     test_settings = LogSettings()
     test_settings.use_timestamps(True)
-    test_settings.set_level(LogLevel.DEBUG)
     log("This is a debug message", log_level=LogLevel.DEBUG)
     log("This is an info message", log_level=LogLevel.INFO)
     log("This is an warning message", log_level=LogLevel.WARNING)
