@@ -41,25 +41,31 @@ class LogHandler:
 
 
     @classmethod
-    def make_logger(cls, log_file_path: str):
+    def make_logger(cls):
         settings = cls._settings
         logger = logging.getLogger(__name__)
         logger.propagate = False
         logger.setLevel(cls._settings.display_log_level.value)
 
         formatter = ColoredFormatter(settings=settings)
-        for h in cls.get_handlers(log_file_path=log_file_path or settings.default_logfile_path):
+        for h in cls.get_handlers():
             h.setFormatter(formatter)
             logger.addHandler(h)
         return logger
 
 
-    @staticmethod
-    def get_handlers(log_file_path: str):
+    @classmethod
+    def update_settings(cls, new_settings : LogSettings):
+        cls._settings = new_settings
+        cls._logger = cls.make_logger()
+
+
+    @classmethod
+    def get_handlers(cls):
         console_handler = logging.StreamHandler()
         handlers = [console_handler]
-        if log_file_path:
-            handlers.append(logging.FileHandler(log_file_path))
+        if cls._settings.log_file_path:
+            handlers.append(logging.FileHandler(cls._settings.log_file_path))
         return handlers
 
 
