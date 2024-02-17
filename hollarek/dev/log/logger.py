@@ -16,57 +16,49 @@ class LogLevel(Enum):
 
 @dataclass
 class LogSettings:
-    instance : Optional[LogSettings] = None
-    default_log_level: LogLevel = LogLevel.INFO
-    display_log_level: LogLevel = LogLevel.INFO
-    default_logfile_path: Optional[str] = None
-    use_timestamp: bool = False
-
-    colors: dict = field(default_factory=lambda: {
-        LogLevel.DEBUG: '\033[94m',  # Blue
-        LogLevel.INFO: '\033[92m',  # Green
-        LogLevel.WARNING: '\033[93m',  # Yellow
-        LogLevel.ERROR: '\033[91m',  # Red
-        LogLevel.CRITICAL: '\033[95m'  # Magenta
-    })
+    _instance : Optional[LogSettings] = None
+    _default_log_level: LogLevel = LogLevel.INFO
+    _display_log_level: LogLevel = LogLevel.INFO
+    _default_logfile_path: Optional[str] = None
+    _use_timestamp: bool = False
 
     def __post_init__(self):
-        self.set_display_level(display_log_level=self.display_log_level)
+        self.set_display_level(display_log_level=self._display_log_level)
 
     def __new__(cls, *args, **kwargs):
-        if not cls.instance:
-            cls.instance = super(LogSettings, cls).__new__(cls)
-        return cls.instance
+        if not cls._instance:
+            cls._instance = super(LogSettings, cls).__new__(cls)
+        return cls._instance
 
     def set_level(self, log_level: LogLevel):
-        self.default_log_level = log_level
+        self._default_log_level = log_level
 
     def set_default_log_file(self, log_file: str):
-        self.default_logfile_path = log_file
+        self._default_logfile_path = log_file
 
     def use_timestamps(self, enable_timestamps: bool):
-        self.use_timestamp = enable_timestamps
+        self._use_timestamp = enable_timestamps
 
     def set_log_file(self, log_file_path : str):
-        self.default_logfile_path = log_file_path
+        self._default_logfile_path = log_file_path
 
     def set_display_level(self, display_log_level: LogLevel):
-        self.display_log_level = display_log_level
-        logging.basicConfig(level=self.display_log_level.value)
+        self._display_log_level = display_log_level
+        logging.basicConfig(level=self._display_log_level.value)
 
 
     @classmethod
     def get_log_func(cls, log_level : LogLevel,
-                     log_file_path : Optional[str] = None) -> callable:
+                          log_file_path : Optional[str] = None) -> callable:
 
-        settings = cls.instance
+        settings = cls._instance
         logger = logging.getLogger(__name__)
         logger.propagate = False
-        logger.setLevel(settings.default_log_level.value)
+        logger.setLevel(settings._default_log_level.value)
 
         formatter = ColoredFormatter()
-        for h in cls.get_handlers(log_file_path=log_file_path or settings.default_logfile_path):
-            h.setLevel(settings.default_log_level.value)
+        for h in cls.get_handlers(log_file_path=log_file_path or settings._default_logfile_path):
+            h.setLevel(settings._default_log_level.value)
             h.setFormatter(formatter)
             logger.addHandler(h)
 
@@ -86,12 +78,26 @@ class LogSettings:
 
 
 class ColoredFormatter(logging.Formatter):
+    colors: dict = {
+        LogLevel.DEBUG: '\033[94m',  # Blue
+        LogLevel.INFO: '\033[92m',  # Green
+        LogLevel.WARNING: '\033[93m',  # Yellow
+        LogLevel.ERROR: '\033[91m',  # Red
+        LogLevel.CRITICAL: '\033[95m'  # Magenta
+    }
+
+    def __init__(self, use_timestamp: bool = True):
+        super().__init__()
+        self.use_timestamp = use_timestamp
+
+
     def format(self, record):
-        log_fmt = f"{LogSettings.instance.colors[LogLevel(record.levelno)]}%(levelname)s: %(message)s\033[0m"
-        if LogSettings.instance.use_timestamp:
+        log_fmt = f"{ColoredFormatter.colors[LogLevel(record.levelno)]}"
+        log_fmt += f"%(levelname)s: %(message)s\033[0m"
+        if self.use_timestamp:
             log_fmt = f"%(asctime)s - {log_fmt}"
-        if LogSettings.instance.default_logfile_path:
-            log_fmt = f"{log_fmt} (%(filename)s:%(lineno)d)"
+        # if LogSettings._instance._default_logfile_path:
+        #     log_fmt = f"{log_fmt} (%(filename)s:%(lineno)d)"
         self._style._fmt = log_fmt
         return super().format(record)
 

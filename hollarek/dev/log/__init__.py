@@ -1,1 +1,1 @@
-from .logger import  get_timestamp
+from .logger import  log, LogSettings
