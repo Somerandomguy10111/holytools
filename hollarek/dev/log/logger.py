@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 from typing import Optional
 
-from hollarek.dev.log.formatter import ColoredFormatter
+from hollarek.dev.log.formatter import Formatter, LogTarget
 from hollarek.dev.log.log_settings import LogLevel, LogSettings
 
 # ---------------------------------------------------------
@@ -17,7 +17,7 @@ def log(msg : str,
     log_func(msg)
 
 
-def update_settings(new_settings : LogSettings):
+def update_logger(new_settings : LogSettings):
     LogHandler._settings = new_settings
     LogHandler._logger = LogHandler.make_logger()
 
@@ -51,25 +51,23 @@ class LogHandler:
         logger.propagate = False
         logger.setLevel(cls._settings.display_log_level.value)
 
-        formatter = ColoredFormatter(settings=settings)
-        for h in cls.get_handlers():
-            h.setFormatter(formatter)
-            logger.addHandler(h)
+        console_handler = logging.StreamHandler()
+        console_handler.setFormatter(Formatter(settings=settings, log_target=LogTarget.CONSOLE))
+        logger.addHandler(console_handler)
+
+        if cls._settings.log_file_path:
+            file_handler = logging.FileHandler(cls._settings.log_file_path)
+            file_handler.setFormatter(Formatter(settings=settings, log_target=LogTarget.FILE))
+            logger.addHandler(file_handler)
         return logger
 
 
-    @classmethod
-    def get_handlers(cls):
-        console_handler = logging.StreamHandler()
-        handlers = [console_handler]
-        if cls._settings.log_file_path:
-            handlers.append(logging.FileHandler(cls._settings.log_file_path))
-        return handlers
-
 
 if __name__ == "__main__":
-    update_settings(new_settings=LogSettings(use_timestamp=True,
-                                             include_ms_in_timestamp=True))
+    the_settings = LogSettings(use_timestamp=True, include_ms_in_timestamp=True, log_file_path='test')
+    update_logger(new_settings=the_settings)
+
+
     log("This is a debug message", log_level=LogLevel.DEBUG)
     log("This is an info message", log_level=LogLevel.INFO)
     log("This is an warning message", log_level=LogLevel.WARNING)

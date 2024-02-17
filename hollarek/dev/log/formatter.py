@@ -5,7 +5,12 @@ import logging
 from hollarek.dev.log.log_settings import LogLevel, LogSettings
 
 
-class ColoredFormatter(logging.Formatter):
+class LogTarget:
+    FILE = "FILE"
+    CONSOLE = "CONSOLE"
+
+
+class Formatter(logging.Formatter):
     colors: dict = {
         LogLevel.DEBUG: '\033[20m',
         LogLevel.INFO: '\033[20m',
@@ -14,8 +19,9 @@ class ColoredFormatter(logging.Formatter):
         LogLevel.CRITICAL: '\x1b[31;1m'  # Bold Red
     }
 
-    def __init__(self, settings : LogSettings):
+    def __init__(self, settings : LogSettings, log_target : LogTarget):
         self.settings : LogSettings = settings
+        self.log_target : LogTarget = log_target
         super().__init__()
 
 
@@ -31,9 +37,10 @@ class ColoredFormatter(logging.Formatter):
         if self.settings.include_call_location:
             log_fmt = f"{log_fmt} (%(filename)s:%(lineno)d)"
 
-        color_prefix = ColoredFormatter.colors.get(LogLevel(record.levelno), "")
-        color_suffix = "\033[0m"
-        log_fmt = color_prefix + log_fmt + color_suffix
+        if self.log_target == LogTarget.CONSOLE:
+            color_prefix = Formatter.colors.get(LogLevel(record.levelno), "")
+            color_suffix = "\033[0m"
+            log_fmt = color_prefix + log_fmt + color_suffix
 
         self._style._fmt = log_fmt
         return super().format(record)

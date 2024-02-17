@@ -1,1 +1,1 @@
-from .logger import  log, update_settings, LogSettings
+from .logger import  log, update_logger, LogSettings
