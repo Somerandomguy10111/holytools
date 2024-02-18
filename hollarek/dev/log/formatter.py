@@ -32,8 +32,8 @@ class Formatter(logging.Formatter):
             timestamp = f"[{custom_time}{conditional_millis}]"
             log_fmt = f"{timestamp}: {log_fmt}"
 
-        if self.settings.include_call_location:
-            log_fmt = f"{log_fmt} (%(filename)s:%(lineno)d)"
+        # if self.settings.include_call_location:
+        #     log_fmt = f"{log_fmt} (%(filename)s:%(lineno)d)"
 
         if self.log_target == LogTarget.CONSOLE:
             color_prefix = Formatter.colors.get(LogLevel(record.levelno), "")
