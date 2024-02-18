@@ -6,27 +6,27 @@ from hollarek.dev import log, LogLevel
 
 # ---------------------------------------------------------
 class CustomTestResult(unittest.TestResult):
-    test_spaces = 50  # Space allocated for test names
-    status_spaces = 20  # Space allocated for status messages
+    test_spaces = 50
+    status_spaces = 20
 
     def addSuccess(self, test):
         super().addSuccess(test)
-        test_name = test.id()  # This gets the full name of the test
+        test_name = test.id()
         log(f'{test_name:<{self.test_spaces}} {"SUCCESS":<{self.status_spaces}}', LogLevel.INFO)
 
     def addError(self, test, err):
         super().addError(test, err)
-        test_name = test.id()  # Adjusted to use test.id()
+        test_name = test.id()
         log(f'{test_name:<{self.test_spaces}} {"ERROR":<{self.status_spaces}}', LogLevel.CRITICAL)
 
     def addFailure(self, test, err):
         super().addFailure(test, err)
-        test_name = test.id()  # Adjusted to use test.id()
+        test_name = test.id()
         log(f'{test_name:<{self.test_spaces}} {"FAIL":<{self.status_spaces}}', LogLevel.ERROR)
 
     def addSkip(self, test, reason):
         super().addSkip(test, reason)
-        test_name = test.id()  # Adjusted to use test.id()
+        test_name = test.id()
         log(f'{test_name:<{self.test_spaces}} {"SKIPPED":<{self.status_spaces}}', LogLevel.INFO)
 
 
@@ -35,7 +35,6 @@ class CustomTestResult(unittest.TestResult):
 class Unittest(unittest.TestCase):
 
     def setUp(self):
-        # Setting up broken json strings as attributes
         self.valid_str = '{"key": "value"}'
         self.broken_str_newline = '{"key": "value with a new\nline"}'
         self.broken_str_tab = '{"key": "value with a tab\t"}'
@@ -43,7 +42,7 @@ class Unittest(unittest.TestCase):
 
     def run(self, result=None):
         try:
-            super().run(result)  # Call the original run method, which will execute the test method.
+            super().run(result)
         except Exception as e:
             self.fail(f"Test failed with error: {e}")
 
@@ -67,13 +66,12 @@ class Unittest(unittest.TestCase):
         parsed_json = json.loads(repaired_str)
         self.assertEqual(parsed_json['key'], "new\nline and\ttab")
 
-
-def test():
-    suite = unittest.TestLoader().loadTestsFromTestCase(Unittest)
-    # Use CustomTestResult with TextTestRunner
-    runner = unittest.TextTestRunner(resultclass=CustomTestResult, verbosity=2)
-    runner.run(suite)
+    @classmethod
+    def execute_tests(cls):
+        suite = unittest.TestLoader().loadTestsFromTestCase(cls)
+        runner = unittest.TextTestRunner(resultclass=CustomTestResult, verbosity=2)
+        runner.run(suite)
 
 
 if __name__ == "__main__":
-    test()
+    Unittest.execute_tests()
