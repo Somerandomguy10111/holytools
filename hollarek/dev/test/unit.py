@@ -3,6 +3,8 @@ import json
 from hollarek.misc import get_salvaged_json
 from hollarek.dev import log, LogLevel
 from enum import Enum
+
+from hollarek.dev.log import get_logger, update_default_log_settings, LogSettings
 # ---------------------------------------------------------
 
 class TestStatus(Enum):
@@ -13,7 +15,7 @@ class TestStatus(Enum):
 
 
 class CustomTestResult(unittest.TestResult):
-    test_spaces = 50
+    test_spaces = 60
     status_spaces = 20
 
     def addSuccess(self, test):
@@ -50,7 +52,6 @@ class CustomTestResult(unittest.TestResult):
 
 
 class Unittest(unittest.TestCase):
-
     def setUp(self):
         self.valid_str = '{"key": "value"}'
         self.broken_str_newline = '{"key": "value with a new\nline"}'
@@ -86,15 +87,17 @@ class Unittest(unittest.TestCase):
     @classmethod
     def execute_tests(cls):
         lines = '-' * 30
-        print(f'{lines}  Test suite for {cls.__name__}  {lines}')
+        log(f'{lines}  Test suite for {cls.__name__}  {lines}')
         module_header, status_header = 'Test module', 'Status'
-        print(f'{module_header:^{CustomTestResult.test_spaces}}{status_header:<{CustomTestResult.status_spaces}}\n')
+        log(f'{module_header:^{CustomTestResult.test_spaces}}{status_header:<{CustomTestResult.status_spaces}}\n')
         suite = unittest.TestLoader().loadTestsFromTestCase(cls)
         runner = unittest.TextTestRunner(resultclass=CustomTestResult, verbosity=2)
         runner.run(suite)
 
 
 if __name__ == "__main__":
+    update_default_log_settings(new_settings=LogSettings(include_call_location=False))
     Unittest.execute_tests()
-    from hollarek.dev .log import get_logger
+
+
     log_func = get_logger()

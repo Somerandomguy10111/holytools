@@ -11,7 +11,7 @@ import inspect, os
 
 
 
-def log(msg : str, level : LogLevel):
+def log(msg : str, level : LogLevel = LogLevel.INFO):
     frame = inspect.currentframe().f_back
     info = inspect.getframeinfo(frame)
     fname = os.path.basename(info.filename)  # Get just the file name
@@ -26,6 +26,10 @@ def get_logger(settings: Optional[LogSettings] = None) -> Logger:
         return copy(LoggerFactory.get_default_logger())
 
     return LoggerFactory.make_logger(settings=settings)
+
+
+def update_default_log_settings(new_settings : LogSettings):
+    LoggerFactory.update_default_settings(settings=new_settings)
 
 
 class LoggerFactory:
