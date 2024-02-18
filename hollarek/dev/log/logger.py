@@ -9,13 +9,11 @@ from hollarek.dev.log.log_settings import LogLevel, LogSettings
 import inspect, os
 # ---------------------------------------------------------
 
-
-
 def log(msg : str, level : LogLevel = LogLevel.INFO):
     frame = inspect.currentframe().f_back
     info = inspect.getframeinfo(frame)
-    fname = os.path.basename(info.filename)  # Get just the file name
-    lineno = info.lineno  # Get the line number
+    fname = os.path.basename(info.filename)
+    lineno = info.lineno
 
     logger = LoggerFactory.get_default_logger()
     logger.log(msg=msg, level=level.value, extra={Formatter.custom_file_name: fname,
