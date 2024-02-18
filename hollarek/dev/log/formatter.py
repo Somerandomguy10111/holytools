@@ -37,8 +37,8 @@ class Formatter(logging.Formatter):
             log_fmt = f"{timestamp}: {log_fmt}"
 
         if self.settings.include_call_location:
-            filename = getattr(record, Formatter.custom_file_name) or record.filename
-            lineno = getattr(record, Formatter.custom_line_no) or record.lineno
+            filename = getattr(record, Formatter.custom_file_name, record.filename)
+            lineno = getattr(record, Formatter.custom_line_no, record.lineno)
             log_fmt += f" {filename}:{lineno}"
 
         if self.log_target == LogTarget.CONSOLE:
