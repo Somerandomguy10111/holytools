@@ -1,1 +1,1 @@
-from .logger import  log, update_logger, LogSettings, LogLevel
+from .logger import  log, get_log_func, LogSettings, LogLevel
