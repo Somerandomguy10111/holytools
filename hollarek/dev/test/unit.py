@@ -1,8 +1,36 @@
 import unittest
 import json
 from hollarek.misc import get_salvaged_json
+from hollarek.dev import log, LogLevel
+
 
 # ---------------------------------------------------------
+class CustomTestResult(unittest.TestResult):
+    test_spaces = 50  # Space allocated for test names
+    status_spaces = 20  # Space allocated for status messages
+
+    def addSuccess(self, test):
+        super().addSuccess(test)
+        test_name = test.id()  # This gets the full name of the test
+        log(f'{test_name:<{self.test_spaces}} {"SUCCESS":<{self.status_spaces}}', LogLevel.INFO)
+
+    def addError(self, test, err):
+        super().addError(test, err)
+        test_name = test.id()  # Adjusted to use test.id()
+        log(f'{test_name:<{self.test_spaces}} {"ERROR":<{self.status_spaces}}', LogLevel.CRITICAL)
+
+    def addFailure(self, test, err):
+        super().addFailure(test, err)
+        test_name = test.id()  # Adjusted to use test.id()
+        log(f'{test_name:<{self.test_spaces}} {"FAIL":<{self.status_spaces}}', LogLevel.ERROR)
+
+    def addSkip(self, test, reason):
+        super().addSkip(test, reason)
+        test_name = test.id()  # Adjusted to use test.id()
+        log(f'{test_name:<{self.test_spaces}} {"SKIPPED":<{self.status_spaces}}', LogLevel.INFO)
+
+
+
 
 class Unittest(unittest.TestCase):
 
@@ -42,7 +70,9 @@ class Unittest(unittest.TestCase):
 
 def test():
     suite = unittest.TestLoader().loadTestsFromTestCase(Unittest)
-    unittest.TextTestRunner(verbosity=5).run(suite)
+    # Use CustomTestResult with TextTestRunner
+    runner = unittest.TextTestRunner(resultclass=CustomTestResult, verbosity=2)
+    runner.run(suite)
 
 
 if __name__ == "__main__":
