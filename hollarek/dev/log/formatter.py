@@ -1,6 +1,6 @@
 from __future__ import annotations
 import logging
-from hollarek.dev.log.log_settings import LogLevel, LogSettings
+from hollarek.dev.log.log_settings import LogSettings
 
 
 class LogTarget:
@@ -14,11 +14,11 @@ class Formatter(logging.Formatter):
 
 
     colors: dict = {
-        LogLevel.DEBUG: '\033[20m',
-        LogLevel.INFO: '\033[20m',
-        LogLevel.WARNING: '\033[93m',
-        LogLevel.ERROR: '\033[91m',
-        LogLevel.CRITICAL: '\x1b[31;1m'  # Bold Red
+        logging.DEBUG: '\033[20m',
+        logging.INFO: '\033[20m',
+        logging.WARNING: '\033[93m',
+        logging.ERROR: '\033[91m',
+        logging.CRITICAL: '\x1b[31;1m'  # Bold Red
     }
 
     def __init__(self, settings : LogSettings, log_target : LogTarget):
@@ -42,7 +42,7 @@ class Formatter(logging.Formatter):
             log_fmt += f" {filename}:{lineno}"
 
         if self.log_target == LogTarget.CONSOLE:
-            color_prefix = Formatter.colors.get(LogLevel(record.levelno), "")
+            color_prefix = Formatter.colors.get(record.levelno, "")
             color_suffix = "\033[0m"
             log_fmt = color_prefix + log_fmt + color_suffix
 

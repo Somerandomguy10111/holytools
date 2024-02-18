@@ -1,8 +1,9 @@
 import unittest
 import json
 from hollarek.misc import get_salvaged_json
-from hollarek.dev import log, LogLevel
+from hollarek.dev import log
 from enum import Enum
+import logging
 
 from hollarek.dev.log import get_logger, update_default_log_settings, LogSettings
 # ---------------------------------------------------------
@@ -34,14 +35,14 @@ class CustomTestResult(unittest.TestResult):
         super().addSkip(test, reason)
         self.log(test, "SKIPPED", TestStatus.SKIPPED)
 
-    def log(self, test, reason, test_status: TestStatus):
-        status_to_loglevel = {
-            TestStatus.SUCCESS: LogLevel.INFO,
-            TestStatus.ERROR: LogLevel.CRITICAL,
-            TestStatus.FAIL: LogLevel.ERROR,
-            TestStatus.SKIPPED: LogLevel.INFO
+    def log(self, test, reason : str, test_status: TestStatus):
+        status_to_logging = {
+            TestStatus.SUCCESS: logging.INFO,
+            TestStatus.ERROR: logging.CRITICAL,
+            TestStatus.FAIL: logging.ERROR,
+            TestStatus.SKIPPED: logging.INFO
         }
-        log_level = status_to_loglevel[test_status]
+        log_level = status_to_logging[test_status]
         full_test_name = test.id()
         parts = full_test_name.split('.')
         last_parts = parts[-2:]

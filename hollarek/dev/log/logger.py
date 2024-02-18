@@ -5,18 +5,18 @@ from typing import Optional
 from copy import copy
 
 from hollarek.dev.log.formatter import Formatter, LogTarget
-from hollarek.dev.log.log_settings import LogLevel, LogSettings
+from hollarek.dev.log.log_settings import LogSettings
 import inspect, os
 # ---------------------------------------------------------
 
-def log(msg : str, level : LogLevel = LogLevel.INFO):
+def log(msg : str, level : int = logging.INFO):
     frame = inspect.currentframe().f_back
     info = inspect.getframeinfo(frame)
     fname = os.path.basename(info.filename)
     lineno = info.lineno
 
     logger = LoggerFactory.get_default_logger()
-    logger.log(msg=msg, level=level.value, extra={Formatter.custom_file_name: fname,
+    logger.log(msg=msg, level=level, extra={Formatter.custom_file_name: fname,
                                                   Formatter.custom_line_no: lineno})
 
 def get_logger(settings: Optional[LogSettings] = None) -> Logger:
@@ -52,7 +52,7 @@ class LoggerFactory:
         settings = settings
         logger = logging.getLogger(__name__)
         logger.propagate = False
-        logger.setLevel(settings.display_log_level.value)
+        logger.setLevel(settings.display_log_level)
 
         console_handler = logging.StreamHandler()
         console_handler.setFormatter(Formatter(settings=settings, log_target=LogTarget.CONSOLE))
@@ -70,8 +70,8 @@ class LoggerFactory:
 if __name__ == "__main__":
     the_settings = LogSettings(use_timestamp=True, include_ms_in_timestamp=True, log_file_path='test')
 
-    log("This is a debug message", level=LogLevel.DEBUG)
-    log("This is an info message", level=LogLevel.INFO)
-    log("This is an warning message", level=LogLevel.WARNING)
-    log("This is an error message.", level=LogLevel.ERROR)
-    log("This is a critical error message!!", level=LogLevel.CRITICAL)
+    log("This is a debug message", level=logging.DEBUG)
+    log("This is an info message", level=logging.INFO)
+    log("This is an warning message", level=logging.WARNING)
+    log("This is an error message.", level=logging.ERROR)
+    log("This is a critical error message!!", level=logging.CRITICAL)
