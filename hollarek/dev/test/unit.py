@@ -2,34 +2,47 @@ import unittest
 import json
 from hollarek.misc import get_salvaged_json
 from hollarek.dev import log, LogLevel
-
+from enum import Enum
 
 # ---------------------------------------------------------
+
+class TestStatus(Enum):
+    SUCCESS = "SUCCESS"
+    ERROR = "ERROR"
+    FAIL = "FAIL"
+    SKIPPED = "SKIPPED"
+
+
 class CustomTestResult(unittest.TestResult):
     test_spaces = 50
     status_spaces = 20
 
     def addSuccess(self, test):
         super().addSuccess(test)
-        test_name = test.id()
-        log(f'{test_name:<{self.test_spaces}} {"SUCCESS":<{self.status_spaces}}', LogLevel.INFO)
+        self.log(test, "SUCCESS", TestStatus.SUCCESS)
 
     def addError(self, test, err):
         super().addError(test, err)
-        test_name = test.id()
-        log(f'{test_name:<{self.test_spaces}} {"ERROR":<{self.status_spaces}}', LogLevel.CRITICAL)
+        self.log(test, "ERROR", TestStatus.ERROR)
 
     def addFailure(self, test, err):
         super().addFailure(test, err)
-        test_name = test.id()
-        log(f'{test_name:<{self.test_spaces}} {"FAIL":<{self.status_spaces}}', LogLevel.ERROR)
+        self.log(test, "FAIL", TestStatus.FAIL)
 
     def addSkip(self, test, reason):
         super().addSkip(test, reason)
+        self.log(test, "SKIPPED", TestStatus.SKIPPED)
+
+    def log(self, test, reason, test_status: TestStatus):
+        status_to_loglevel = {
+            TestStatus.SUCCESS: LogLevel.INFO,
+            TestStatus.ERROR: LogLevel.CRITICAL,
+            TestStatus.FAIL: LogLevel.ERROR,
+            TestStatus.SKIPPED: LogLevel.INFO
+        }
+        log_level = status_to_loglevel[test_status]
         test_name = test.id()
-        log(f'{test_name:<{self.test_spaces}} {"SKIPPED":<{self.status_spaces}}', LogLevel.INFO)
-
-
+        log(f'{test_name:<{self.test_spaces}} {reason:<{self.status_spaces}}', log_level)
 
 
 class Unittest(unittest.TestCase):
