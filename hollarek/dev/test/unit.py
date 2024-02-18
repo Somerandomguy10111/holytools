@@ -1,4 +1,6 @@
 import logging
+from logging import Logger
+from typing import Optional
 import unittest
 from unittest.result import TestResult
 
@@ -9,7 +11,7 @@ from abc import ABC, abstractmethod
 
 
 class Unittest(unittest.TestCase, ABC):
-    _logger = get_logger(settings=LogSettings(include_call_location=False))
+    _logger : Optional[Logger] = None
 
     @abstractmethod
     def setUp(self):
@@ -65,8 +67,15 @@ class Unittest(unittest.TestCase, ABC):
 
 
     @classmethod
+    def get_logger(cls) -> Logger:
+        if not cls._logger:
+            cls._logger = get_logger(settings=LogSettings(include_call_location=False), name=cls.__name__)
+        return cls._logger
+
+    @classmethod
     def log(cls,msg : str):
-        cls._logger.log(msg=msg,level=logging.INFO)
+        logger = cls.get_logger()
+        logger.log(msg=msg,level=logging.INFO)
 
 
 import json

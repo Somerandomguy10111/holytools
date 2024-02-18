@@ -19,11 +19,14 @@ def log(msg : str, level : int = logging.INFO):
     logger.log(msg=msg, level=level, extra={Formatter.custom_file_name: fname,
                                                   Formatter.custom_line_no: lineno})
 
-def get_logger(settings: Optional[LogSettings] = None) -> Logger:
+def get_logger(settings: Optional[LogSettings] = None, name : Optional[str] = None) -> Logger:
     if not settings:
         return copy(LoggerFactory.get_default_logger())
 
-    return LoggerFactory.make_logger(settings=settings)
+    if name is None:
+        name = "unnamed_logger"
+
+    return LoggerFactory.make_logger(settings=settings, name=name)
 
 
 def update_default_log_settings(new_settings : LogSettings):
@@ -48,9 +51,9 @@ class LoggerFactory:
 
 
     @classmethod
-    def make_logger(cls, settings: LogSettings) -> Logger:
+    def make_logger(cls, settings: LogSettings, name : str) -> Logger:
         settings = settings
-        logger = logging.getLogger(__name__)
+        logger = logging.getLogger(name)
         logger.propagate = False
         logger.setLevel(settings.log_level_threshold)
 
