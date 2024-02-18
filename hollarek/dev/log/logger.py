@@ -6,15 +6,20 @@ from copy import copy
 
 from hollarek.dev.log.formatter import Formatter, LogTarget
 from hollarek.dev.log.log_settings import LogLevel, LogSettings
-
+import inspect, os
 # ---------------------------------------------------------
 
 
 
-def log(msg : str, level : LogLevel = LogLevel.INFO):
-    logger  = LoggerFactory.get_default_logger()
-    logger.log(msg=msg, level=level.value)
+def log(msg : str, level : LogLevel):
+    frame = inspect.currentframe().f_back
+    info = inspect.getframeinfo(frame)
+    fname = os.path.basename(info.filename)  # Get just the file name
+    lineno = info.lineno  # Get the line number
 
+    logger = LoggerFactory.get_default_logger()
+    logger.log(msg=msg, level=level.value, extra={Formatter.custom_file_name: fname,
+                                                  Formatter.custom_line_no: lineno})
 
 def get_logger(settings: Optional[LogSettings] = None) -> Logger:
     if not settings:

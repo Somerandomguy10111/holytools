@@ -9,6 +9,10 @@ class LogTarget:
 
 
 class Formatter(logging.Formatter):
+    custom_file_name = 'custom_file_name'
+    custom_line_no = 'custom_lineno'
+
+
     colors: dict = {
         LogLevel.DEBUG: '\033[20m',
         LogLevel.INFO: '\033[20m',
@@ -33,7 +37,9 @@ class Formatter(logging.Formatter):
             log_fmt = f"{timestamp}: {log_fmt}"
 
         if self.settings.include_call_location:
-            log_fmt = f"{log_fmt} (%(filename)s:%(lineno)d)"
+            filename = getattr(record, Formatter.custom_file_name) or record.filename
+            lineno = getattr(record, Formatter.custom_line_no) or record.lineno
+            log_fmt += f" {filename}:{lineno}"
 
         if self.log_target == LogTarget.CONSOLE:
             color_prefix = Formatter.colors.get(LogLevel(record.levelno), "")
