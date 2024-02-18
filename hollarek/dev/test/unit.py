@@ -3,7 +3,7 @@ import unittest
 from unittest.result import TestResult
 
 from hollarek.dev.test.test_runners import CustomTestResult, CustomTestRunner
-from hollarek.dev.log import get_logger, update_default_log_settings, LogSettings
+from hollarek.dev.log import get_logger, LogSettings
 from abc import ABC, abstractmethod
 # ---------------------------------------------------------
 
@@ -32,7 +32,7 @@ class Unittest(unittest.TestCase, ABC):
     @classmethod
     def _get_test_results(cls) -> TestResult:
         suite = unittest.TestLoader().loadTestsFromTestCase(cls)
-        runner = CustomTestRunner(resultclass=CustomTestResult, verbosity=2)
+        runner = CustomTestRunner(logger=cls._logger)
         return runner.run(suite)
 
     @classmethod
@@ -67,6 +67,7 @@ class Unittest(unittest.TestCase, ABC):
     @classmethod
     def log(cls,msg : str):
         cls._logger.log(msg=msg,level=logging.INFO)
+
 
 import json
 from hollarek.misc import get_salvaged_json
@@ -108,5 +109,3 @@ class JsonTester(Unittest):
 
 if __name__ == "__main__":
     JsonTester.run_tests()
-
-    log_func = get_logger()

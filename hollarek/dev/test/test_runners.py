@@ -1,8 +1,7 @@
 import logging
 import unittest
 from enum import Enum
-
-from hollarek.dev import log
+from logging import Logger
 
 
 class TestStatus(Enum):
@@ -15,6 +14,10 @@ class TestStatus(Enum):
 class CustomTestResult(unittest.TestResult):
     test_spaces = 60
     status_spaces = 20
+
+    def __init__(self, logger : Logger, stream, descriptions, verbosity):
+        super().__init__(stream=stream, descriptions=descriptions, verbosity=verbosity)
+        self.logger = logger
 
     def addSuccess(self, test):
         super().addSuccess(test)
@@ -45,12 +48,20 @@ class CustomTestResult(unittest.TestResult):
         last_parts = parts[-2:]
         test_name = '.'.join(last_parts)[:CustomTestResult.test_spaces]
 
-        log(f'{test_name:<{self.test_spaces}}| {reason:<{self.status_spaces}}', log_level)
+        self.logger.log(msg=f'{test_name:<{self.test_spaces}}| {reason:<{self.status_spaces}}',level=log_level)
 
 
 class CustomTestRunner(unittest.TextTestRunner):
+    def __init__(self, logger : Logger):
+        super().__init__(resultclass=None)
+        self.logger : Logger = logger
+
+
     def run(self, test):
-        result = CustomTestResult(self.stream, self.descriptions, self.verbosity)
+        result = CustomTestResult(logger=self.logger,
+                                  stream=self.stream,
+                                  descriptions=self.descriptions,
+                                  verbosity=2)
         test(result)
         result.printErrors()
 
