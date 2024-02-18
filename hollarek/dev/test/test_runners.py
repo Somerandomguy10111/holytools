@@ -12,7 +12,7 @@ class TestStatus(Enum):
 
 
 class CustomTestResult(unittest.TestResult):
-    test_spaces = 60
+    test_spaces = 50
     status_spaces = 20
 
     def __init__(self, logger : Logger, stream, descriptions, verbosity):
@@ -48,7 +48,7 @@ class CustomTestResult(unittest.TestResult):
         last_parts = parts[-2:]
         test_name = '.'.join(last_parts)[:CustomTestResult.test_spaces]
 
-        self.logger.log(msg=f'{test_name:<{self.test_spaces}}| {reason:<{self.status_spaces}}',level=log_level)
+        self.logger.log(msg=f'{test_name:<{self.test_spaces}}:  {reason:<{self.status_spaces}}',level=log_level)
 
 
 class CustomTestRunner(unittest.TextTestRunner):
