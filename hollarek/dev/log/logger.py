@@ -50,7 +50,7 @@ class LogHandler:
                 info = inspect.getframeinfo(caller_frame)
                 fname = os.path.basename(info.filename)
                 caller_datails = f"{fname}:{info.lineno} in {info.function}"
-                msg = f" {msg}{caller_datails}"
+                msg = f"{msg}{caller_datails}"
 
             cls._logger.log(msg=msg, *args, **kwargs)
 

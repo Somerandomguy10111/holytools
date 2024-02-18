@@ -3,7 +3,6 @@ import json
 from hollarek.misc import get_salvaged_json
 from hollarek.dev import log, LogLevel
 from enum import Enum
-
 # ---------------------------------------------------------
 
 class TestStatus(Enum):
@@ -41,8 +40,13 @@ class CustomTestResult(unittest.TestResult):
             TestStatus.SKIPPED: LogLevel.INFO
         }
         log_level = status_to_loglevel[test_status]
-        test_name = test.id()
-        log(f'{test_name:<{self.test_spaces}} {reason:<{self.status_spaces}}', log_level)
+        full_test_name = test.id()
+        parts = full_test_name.split('.')
+        last_parts = parts[-2:]
+        test_name = '.'.join(last_parts)
+
+
+        log(f'{test_name:<{self.test_spaces}}{reason:<{self.status_spaces}}', log_level)
 
 
 class Unittest(unittest.TestCase):
@@ -81,9 +85,14 @@ class Unittest(unittest.TestCase):
 
     @classmethod
     def execute_tests(cls):
+        lines = '-'*40
+        print(f'{lines} {cls.__name__}{lines}')
+        module_header, status_header = 'Module', 'Status'
+        print(f'{module_header:<{CustomTestResult.test_spaces}}{status_header:<{CustomTestResult.status_spaces}}\n')
         suite = unittest.TestLoader().loadTestsFromTestCase(cls)
         runner = unittest.TextTestRunner(resultclass=CustomTestResult, verbosity=2)
         runner.run(suite)
+
 
 
 if __name__ == "__main__":
