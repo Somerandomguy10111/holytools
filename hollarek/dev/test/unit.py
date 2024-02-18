@@ -46,11 +46,18 @@ class CustomTestResult(unittest.TestResult):
         full_test_name = test.id()
         parts = full_test_name.split('.')
         last_parts = parts[-2:]
-        test_name = '.'.join(last_parts)
+        test_name = '.'.join(last_parts)[:CustomTestResult.test_spaces]
+
+        log(f'{test_name:<{self.test_spaces}}| {reason:<{self.status_spaces}}', log_level)
 
 
-        log(f'{test_name:<{self.test_spaces}}{reason:<{self.status_spaces}}', log_level)
+class CustomTestRunner(unittest.TextTestRunner):
+    def run(self, test):
+        result = CustomTestResult(self.stream, self.descriptions, self.verbosity)
+        test(result)
+        result.printErrors()
 
+        return result
 
 class Unittest(unittest.TestCase):
     def setUp(self):
@@ -83,17 +90,37 @@ class Unittest(unittest.TestCase):
     def test_multiple_control_characters(self):
         repaired_str = get_salvaged_json(self.broken_str_multiple)
         parsed_json = json.loads(repaired_str)
-        self.assertEqual(parsed_json['keyy'], "new\nline and\ttab")
+        self.assertEqual(parsed_json['key'], "new\nline and\ttab")
 
     @classmethod
     def execute_tests(cls):
-        lines = '-' * 30
-        log(f'{lines}  Test suite for {cls.__name__}  {lines}')
-        module_header, status_header = 'Test module', 'Status'
-        log(f'{module_header:^{CustomTestResult.test_spaces}}{status_header:<{CustomTestResult.status_spaces}}\n')
+        name_info = f'  Test suite for \"{cls.__name__}\"  '
+
+        line_len = max(CustomTestResult.test_spaces + CustomTestResult.status_spaces-len(name_info),0)
+        lines = '-' * int(line_len/2.)
+
+        log(f'{lines}{name_info}{lines}\n')
         suite = unittest.TestLoader().loadTestsFromTestCase(cls)
-        runner = unittest.TextTestRunner(resultclass=CustomTestResult, verbosity=2)
-        runner.run(suite)
+        runner = CustomTestRunner(resultclass=CustomTestResult, verbosity=2)
+        result = runner.run(suite)
+
+        total_tests = result.testsRun
+        errors = len(result.errors)
+        failures = len(result.failures)
+        successful_tests = total_tests - errors - failures
+
+        RED = '\033[91m'
+        GREEN = '\033[92m'
+        RESET = '\033[0m'
+        CHECKMARK = '✓'
+        CROSS = '❌'
+
+        if errors + failures == 0:
+            final_status = f"{GREEN}\n{CHECKMARK} {successful_tests}/{total_tests} tests ran successfully!{RESET}"
+        else:
+            final_status = f"{RED}\n{CROSS} {total_tests - successful_tests}/{total_tests} tests had errors or failures!{RESET}"
+
+        log(final_status)
 
 
 if __name__ == "__main__":
