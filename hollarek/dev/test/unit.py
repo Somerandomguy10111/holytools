@@ -81,18 +81,17 @@ class Unittest(unittest.TestCase):
     def test_multiple_control_characters(self):
         repaired_str = get_salvaged_json(self.broken_str_multiple)
         parsed_json = json.loads(repaired_str)
-        self.assertEqual(parsed_json['key'], "new\nline and\ttab")
+        self.assertEqual(parsed_json['keyy'], "new\nline and\ttab")
 
     @classmethod
     def execute_tests(cls):
-        lines = '-'*40
-        print(f'{lines} {cls.__name__}{lines}')
-        module_header, status_header = 'Module', 'Status'
-        print(f'{module_header:<{CustomTestResult.test_spaces}}{status_header:<{CustomTestResult.status_spaces}}\n')
+        lines = '-' * 30
+        print(f'{lines}  Test suite for {cls.__name__}  {lines}')
+        module_header, status_header = 'Test module', 'Status'
+        print(f'{module_header:^{CustomTestResult.test_spaces}}{status_header:<{CustomTestResult.status_spaces}}\n')
         suite = unittest.TestLoader().loadTestsFromTestCase(cls)
         runner = unittest.TextTestRunner(resultclass=CustomTestResult, verbosity=2)
         runner.run(suite)
-
 
 
 if __name__ == "__main__":
