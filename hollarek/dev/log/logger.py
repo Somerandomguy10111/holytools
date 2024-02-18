@@ -1,8 +1,7 @@
 from __future__ import annotations
 import logging
-import inspect
-import os
-from typing import Optional, Callable
+from logging import Logger
+from typing import Optional
 from copy import copy
 
 from hollarek.dev.log.formatter import Formatter, LogTarget
@@ -11,55 +10,38 @@ from hollarek.dev.log.log_settings import LogLevel, LogSettings
 # ---------------------------------------------------------
 
 
+
 def log(msg : str, level : LogLevel = LogLevel.INFO):
-    log_func  = LogFactory.get_default_log_func()
-    log_func(msg=msg,level=level.value)
+    logger  = LoggerFactory.get_default_logger()
+    logger.log(msg=msg, level=level.value)
 
 
-def get_log_func(settings: Optional[LogSettings] = None) -> Callable[[str, LogLevel], None]:
+def get_logger(settings: Optional[LogSettings] = None) -> Logger:
     if not settings:
-        return copy(LogFactory.get_default_log_func())
+        return copy(LoggerFactory.get_default_logger())
 
-    return LogFactory.get_log_func(settings=settings)
+    return LoggerFactory.make_logger(settings=settings)
 
 
-class LogFactory:
-    _default_log_func : Optional[callable] = None
+class LoggerFactory:
+    _default_logger : Optional[Logger] = None
     _default_settings : LogSettings = LogSettings()
 
     @classmethod
-    def get_default_log_func(cls) -> callable:
-        if not cls._default_log_func:
-            cls._default_log_func = get_log_func(settings=cls._default_settings)
+    def get_default_logger(cls) -> Logger:
+        if not cls._default_logger:
+            cls._default_logger = get_logger(settings=cls._default_settings)
         
-        return cls._default_log_func
+        return cls._default_logger
 
     @classmethod
     def update_default_settings(cls, settings : LogSettings):
         cls._default_settings = settings
-        cls._default_log_func = get_log_func(settings=cls._default_settings)
+        cls._default_logger = get_logger(settings=cls._default_settings)
 
 
     @classmethod
-    def get_log_func(cls, settings : LogSettings) -> callable:
-        logger = cls.make_logger(settings=settings)
-
-        def log_func(msg : str, *args, **kwargs):
-            if settings.include_call_location:
-                caller_frame = inspect.currentframe().f_back.f_back
-                info = inspect.getframeinfo(caller_frame)
-                fname = os.path.basename(info.filename)
-                caller_datails = f"{fname}:{info.lineno} in {info.function}"
-                msg = f"{msg}{caller_datails}"
-
-            logger.log(msg=msg, *args, **kwargs)
-
-        cls._log_func = log_func
-        return log_func
-
-
-    @classmethod
-    def make_logger(cls, settings: LogSettings):
+    def make_logger(cls, settings: LogSettings) -> Logger:
         settings = settings
         logger = logging.getLogger(__name__)
         logger.propagate = False

@@ -97,5 +97,5 @@ class Unittest(unittest.TestCase):
 
 if __name__ == "__main__":
     Unittest.execute_tests()
-    from hollarek.dev .log import get_log_func
-    log_func = get_log_func()
+    from hollarek.dev .log import get_logger
+    log_func = get_logger()
