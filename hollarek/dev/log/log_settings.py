@@ -8,7 +8,7 @@ from typing import Optional
 
 @dataclass
 class LogSettings:
-    display_log_level: int = logging.INFO
+    log_level_threshold: int = logging.INFO
     log_file_path: Optional[str] = None
     use_timestamp: bool = False
     include_call_location : bool = True

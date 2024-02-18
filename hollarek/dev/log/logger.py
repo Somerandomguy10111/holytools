@@ -52,7 +52,7 @@ class LoggerFactory:
         settings = settings
         logger = logging.getLogger(__name__)
         logger.propagate = False
-        logger.setLevel(settings.display_log_level)
+        logger.setLevel(settings.log_level_threshold)
 
         console_handler = logging.StreamHandler()
         console_handler.setFormatter(Formatter(settings=settings, log_target=LogTarget.CONSOLE))
