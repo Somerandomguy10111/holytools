@@ -1,13 +1,15 @@
 from __future__ import annotations
+
+import dataclasses
 from datetime import datetime
 import json
 from typing import  get_type_hints
 from hollarek.dev import get_core_type
 from abc import ABC
-
+from dataclasses import dataclass
 # -------------------------------------------
 
-class JsonDataclass(ABC):
+class Jsonifyable(ABC):
     @classmethod
     def from_str(cls, json_str: str):
         json_dict = json.loads(json_str, object_hook=cls.json_decode)
@@ -20,8 +22,13 @@ class JsonDataclass(ABC):
         return {attr : self.get_json_entry(obj=value) for attr, value in self.__dict__.items()}
 
 
+    def __init__(self):
+        if not dataclasses.is_dataclass(self):
+            raise TypeError(f'{self.__class__} must be dataclass to be Jsonifyable')
+
+
     @classmethod
-    def from_json(cls, json_dict : dict) -> JsonDataclass:
+    def from_json(cls, json_dict : dict) -> Jsonifyable:
         obj = cls.__new__(cls)
         type_hints = get_type_hints(cls)
 
@@ -30,7 +37,7 @@ class JsonDataclass(ABC):
             core_type = get_core_type(dtype=type_hints.get(key))
             print(f'key, value, type = {key}, {value}, {type_hints.get(key)}')
 
-            if issubclass(core_type, JsonDataclass):
+            if issubclass(core_type, Jsonifyable):
                 if not value is None:
                     setattr(obj, key, core_type.from_json(json_dict=value))
             else:
@@ -40,7 +47,7 @@ class JsonDataclass(ABC):
 
     @staticmethod
     def get_json_entry(obj):
-        is_composite = isinstance(obj, JsonDataclass)
+        is_composite = isinstance(obj, Jsonifyable)
         if is_composite:
             return obj.to_json()
         return obj
@@ -61,3 +68,4 @@ class JsonDataclass(ABC):
         if isinstance(obj, datetime):
             return obj.isoformat()
         return json.JSONEncoder().default(obj)
+

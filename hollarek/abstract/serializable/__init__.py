@@ -1,1 +1,1 @@
-from .json_dataclass import JsonDataclass
+from .jsonifyable import Jsonifyable
