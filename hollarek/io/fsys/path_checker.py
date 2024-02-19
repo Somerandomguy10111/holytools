@@ -1,9 +1,7 @@
 from __future__ import annotations
-
 import os
-
 from pathvalidate import sanitize_filepath
-
+# -------------------------------------------
 
 class PathChecker:
     @staticmethod
