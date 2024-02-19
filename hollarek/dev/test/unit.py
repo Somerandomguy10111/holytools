@@ -79,7 +79,7 @@ class Unittest(unittest.TestCase, ABC):
 
 
 import json
-from hollarek.misc import get_salvaged_json
+from json_repair import repair_json
 
 class JsonTester(Unittest):
     def setUp(self):
@@ -95,22 +95,22 @@ class JsonTester(Unittest):
             self.fail(f"Test failed with error: {e}")
 
     def test_no_control_characters(self):
-        repaired_str = get_salvaged_json(self.valid_str)
+        repaired_str = repair_json(self.valid_str)
         parsed_json = json.loads(repaired_str)
         self.assertEqual(parsed_json['key'], "value")
 
     def test_single_newline(self):
-        repaired_str = get_salvaged_json(self.broken_str_newline)
+        repaired_str = repair_json(self.broken_str_newline)
         parsed_json = json.loads(repaired_str)
         self.assertEqual(parsed_json['key'], "value with a new\nline")
 
     def test_tab_and_backslash(self):
-        repaired_str = get_salvaged_json(self.broken_str_tab)
+        repaired_str = repair_json(self.broken_str_tab)
         parsed_json = json.loads(repaired_str)
         self.assertEqual(parsed_json['key'], "value with a tab\t")
 
     def test_multiple_control_characters(self):
-        repaired_str = get_salvaged_json(self.broken_str_multiple)
+        repaired_str = repair_json(self.broken_str_multiple)
         parsed_json = json.loads(repaired_str)
         self.assertEqual(parsed_json['keyy'], "new\nline and\ttab")
 
