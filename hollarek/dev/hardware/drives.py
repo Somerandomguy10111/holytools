@@ -11,7 +11,7 @@ def log(msg : str, level : int = logging.INFO):
     drive_logger.log(msg=msg, level=level)
 
 
-class Partition:
+class PartitionInfo:
     @classmethod
     def from_resource_path(cls, resource_path : str):
         device_name = find_device_of_path(resource_path=resource_path)

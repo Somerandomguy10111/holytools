@@ -27,7 +27,7 @@ class JsonDataclass(ABC):
 
         print(f'--- Initializing object of class {cls} ---')
         for key, value in json_dict.items():
-            core_type = get_core_type(the_type=type_hints.get(key))
+            core_type = get_core_type(dtype=type_hints.get(key))
             print(f'key, value, type = {key}, {value}, {type_hints.get(key)}')
 
             if issubclass(core_type, JsonDataclass):

@@ -1,1 +1,1 @@
-from .drives import Partition
+from .drives import PartitionInfo
