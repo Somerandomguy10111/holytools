@@ -1,27 +1,18 @@
 from __future__ import annotations
 import logging
-from logging import Logger
-from typing import Optional
+from logging import Logger as BaseLogger
+from typing import Optional, Union
 from copy import copy
 
 from hollarek.dev.log.formatter import Formatter, LogTarget
-from hollarek.dev.log.log_settings import LogSettings
-import inspect, os
+from hollarek.dev.log.log_settings import LogSettings, LogLevel
 # ---------------------------------------------------------
 
-def log(msg : str, level : int = logging.INFO):
-    frame = inspect.currentframe().f_back
-    info = inspect.getframeinfo(frame)
-    fname = os.path.basename(info.filename)
-    lineno = info.lineno
 
-    logger = LoggerFactory.get_default_logger()
-    logger.log(msg=msg, level=level, extra={Formatter.custom_file_name: fname,
-                                                  Formatter.custom_line_no: lineno})
-
-def get_logger(settings: Optional[LogSettings] = None, name : Optional[str] = None) -> Logger:
+def get_logger(settings: Optional[LogSettings] = None,
+                          name : Optional[str] = None) -> Logger:
     if not settings:
-        return copy(LoggerFactory.get_default_logger())
+        settings = LogSettings()
 
     if name is None:
         name = "unnamed_logger"
@@ -31,6 +22,14 @@ def get_logger(settings: Optional[LogSettings] = None, name : Optional[str] = No
 
 def update_default_log_settings(new_settings : LogSettings):
     LoggerFactory.update_default_settings(settings=new_settings)
+
+
+class Logger(BaseLogger):
+    def log(self, msg : str, level : Union[int, LogLevel] = LogLevel.INFO, *args, **kwargs):
+        if isinstance(level, LogLevel):
+            level = level.value
+
+        super().log(msg=msg, level=level, *args, **kwargs)
 
 
 class LoggerFactory:
@@ -53,7 +52,7 @@ class LoggerFactory:
     @classmethod
     def make_logger(cls, settings: LogSettings, name : str) -> Logger:
         settings = settings
-        logger = logging.getLogger(name)
+        logger = Logger(name=name)
         logger.propagate = False
         logger.setLevel(settings.log_level_threshold)
 
@@ -72,9 +71,10 @@ class LoggerFactory:
 
 if __name__ == "__main__":
     the_settings = LogSettings(use_timestamp=True, include_ms_in_timestamp=True, log_file_path='test')
+    log = get_logger().log
 
     log("This is a debug message", level=logging.DEBUG)
     log("This is an info message", level=logging.INFO)
-    log("This is an warning message", level=logging.WARNING)
+    log("This is a warning message", level=logging.WARNING)
     log("This is an error message.", level=logging.ERROR)
     log("This is a critical error message!!", level=logging.CRITICAL)
