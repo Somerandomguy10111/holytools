@@ -1,16 +1,9 @@
-from dataclasses import dataclass
 import psutil
 from psutil import Process, NoSuchProcess
 import inspect
 from pympler import asizeof
 
 # -------------------------------------------
-
-@dataclass
-class UsageStatistics:
-    cpu_usage : float
-    memory_in_bytes : int
-    user : str
 
 class ProcessStatistics:
     def __init__(self, pid : int):
@@ -25,6 +18,8 @@ class ProcessStatistics:
         if not init_successful:
             raise IOError(f"Process with PID {self.pid} does not exist.")
 
+    def get_subprocesses(self) -> list[Process]:
+        return self.process.children(recursive=True)
 
     def get_memory_usage_in_mb(self) -> float:
         memory_info = self.process.memory_info()
@@ -32,7 +27,17 @@ class ProcessStatistics:
 
     def get_cpu_usage(self) -> float:
         process = psutil.Process(self.pid)
-        return process.cpu_percent(interval=1)
+        return process.cpu_percent(interval=0.1)
+
+    def get_subprocess_mem_usage(self) -> dict[str, int]:
+        mem_usage = {}
+        for child in self.get_subprocesses():
+            try:
+                mem_info = child.memory_info()
+                mem_usage[child.name()] = mem_info.rss
+            except psutil.NoSuchProcess:
+                continue
+        return mem_usage
 
 
 class FunctionStatistics:
@@ -58,17 +63,20 @@ class FunctionStatistics:
 
 
 if __name__ == "__main__":
-    # process_stats = ProcessStatistics(1234)
-    # print(f"Memory usage: {process_stats.get_memory_usage_in_mb()} MB")
-    # print(f"CPU usage: {process_stats.get_cpu_usage()} %")
+    process_stats = ProcessStatistics(4028)
+    print(f"Memory usage: {process_stats.get_memory_usage_in_mb()} MB")
+    print(f"CPU usage: {process_stats.get_cpu_usage()} %")
+    print(process_stats.get_subprocesses())
+    print(process_stats.get_subprocess_mem_usage())
+
 
     # FunctionStatistics usage example
-    def sample_function():
-        func_stats = FunctionStatistics()
-        a = [i for i in range(1)]
-        increase = func_stats.get_mem_usage()
-        print(f"Memory usage of function: {increase} bytes")
-
-        print(func_stats.get_variable_mem_usage())
-
-    sample_function()
+    # def sample_function():
+    #     func_stats = FunctionStatistics()
+    #     a = [i for i in range(1)]
+    #     increase = func_stats.get_mem_usage()
+    #     print(f"Memory usage of function: {increase} bytes")
+    #
+    #     print(func_stats.get_variable_mem_usage())
+    #
+    # sample_function()
