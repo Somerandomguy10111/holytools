@@ -37,31 +37,38 @@ class ProcessStatistics:
 
 class FunctionStatistics:
     @staticmethod
-    def get_caller_frame():
-        return inspect.currentframe().f_back
-
-    def get_memory_usage_in_bytes(self) -> int:
-        caller_frame = self.get_caller_frame()
+    def get_mem_usage() -> int:
+        caller_frame = inspect.currentframe().f_back
         try:
             current_locals_size = asizeof.asizeof(caller_frame.f_locals)
             return current_locals_size
         finally:
             del caller_frame
 
+    @staticmethod
+    def get_variable_mem_usage() -> dict[str, int]:
+        caller_frame = inspect.currentframe().f_back
+        try:
+            variables_memory_usage = {}
+            for var_name, var_value in caller_frame.f_locals.items():
+                variables_memory_usage[var_name] = asizeof.asizeof(var_value)
+            return variables_memory_usage
+        finally:
+            del caller_frame
 
-# Example usage
+
 if __name__ == "__main__":
-    # ProcessStatistics usage example
-    # Replace '1234' with an actual process ID
-    process_stats = ProcessStatistics(1234)
-    print(f"Memory usage: {process_stats.get_memory_usage_in_mb()} MB")
-    print(f"CPU usage: {process_stats.get_cpu_usage()} %")
+    # process_stats = ProcessStatistics(1234)
+    # print(f"Memory usage: {process_stats.get_memory_usage_in_mb()} MB")
+    # print(f"CPU usage: {process_stats.get_cpu_usage()} %")
 
     # FunctionStatistics usage example
     def sample_function():
         func_stats = FunctionStatistics()
-        a = [i for i in range(1000)]
-        increase = func_stats.get_memory_usage_in_bytes()
+        a = [i for i in range(1)]
+        increase = func_stats.get_mem_usage()
         print(f"Memory usage of function: {increase} bytes")
+
+        print(func_stats.get_variable_mem_usage())
 
     sample_function()
