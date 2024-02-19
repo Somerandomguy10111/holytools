@@ -28,11 +28,28 @@ class FsysNode:
         return [des for des in self.get_subnodes() if des.is_file()]
 
 
-    def get_subnodes(self) -> list[FsysNode]:
+    def get_subnodes(self, follow_symlinks : bool = False) -> list[FsysNode]:
+        if not self.is_dir():
+            return []
+
         if self._subnodes is None:
+            self._subnodes = self._retrieve_subnodes(follow_symlinks=follow_symlinks)
+
+        return self._subnodes
+
+
+    def _retrieve_subnodes(self, follow_symlinks : bool = False) -> list[FsysNode]:
+        subnodes = []
+        if follow_symlinks:
+            child_paths = [os.path.join(self.get_path(), name) for name in os.listdir(self.get_path())]
+            child_nodes = [FsysNode(path=path) for path in child_paths]
+            for child in child_nodes:
+                subnodes.append(child)
+                subnodes += child.get_subnodes(follow_symlinks=True)
+        else:
             path_list = list(Path(self._path).rglob('*'))
             self._subnodes: list[FsysNode] = [FsysNode(str(path)) for path in path_list]
-        return self._subnodes
+        return subnodes
 
     # -------------------------------------------
     # get
@@ -93,6 +110,8 @@ if __name__ == "__main__":
     test_zip_bytes  = test_node.get_zip()
 
     print(test_node.select_file_subnodes(['.dat', '.txt']))
+
+    print(test_node.get_subnodes(follow_symlinks=True))
 
     # with open('test.zip', 'wb') as the_file:
     #     the_file.write(test_zip_bytes)
