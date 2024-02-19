@@ -1,8 +1,7 @@
 from __future__ import annotations
-import logging
-from logging import Logger as BaseLogger
+import logging, os, inspect
 from typing import Optional, Union
-from copy import copy
+from logging import Logger as BaseLogger
 
 from hollarek.dev.log.formatter import Formatter, LogTarget
 from hollarek.dev.log.log_settings import LogSettings, LogLevel
@@ -15,13 +14,15 @@ def get_logger(settings: Optional[LogSettings] = None,
         settings = LogSettings()
 
     if name is None:
-        name = "unnamed_logger"
+        frame = inspect.currentframe().f_back
+        module = inspect.getmodule(frame)
+        if module:
+            name = module.__name__
+        else:
+            name = "unnamed_logger"
+
 
     return LoggerFactory.make_logger(settings=settings, name=name)
-
-
-def update_default_log_settings(new_settings : LogSettings):
-    LoggerFactory.update_default_settings(settings=new_settings)
 
 
 class Logger(BaseLogger):
@@ -40,14 +41,8 @@ class LoggerFactory:
     def get_default_logger(cls) -> Logger:
         if not cls._default_logger:
             cls._default_logger = get_logger(settings=cls._default_settings)
-        
+
         return cls._default_logger
-
-    @classmethod
-    def update_default_settings(cls, settings : LogSettings):
-        cls._default_settings = settings
-        cls._default_logger = get_logger(settings=cls._default_settings)
-
 
     @classmethod
     def make_logger(cls, settings: LogSettings, name : str) -> Logger:
@@ -71,10 +66,14 @@ class LoggerFactory:
 
 if __name__ == "__main__":
     the_settings = LogSettings(use_timestamp=True, include_ms_in_timestamp=True, log_file_path='test')
-    log = get_logger().log
+
+    test_logger = get_logger()
+    print(test_logger.name)
+    log = test_logger.log
 
     log("This is a debug message", level=logging.DEBUG)
     log("This is an info message", level=logging.INFO)
     log("This is a warning message", level=logging.WARNING)
     log("This is an error message.", level=logging.ERROR)
     log("This is a critical error message!!", level=logging.CRITICAL)
+
