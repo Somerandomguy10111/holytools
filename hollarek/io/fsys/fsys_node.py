@@ -16,14 +16,12 @@ class FsysNode:
     # sub
 
     def select_file_subnodes(self, allowed_formats : list[str]) -> list[FsysNode]:
-        selected_node = []
-        file_nodes  = self.get_file_subnodes()
-        for node in file_nodes:
-            suffix = node.get_suffix()
-            if suffix in allowed_formats:
-                selected_node.append(node)
+        fpaths = [str(path) for path in Path(self._path).rglob('*')]
+        fmt_with_dots = [fmt if fmt.startswith('.') else f'.{fmt}' for fmt in allowed_formats]
+        is_allowed_path = lambda path : any([path.endswith(fmt) for fmt in fmt_with_dots])
+        selected_paths = [path for path in fpaths if is_allowed_path(path)]
 
-        return selected_node
+        return [FsysNode(path=path) for path in selected_paths]
 
 
     def get_file_subnodes(self) -> list[FsysNode]:
@@ -89,14 +87,15 @@ class FsysNode:
 
 
 if __name__ == "__main__":
-    test_path = '/home/daniel/OneDrive/Downloads/test'
+    test_path = '/home/daniel/OneDrive/Downloads'
     print(os.path.isfile(test_path))
     test_node = FsysNode(path=test_path)
     test_zip_bytes  = test_node.get_zip()
 
+    print(test_node.select_file_subnodes(['.dat', '.txt']))
 
-    with open('test.zip', 'wb') as the_file:
-        the_file.write(test_zip_bytes)
+    # with open('test.zip', 'wb') as the_file:
+    #     the_file.write(test_zip_bytes)
 
     # print(home_node.get_file_nodes())
     # for node in home_node.select_file_nodes(allowed_formats=['png']):
