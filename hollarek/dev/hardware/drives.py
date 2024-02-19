@@ -34,9 +34,9 @@ class Partition:
         log(f'Free space on partition {self.device_name}: {free_space_GB}/{total_space_GB} GB')
 
         if free_space_GB < critical_free_space_in_GB:
-            log(f'Warning: Almost no disk space remaining on {self.device_name}. Only {free_space_GB} GB left!')
+            log(f'Warning: Almost no disk space remaining on {self.device_name}. Only {free_space_GB} GB left!', level=logging.CRITICAL)
         elif free_space_GB < warning_free_space:
-            log(f'Warning: Disk space is running low on "{self.device_name}". Only {free_space_GB} GB left!')
+            log(f'Warning: Disk space is running low on "{self.device_name}". Only {free_space_GB} GB left!', level=logging.WARNING)
 
 
     def get_free_space_in_GB(self) -> float:
@@ -72,14 +72,14 @@ if __name__ == '__main__':
     import psutil
     # test_partitions = psutil.disk_partitions()
     # print(test_partitions)
-
-    test_part = Partition(device_name='/dev/nvme0n1p2')
-    log(test_part.mount_point)
-    test_part.print_free_space_info()
-
-    new_part = Partition.from_resource_path(resource_path='/media/daniel/STICKY1')
-    log(new_part.mount_point)
-    new_part.print_free_space_info()
-
+    #
+    # test_part = Partition(device_name='/dev/nvme0n1p2')
+    # log(test_part.mount_point)
+    # test_part.print_free_space_info()
+    #
+    # new_part = Partition.from_resource_path(resource_path='/media/daniel/STICKY1')
+    # log(new_part.mount_point)
+    # new_part.print_free_space_info()
+    #
     # for p in partitions:
     #     print(p.mountpoint, psutil.disk_usage(p.mountpoint).percent)
