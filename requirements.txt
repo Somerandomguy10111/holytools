@@ -9,3 +9,5 @@ psutil
 pympler
 beautifulsoup4
 dill
+notebook
+jupyter-server
