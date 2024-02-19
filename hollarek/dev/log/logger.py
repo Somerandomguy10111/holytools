@@ -1,5 +1,5 @@
 from __future__ import annotations
-import logging, os, inspect
+import logging, inspect
 from typing import Optional, Union
 from logging import Logger as BaseLogger
 

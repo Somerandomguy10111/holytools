@@ -1,8 +1,4 @@
 from __future__ import annotations
-
-from hollarek.io.web.site_visitor import SiteVisitor
-
-import threading
 import requests
 import logging
 from typing import Optional
@@ -21,7 +17,7 @@ class SearchEngine:
         return cls._instance
 
     def __init__(self,google_key : Optional[str] = None,
-                 searchengine_id : Optional[str] = None)
+                 searchengine_id : Optional[str] = None):
 
         if not SearchEngine._is_initialized:
             if google_key is None or searchengine_id is None:
