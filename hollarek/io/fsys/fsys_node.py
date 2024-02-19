@@ -9,7 +9,7 @@ class FsysNode:
     def __init__(self, path : str):
         self._path : str = path
         self._subnodes : Optional[list[FsysNode]] = None
-        if not self.get_is_resource():
+        if not self.get_is_dir() or self.get_is_file():
             raise FileNotFoundError(f'Path {path} is not a file/folder')
 
     # -------------------------------------------
@@ -24,6 +24,7 @@ class FsysNode:
                 selected_node.append(node)
 
         return selected_node
+
 
     def get_file_subnodes(self) -> list[FsysNode]:
         return [des for des in self.get_subnodes() if des.get_is_file()]
@@ -56,10 +57,6 @@ class FsysNode:
 
     def get_size_in_MB(self) -> float:
         return os.path.getsize(self._path) / (1024 * 1024)
-
-
-    def get_is_resource(self) -> bool:
-        return self.get_is_dir() or self.get_is_file()
 
     def get_is_file(self) -> bool:
         return os.path.isfile(self._path)

@@ -29,7 +29,7 @@ def print_free_space_info(location_path : str):
     log(f'Free space at {location_path}: {free_space_GB}/{total_space_GB} GB')
 
     if free_space_GB < warning_free_space:
-        log(f'Warning: Disk space is running low at {location_path}. Only {free_space_GB} GB left!', level=logging.WARNING)
+        log(f'Warning: Disk space is running low at "{location_path}. Only {free_space_GB} GB left!', level=logging.WARNING)
 
     elif free_space_GB < critical_free_space_in_GB:
         log(f'Warning: Almost no disk space remaining at {location_path}. Only {free_space_GB} GB left!', level=logging.CRITICAL)

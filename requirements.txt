@@ -5,3 +5,4 @@ requests
 func-timeout
 selenium
 pathvalidate
+psutil
