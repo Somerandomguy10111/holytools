@@ -8,3 +8,4 @@ pathvalidate
 psutil
 pympler
 beautifulsoup4
+dill
