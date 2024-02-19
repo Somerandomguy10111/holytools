@@ -10,9 +10,6 @@ from hollarek.dev.log.log_settings import LogSettings, LogLevel
 
 def get_logger(settings: Optional[LogSettings] = None,
                           name : Optional[str] = None) -> Logger:
-    if not settings:
-        settings = LogSettings()
-
     if name is None:
         frame = inspect.currentframe().f_back
         module = inspect.getmodule(frame)
@@ -21,8 +18,11 @@ def get_logger(settings: Optional[LogSettings] = None,
         else:
             name = "unnamed_logger"
 
+    return LoggerFactory.make_logger(name=name,settings=settings)
 
-    return LoggerFactory.make_logger(settings=settings, name=name)
+
+def update_defaults(new_settings : LogSettings):
+    LoggerFactory.set_defaults(settings=new_settings)
 
 
 class Logger(BaseLogger):
@@ -34,19 +34,16 @@ class Logger(BaseLogger):
 
 
 class LoggerFactory:
-    _default_logger : Optional[Logger] = None
     _default_settings : LogSettings = LogSettings()
 
     @classmethod
-    def get_default_logger(cls) -> Logger:
-        if not cls._default_logger:
-            cls._default_logger = get_logger(settings=cls._default_settings)
-
-        return cls._default_logger
+    def set_defaults(cls, settings : LogSettings):
+        cls._default_settings = settings
 
     @classmethod
-    def make_logger(cls, settings: LogSettings, name : str) -> Logger:
-        settings = settings
+    def make_logger(cls, name : str, settings : Optional[LogSettings] = None) -> Logger:
+        settings = settings or cls._default_settings
+
         logger = Logger(name=name)
         logger.propagate = False
         logger.setLevel(settings.log_level_threshold)
@@ -66,9 +63,7 @@ class LoggerFactory:
 
 if __name__ == "__main__":
     the_settings = LogSettings(use_timestamp=True, include_ms_in_timestamp=True, log_file_path='test')
-
     test_logger = get_logger()
-    print(test_logger.name)
     log = test_logger.log
 
     log("This is a debug message", level=logging.DEBUG)

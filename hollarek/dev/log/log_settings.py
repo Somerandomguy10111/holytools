@@ -1,7 +1,6 @@
 from __future__ import annotations
-
 import logging
-from dataclasses import dataclass
+from dataclasses import dataclass, fields
 from enum import Enum
 from typing import Optional
 
@@ -15,10 +14,6 @@ class LogSettings:
     use_timestamp: bool = True
     include_call_location : bool = False
     include_ms_in_timestamp : bool = False
-
-
-def update_default_log_settings(new_settings : LogSettings):
-    pass
 
 
 class LogLevel(Enum):
