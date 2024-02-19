@@ -6,3 +6,4 @@ func-timeout
 selenium
 pathvalidate
 psutil
+pympler

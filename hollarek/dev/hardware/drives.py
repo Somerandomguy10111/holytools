@@ -11,6 +11,9 @@ def log(msg : str, level : int = logging.INFO):
     drive_logger.log(msg=msg, level=level)
 
 
+class Drive:
+    pass
+
 def get_free_space_in_GB(directory : str) -> float:
     total, used, free = shutil.disk_usage(os.path.realpath(directory))
     return free / (1024**3)
