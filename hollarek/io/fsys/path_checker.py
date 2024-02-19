@@ -32,16 +32,3 @@ class PathChecker:
 
 
 
-import tempfile, shutil
-
-
-def get_folder_zip(input_dir_path : str) -> bytes:
-    with tempfile.TemporaryDirectory() as temp_dir:
-        base_path = os.path.join(temp_dir, 'data_backup')
-        shutil.make_archive(base_name=base_path, format='zip', root_dir=input_dir_path)
-
-        with open(f'{base_path}.zip', 'rb') as file:
-            zip_bytes = file.read()
-
-    return zip_bytes
-
