@@ -1,10 +1,9 @@
 from __future__ import annotations
-
-from func_timeout import func_timeout
+from bs4 import BeautifulSoup
+from func_timeout import func_timeout, FunctionTimedOut
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from .mail_addresses import get_mail_addresses_in_text
-from func_timeout import FunctionTimedOut
 import logging
 
 
@@ -40,6 +39,14 @@ class SiteVisitor:
         return get_mail_addresses_in_text(text=self.get_html(site_url=site_url))
 
 
+    def get_text(self, site_url: str) -> str:
+        page_source = self.get_html(site_url=site_url)
+
+        soup = BeautifulSoup(page_source, 'html.parser')
+        site_text = ' '.join(element for element in soup.stripped_strings)
+        return site_text
+
+
     def get_html(self, site_url: str) -> str:
         try:
             result = self.fetch_site_html(site_url)
@@ -50,16 +57,7 @@ class SiteVisitor:
 
         return result
 
-    # def _get_free_driver(self) -> WebDriver:
-    #     unoccupied_drivers = [driver for driver in self if not driver.is_busy]
-    #     if len(unoccupied_drivers) > 0:
-    #         return unoccupied_drivers[0]
-    #
-    #     else:
-    #         return self._make_driver()
-    #
-    # def _make_driver(self):
-    #     new_driver = WebDriver()
-    #     self.drivers.append(new_driver)
-    #
-    #     return new_driver
+
+if __name__ == '__main__':
+    visitor = SiteVisitor()
+    print(visitor.get_text(site_url='https://en.wikipedia.org/wiki/Beaver'))
