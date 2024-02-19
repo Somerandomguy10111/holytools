@@ -26,7 +26,7 @@ def check_subdir_namecollsions():
                 imported_names.add(name)
 
 
-def generate_venv(src_dirpath : str, venv_name : str = 'venv'):
+def mkvenv(src_dirpath : str, venv_name : str = 'venv'):
     # setup dependencies
     """
     Generates a venv with all python packages that can be found in src code in src_dirpath
