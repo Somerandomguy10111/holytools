@@ -12,3 +12,4 @@ dill
 notebook
 jupyterlab
 cryptography
+boto3
