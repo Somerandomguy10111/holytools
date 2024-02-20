@@ -43,7 +43,6 @@ class AES(Crypto):
     # -------------------------------------------
     # get
 
-
     def _get_encryptor(self, byte_key : bytes):
         return self._get_cipher(key=byte_key).encryptor()
 
