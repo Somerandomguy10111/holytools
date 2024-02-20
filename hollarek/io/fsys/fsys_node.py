@@ -113,7 +113,7 @@ if __name__ == "__main__":
 
     print(test_node.get_subnodes(follow_symlinks=True))
 
-    # with open('test.zip', 'wb') as the_file:
+    # with open('test_suite.zip', 'wb') as the_file:
     #     the_file.write(test_zip_bytes)
 
     # print(home_node.get_file_nodes())

@@ -82,7 +82,7 @@ class Person(Jsonifyable):
 @dataclass
 class ComplexPerson(Jsonifyable):
     name: str
-    data: dict  # This is to test non-Jsonifyable, but still JSON-compatible
+    data: dict  # This is to test_suite non-Jsonifyable, but still JSON-compatible
     timestamp: datetime  # Testing proper serialization of datetime
 
 # Create another class intended to fail serialization due to unsupported type

@@ -62,7 +62,7 @@ class LoggerFactory:
 
 
 if __name__ == "__main__":
-    the_settings = LogSettings(use_timestamp=True, include_ms_in_timestamp=True, log_file_path='test')
+    the_settings = LogSettings(use_timestamp=True, include_ms_in_timestamp=True, log_file_path='test_suite')
     test_logger = get_logger()
     log = test_logger.log
 
