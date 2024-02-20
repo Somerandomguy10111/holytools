@@ -54,3 +54,4 @@ class ConfigManager:
 if __name__ == "__main__":
     conf = ConfigManager()
     conf.get_value(key='abc', category=StdCategories.GENERAL)
+
