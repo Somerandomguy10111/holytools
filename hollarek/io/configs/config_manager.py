@@ -62,16 +62,16 @@ class ConfigManager:
 
 
     def encrypt(self, content : str) -> str:
-        print(f'Plain text value : {content}')
+        # print(f'Plain text value : {content}')
         encr = self.aes.encrypt(content=content, key = self.encr_key) if self.encr_key else content
-        print(f'Encrypted value: {encr}')
+        # print(f'Encrypted value: {encr}')
         return encr
 
 
     def decrypt(self, content : str) -> str:
-        print(f'Encrypted value: {content}')
+        # print(f'Encrypted value: {content}')
         decr = self.aes.decrypt(content=content, key=self.encr_key) if self.encr_key else content
-        print(f'Decrypted value: {decr}')
+        # print(f'Decrypted value: {decr}')
         return decr
 
 
@@ -84,6 +84,6 @@ class ConfigManager:
 
 if __name__ == "__main__":
     conf = ConfigManager(encryption_key='abc')
-    conf.get_value(key='abc', category=StdCategories.GENERAL)
+    print(conf.get_value(key='abc', category=StdCategories.GENERAL))
 
 

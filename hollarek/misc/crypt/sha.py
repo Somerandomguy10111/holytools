@@ -4,7 +4,7 @@ from cryptography.hazmat.backends import default_backend
 
 class SHA:
     @staticmethod
-    def get_hash(str_key: str, bit_length: int = 256) -> bytes:
+    def get_hash(txt: str, bit_length: int = 256) -> bytes:
         if bit_length == 256:
             algorithm = hashes.SHA256()
         elif bit_length == 384:
@@ -15,6 +15,6 @@ class SHA:
             raise ValueError("Unsupported bit length for SHA hash.")
 
         digest = hashes.Hash(algorithm=algorithm, backend=default_backend())
-        digest.update(str_key.encode())
+        digest.update(txt.encode())
         return digest.finalize()
 
