@@ -1,5 +1,5 @@
 from abc import abstractmethod, ABC
-
+from typing import Optional
 
 class Crypto:
     @abstractmethod
@@ -7,5 +7,5 @@ class Crypto:
         pass
 
     @abstractmethod
-    def decrypt(self, key: str, content: str) -> str:
+    def decrypt(self, key: str, content: str) -> Optional[str]:
         pass
