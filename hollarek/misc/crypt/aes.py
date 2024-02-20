@@ -4,8 +4,11 @@ from cryptography.hazmat.backends import default_backend
 from .sha import SHA
 from .crypto import Crypto
 import os
-
+from hollarek.dev.log import get_logger, LogLevel
+from typing import Optional
 # -------------------------------------------
+
+log = get_logger().log
 
 class AES(Crypto):
     def __init__(self):
@@ -22,17 +25,20 @@ class AES(Crypto):
         return b64encode(self.iv + encrypted_content).decode()
 
 
-    def decrypt(self, key : str, content: str) -> str:
-        if len(key) != 32:
-            raise ValueError("Key must be 32 bytes long for AES-256.")
-
+    def decrypt(self, key : str, content: str) -> Optional[str]:
         encrypted_data = b64decode(content)
         byte_key = self.sha.get_hash(str_key=key)
         iv, data  = encrypted_data[:16], encrypted_data[16:]
         decryptor = self._get_decryptor(byte_key=byte_key)
 
         decrypted_content = decryptor.update(data) + decryptor.finalize()
-        return decrypted_content.decode()
+        try:
+            decoded = decrypted_content.decode()
+        except UnicodeDecodeError:
+            log(f'Error decoding bytes to UTF-8. Most likely the decryption key is not correct', level=LogLevel.WARNING)
+            decoded = None
+
+        return decoded
 
     # -------------------------------------------
     # get

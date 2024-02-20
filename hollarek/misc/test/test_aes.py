@@ -6,4 +6,4 @@ if __name__ == "__main__":
 
     decr1 = aes.decrypt(key='abcd', content=encr)
     decr2 = aes.decrypt(key='aa', content=encr)
-    print(decr1, decr2)
+    print(decr1)
