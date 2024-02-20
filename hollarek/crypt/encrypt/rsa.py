@@ -2,7 +2,7 @@ from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import padding, rsa
 from cryptography.hazmat.primitives import hashes
 import base64
-from .crypto_algo import CryptoAlgo
+from .algo import CryptoAlgo
 
 
 class RSA(CryptoAlgo):

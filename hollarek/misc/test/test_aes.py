@@ -1,4 +1,4 @@
-from hollarek.misc.crypt import AES
+from hollarek.crypt.encrypt import AES
 
 if __name__ == "__main__":
     aes = AES()
@@ -13,3 +13,5 @@ if __name__ == "__main__":
     print(f'Correct key: {decr1}')
     print(f'False key: {decr2}')
     print(f'New instance, correct key: {decr2}')
+
+

@@ -3,10 +3,10 @@ from base64 import b64encode, b64decode
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.backends import default_backend
 from hollarek.dev.log import get_logger, LogLevel
-from typing import Optional
+from typing import Optional, Union
 
 from hollarek.crypt.hash import SHA
-from .crypto_algo import CryptoAlgo
+from .algo import CryptoAlgo
 # -------------------------------------------
 
 log = get_logger().log
@@ -17,21 +17,20 @@ class AES(CryptoAlgo):
         self.sha = SHA()
 
 
-    def encrypt(self, content: str, key : str) -> str:
+    def encrypt(self, content: str, key : Union[str, bytes]) -> str:
+        iv = os.urandom(16)
         byte_content = content.encode()
-        byte_key, iv = self.sha.get_hash(txt=key), os.urandom(16)
 
-        encryptor = self._get_encryptor(byte_key=byte_key, iv=iv)
+        encryptor = self._get_encryptor(byte_key=self.get_byte_key(key=key), iv=iv)
         encrypted_content = encryptor.update(byte_content) + encryptor.finalize()
         return b64encode(iv + encrypted_content).decode()
 
 
-    def decrypt(self, key : str, content: str) -> Optional[str]:
+    def decrypt(self, key : Union[str, bytes], content: str) -> Optional[str]:
         encrypted_data = b64decode(content)
-        byte_key = self.sha.get_hash(txt=key)
         iv, data  = encrypted_data[:16], encrypted_data[16:]
-        decryptor = self._get_decryptor(byte_key=byte_key, iv=iv)
 
+        decryptor = self._get_decryptor(byte_key=self.get_byte_key(key=key), iv=iv)
         decrypted_content = decryptor.update(data) + decryptor.finalize()
         try:
             decoded = decrypted_content.decode()
@@ -43,6 +42,12 @@ class AES(CryptoAlgo):
 
     # -------------------------------------------
     # get
+
+    def get_byte_key(self, key : Union[str, bytes]):
+        byte_key = self.sha.get_hash(txt=key) if isinstance(key, str) else key
+        if not len(byte_key) == 32:
+            raise IOError(f'Key must be 32 bytes long, but got {len(byte_key)} bytes.')
+        return byte_key
 
     def _get_encryptor(self, byte_key : bytes, iv : bytes):
         return self._get_cipher(key=byte_key, iv=iv).encryptor()
