@@ -1,10 +1,12 @@
+import os
 from base64 import b64encode, b64decode
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.backends import default_backend
-from .sha import SHA
-from .crypto import Crypto
 from hollarek.dev.log import get_logger, LogLevel
 from typing import Optional
+
+from .sha import SHA
+from .crypto import Crypto
 # -------------------------------------------
 
 log = get_logger().log
@@ -17,7 +19,7 @@ class AES(Crypto):
 
     def encrypt(self, content: str, key : str) -> str:
         byte_content = content.encode()
-        byte_key, iv = self.sha.get_hash(txt=key), self.sha.get_hash(txt=key)[:16]
+        byte_key, iv = self.sha.get_hash(txt=key), os.urandom(16)
 
         encryptor = self._get_encryptor(byte_key=byte_key, iv=iv)
         encrypted_content = encryptor.update(byte_content) + encryptor.finalize()
