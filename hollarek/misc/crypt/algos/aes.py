@@ -6,7 +6,7 @@ from hollarek.dev.log import get_logger, LogLevel
 from typing import Optional
 
 from .sha import SHA
-from .crypto import Crypto
+from .abstr import Crypto
 # -------------------------------------------
 
 log = get_logger().log
