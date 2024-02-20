@@ -2,10 +2,10 @@ from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import padding, rsa
 from cryptography.hazmat.primitives import hashes
 import base64
-from .abstr import Crypto
+from .crypto_algo import CryptoAlgo
 
 
-class RSA(Crypto):
+class RSA(CryptoAlgo):
 
     def encrypt(self, content: str, public_key: bytes) -> str:
         public_key_obj = self._load_public_key(public_key)

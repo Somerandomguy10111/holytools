@@ -5,13 +5,13 @@ from cryptography.hazmat.backends import default_backend
 from hollarek.dev.log import get_logger, LogLevel
 from typing import Optional
 
-from .sha import SHA
-from .abstr import Crypto
+from hollarek.crypt.hash import SHA
+from .crypto_algo import CryptoAlgo
 # -------------------------------------------
 
 log = get_logger().log
 
-class AES(Crypto):
+class AES(CryptoAlgo):
     def __init__(self):
         self.backend = default_backend()
         self.sha = SHA()
