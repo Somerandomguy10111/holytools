@@ -5,7 +5,7 @@ import subprocess
 from distutils.dir_util import copy_tree
 
 
-from cloud.entities.enums import AWSRegions
+from hollarek.cloud.entities.enums import AWSRegions
 # ----------------------------------------------
 
 class LambdaAWS:

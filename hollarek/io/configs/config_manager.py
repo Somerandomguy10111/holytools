@@ -2,7 +2,7 @@ import os.path
 from configparser import ConfigParser
 from enum import Enum
 import io
-from hollarek.misc.crypt import AES
+from hollarek.crypt import AES
 from typing import Optional
 
 class StdCategories(Enum):

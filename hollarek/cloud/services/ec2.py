@@ -2,8 +2,8 @@ import boto3, logging
 from botocore.exceptions import ClientError
 from typing import List
 
-from cloud.entities.EC2Template import InstanceTemplate
-from cloud.entities.enums import AWSRegions, InstanceState
+from hollarek.cloud.entities.EC2Template import InstanceTemplate
+from hollarek.cloud.entities.enums import AWSRegions, InstanceState
 
 # ----------------------------------------------
 

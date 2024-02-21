@@ -1,5 +1,5 @@
 import boto3, logging
-from cloud.entities.enums import AWSRegions
+from hollarek.cloud.entities.enums import AWSRegions
 
 # ----------------------------------------------
 
