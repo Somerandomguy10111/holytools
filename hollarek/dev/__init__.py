@@ -1,3 +1,3 @@
-from .dtype import *
+from .dtyping import *
 from .log import *
 from .test import *
