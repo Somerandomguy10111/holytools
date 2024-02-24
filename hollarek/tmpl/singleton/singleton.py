@@ -1,4 +1,4 @@
-from ..loggable import Loggable
+from ..loggable import Loggable, LogLevel
 
 
 class Singleton(Loggable):
@@ -6,6 +6,10 @@ class Singleton(Loggable):
     is_initialized = False
 
     def __new__(cls, *args, **kwargs):
+        if (args or kwargs) and cls.is_initialized:
+            cls.cls_log("Warning: Additional arguments provided to an already initialized singleton",
+                        level=LogLevel.WARNING)
+
         if not cls._instance:
             cls._instance = super().__new__(cls)
         return cls._instance
@@ -14,8 +18,6 @@ class Singleton(Loggable):
     def __init__(self, *args, **kwargs):
         super().__init__()
         self.is_initialized = self.__class__.is_initialized
-        if (args or kwargs) and self.is_initialized:
-            self.log("Warning: Additional arguments provided to an already initialized singleton")
 
         if not self.is_initialized:
             self.__class__.is_initialized = True

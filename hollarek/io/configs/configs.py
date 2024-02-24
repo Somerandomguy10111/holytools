@@ -16,7 +16,7 @@ class AWSConfigs(Configs):
         self.secret_name: str = secret_name
         session = boto3.session.Session()
         self.client = session.client(service_name='secretsmanager', region_name=region.value)
-        self.log(f'Initialized {self.__class__.__name__} with region \"{region.value}\"')
+        self.cls_log(f'Initialized {self.__class__.__name__} with region \"{region.value}\"')
 
 
     def set(self, key : str, value : str):
@@ -31,7 +31,7 @@ class AWSConfigs(Configs):
             settings = Settings.from_str(secret_value['SecretString'])
 
         except Exception as e:
-            self.log(f'An error occurred while trying to read value from AWS: {e}', LogLevel.ERROR)
+            self.cls_log(f'An error occurred while trying to read value from AWS: {e}', LogLevel.ERROR)
 
         return settings
 
@@ -47,7 +47,7 @@ class LocalConfigs(Configs):
         self._config_fpath : str = config_fpath
         self._aes : AES = AES()
         self._encr_key : Optional[str] = encryption_key
-        self.log(f'Initialized {self.__class__.__name__} with \"{self._config_fpath}\"')
+        self.cls_log(f'Initialized {self.__class__.__name__} with \"{self._config_fpath}\"')
 
 
     def set(self, key : str, value:  str):

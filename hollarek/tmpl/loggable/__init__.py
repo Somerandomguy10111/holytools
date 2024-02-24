@@ -1,1 +1,1 @@
-from .loggable import Loggable
+from .loggable import Loggable, LogLevel, LogSettings
