@@ -8,8 +8,8 @@ from typing import Optional
 from hollarek.crypt import AES
 from hollarek.cloud import AWSRegion
 from hollarek.dev import LogLevel
-from hollarek.io.configs.abstr_configs import Configs
-from .abstr_configs import Settings
+from hollarek.io.configs.abstr import Configs
+from .abstr import Settings
 # ---------------------------------------------------------
 
 
@@ -62,26 +62,33 @@ class LocalConfigs(Configs):
 
 
     def retrieve_settings(self) -> Settings:
-        with open(self._config_fpath, 'r') as configfile:
-            decrypted_data = self._decrypt(configfile.read().strip())
-            self._parser.read_string(decrypted_data)
-        settings_dict = dict(self._parser.items(section=LocalConfigs.CATEGORY_NAME))
-        return settings_dict
-
+        self._parser.read_string(self.get_decrypted_from_file())
+        return dict(self._parser.items(section=LocalConfigs.CATEGORY_NAME))
 
 
     def set(self, key : str, value:  str):
-        section = LocalConfigs.CATEGORY_NAME
-        self._parser.set(section, key, value)
-        with io.StringIO() as configIO:
-            self._parser.write(configIO)
-            config_str = configIO.getvalue()
-        encrypted_data = self._encrypt(content=config_str)
+        self._settings[key] = value
+        self._parser.set(LocalConfigs.CATEGORY_NAME, key, value)
+
         with open(self._config_fpath, 'w') as configfile:
-            configfile.write(encrypted_data)
+            encr = self.get_encrypted_from_settings()
+            configfile.write(encr)
 
     # -------------------------------------------
     # encryption
+
+    def get_encrypted_from_settings(self) -> str:
+        with io.StringIO() as configIO:
+            self._parser.write(configIO)
+            config_str = configIO.getvalue()
+        return self._encrypt(content=config_str)
+
+
+    def get_decrypted_from_file(self) -> str:
+        with open(self._config_fpath, 'r') as configfile:
+            decrypted_data = self._decrypt(configfile.read().strip())
+            return decrypted_data
+
 
     def _encrypt(self, content : str) -> str:
         encr = self._aes.encrypt(content=content, key = self._encr_key) if self._encr_key else content
