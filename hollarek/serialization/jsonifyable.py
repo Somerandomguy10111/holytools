@@ -89,7 +89,7 @@ class ComplexPerson(Jsonifyable):
 @dataclass
 class FaultyPerson(Jsonifyable):
     name: str
-    unsupported: set  # 'set' is not directly JSON serializable
+    unsupported: set  # 'set' is not directly JSON serialization
 
 # Testing
 if __name__ == "__main__":
@@ -102,7 +102,7 @@ if __name__ == "__main__":
     complex_person = ComplexPerson(name="Alice", data={"key": "value"}, timestamp=datetime.now())
     print(complex_person.to_str())
 
-    # Object intended to fail due to containing a non-serializable 'set'
+    # Object intended to fail due to containing a non-serialization 'set'
     faulty_person = FaultyPerson(name="Faulty", unsupported={1, 2, 3})
     try:
         print(faulty_person.to_str())  # This should raise an exception
