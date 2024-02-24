@@ -10,13 +10,13 @@ from .abstr import Settings
 # ---------------------------------------------------------
 
 
-
 class AWSConfigs(Configs):
-    def __init__(self, secret_name : str, region : AWSRegion):
+    def __init__(self, secret_name : str, region : AWSRegion = AWSRegion.EU_NORTH_1):
         super().__init__()
         self.secret_name: str = secret_name
         session = boto3.session.Session()
         self.client = session.client(service_name='secretsmanager', region_name=region.value)
+        self.log(f'Initialized {self.__class__.__name__} with region \"{region.value}\"')
 
 
     def set(self, key : str, value : str):

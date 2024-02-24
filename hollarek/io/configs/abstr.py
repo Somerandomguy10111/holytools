@@ -8,7 +8,7 @@ from hollarek.dev import get_logger, LogSettings
 class Settings(dict[str,str]):
     @staticmethod
     def from_str(json_str : str) -> Settings:
-        return json.loads(json_str)
+        return Settings(json.loads(json_str))
 
     def to_str(self) -> str:
         return json.dumps(self)
@@ -31,7 +31,7 @@ class Configs:
             if not value:
                 raise KeyError
         except Exception as e:
-            value = input(f'Could not find key {key} in settings: \"{e}\" Please set it manually')
+            value = input(f'Could not find key {key} in settings: Please set it manually\n')
             value = self.set(key=key, value=value)
         return value
 
