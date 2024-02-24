@@ -50,6 +50,8 @@ class LocalConfigs(Configs):
 
     def set(self, key : str, value:  str):
         self._settings[key] = value
+        parent_dir = os.path.basename(self._config_fpath)
+        os.makedirs(parent_dir)
         with open(self._config_fpath, 'w') as configfile:
             config_str = self._settings.to_str()
             encr = self._encrypt(content=config_str)

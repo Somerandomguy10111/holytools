@@ -3,7 +3,7 @@ from __future__ import annotations
 import time
 from abc import abstractmethod
 import json
-from hollarek.tmpl import Singleton
+from hollarek.tmpl import Singleton, LogLevel
 
 
 class Settings(dict[str,str]):
@@ -28,13 +28,16 @@ class Configs(Singleton):
     def get(self, key : str) -> str:
         if not self.is_setup:
             self._settings  = self._retrieve_settings()
+
+        if self._settings.is_empty():
+            self.log(msg=f'No settings found', level=LogLevel.WARNING)
         try:
             value = self._settings.get(key)
             if not value:
                 raise KeyError
         except:
-            time.sleep(0.001)
-            value = input(f'Could not find key {key} in settings: Please set it manually\n')
+            self.log(f'Could not find key {key} in settings: Please set it manually', level=LogLevel.WARNING)
+            value = input()
             value = self.set(key=key, value=value)
         return value
 
