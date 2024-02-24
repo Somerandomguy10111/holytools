@@ -6,7 +6,10 @@ import json
 from typing import  get_type_hints
 from hollarek.dev import get_core_type
 from abc import ABC
-from dataclasses import dataclass
+
+from t_jsonifyable import person, complex_person, faulty_person
+
+
 # -------------------------------------------
 
 class Jsonifyable(ABC):
@@ -68,43 +71,3 @@ class Jsonifyable(ABC):
         if isinstance(obj, datetime):
             return obj.isoformat()
         return json.JSONEncoder().default(obj)
-
-
-
-from typing import Optional
-# Create two example dataclasses
-@dataclass
-class Person(Jsonifyable):
-    name: str
-    age: int
-    birthday: Optional[datetime] = None
-
-@dataclass
-class ComplexPerson(Jsonifyable):
-    name: str
-    data: dict  # This is to test_suite non-Jsonifyable, but still JSON-compatible
-    timestamp: datetime  # Testing proper tmpl of datetime
-
-# Create another class intended to fail tmpl due to unsupported type
-@dataclass
-class FaultyPerson(Jsonifyable):
-    name: str
-    unsupported: set  # 'set' is not directly JSON tmpl
-
-# Testing
-if __name__ == "__main__":
-    # Object expected to work
-    person_json = '{"name": "John Doe", "age": 30, "birthday": "1992-05-01T00:00:00"}'
-    person = Person.from_str(person_json)
-    print(person.to_str())  # Convert back to JSON string
-
-    # Object with all JSON-compatible types but not Jsonifyable inherently
-    complex_person = ComplexPerson(name="Alice", data={"key": "value"}, timestamp=datetime.now())
-    print(complex_person.to_str())
-
-    # Object intended to fail due to containing a non-tmpl 'set'
-    faulty_person = FaultyPerson(name="Faulty", unsupported={1, 2, 3})
-    try:
-        print(faulty_person.to_str())  # This should raise an exception
-    except TypeError as e:
-        print(f"Expected error for non-serializable type: {e}")
