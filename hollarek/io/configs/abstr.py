@@ -17,11 +17,15 @@ class Settings(dict[str,str]):
 class Configs:
     def __init__(self):
         self._settings : Settings = Settings()
+        self.is_initialized : bool = False
         logger = get_logger(settings=LogSettings(), name=self.__class__.__name__)
         self.log = logger.log
 
 
     def get(self, key : str) -> str:
+        if not self.is_initialized:
+            self._settings  = self._retrieve_settings()
+            self.is_initialized = True
         try:
             value = self._settings.get(key)
             if not value:
@@ -32,7 +36,7 @@ class Configs:
         return value
 
     @abstractmethod
-    def retrieve_settings(self) -> Optional[Settings]:
+    def _retrieve_settings(self) -> Optional[Settings]:
         pass
 
 

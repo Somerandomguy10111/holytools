@@ -1,7 +1,5 @@
-import io
 import os.path
 import boto3
-from configparser import ConfigParser
 from typing import Optional
 
 from hollarek.crypt import AES
@@ -19,7 +17,6 @@ class AWSConfigs(Configs):
         self.secret_name: str = secret_name
         session = boto3.session.Session()
         self.client = session.client(service_name='secretsmanager', region_name=region.value)
-        self._settings: Settings = self.retrieve_settings()
 
 
     def set(self, key : str, value : str):
@@ -27,7 +24,7 @@ class AWSConfigs(Configs):
         self.client.update_secret(SecretId=self.secret_name, SecretString=self._settings.to_str())
 
 
-    def retrieve_settings(self) -> Optional[Settings]:
+    def _retrieve_settings(self) -> Optional[Settings]:
         settings = None
         try:
             secret_value = self.client.get_secret_value(SecretId=self.secret_name)
@@ -40,56 +37,35 @@ class AWSConfigs(Configs):
 
 
 
-
-
 class LocalConfigs(Configs):
-    CATEGORY_NAME = 'GENERAL'
-
     def __init__(self, config_fpath : str = os.path.expanduser('~/.pyconfig'),
                        encryption_key : Optional[str] = None):
         super().__init__()
         self._config_fpath : str = config_fpath
-        self._parser : ConfigParser = self.make_parser()
         self._aes : AES = AES()
         self._encr_key : Optional[str] = encryption_key
 
         self.log(f'Initialized {self.__class__.__name__} with \"{self._config_fpath}\"')
 
-
-    @staticmethod
-    def make_parser():
-        parser : ConfigParser = ConfigParser()
-        parser.add_section(LocalConfigs.CATEGORY_NAME)
-        return parser
-
-
-    def retrieve_settings(self) -> Settings:
-        self._parser.read_string(self.get_decrypted_from_file())
-        settings_dict = dict(self._parser.items(section=LocalConfigs.CATEGORY_NAME))
-        return Settings(settings_dict)
-
-
     def set(self, key : str, value:  str):
         self._settings[key] = value
-        self._parser.set(LocalConfigs.CATEGORY_NAME, key, value)
-
         with open(self._config_fpath, 'w') as configfile:
-            encr = self.get_encrypted_from_settings()
+            config_str = self._settings.to_str()
+            encr = self._encrypt(content=config_str)
             configfile.write(encr)
+
+
+    def _retrieve_settings(self) -> Settings:
+        file_content = self._get_file_content()
+        settings = Settings.from_str(json_str=file_content)
+        return settings
 
     # -------------------------------------------
     # encryption
 
-    def get_encrypted_from_settings(self) -> str:
-        with io.StringIO() as configIO:
-            self._parser.write(configIO)
-            config_str = configIO.getvalue()
-        return self._encrypt(content=config_str)
-
-
-    def get_decrypted_from_file(self) -> str:
+    def _get_file_content(self) -> str:
         with open(self._config_fpath, 'r') as configfile:
-            decrypted_data = self._decrypt(configfile.read().strip())
+            decrypted_data = self._decrypt(configfile.read())
             return decrypted_data
 
 
@@ -104,5 +80,3 @@ class LocalConfigs(Configs):
 
 
 
-if __name__ == "__main__":
-    conf = LocalConfigs(encryption_key='abc')
