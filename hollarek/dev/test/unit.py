@@ -24,9 +24,8 @@ class Unittest(unittest.TestCase, ABC):
         except Exception as e:
             self.fail(f"Test failed with error: {e}")
 
-
     @classmethod
-    def run_tests(cls):
+    def execute_all(cls):
         cls._print_header()
         results = cls._get_test_results()
         cls.log(cls._get_final_status_msg(result=results))

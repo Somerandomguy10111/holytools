@@ -88,4 +88,4 @@ class TestIsOptionalType(Unittest):
 
 if __name__ == '__main__':
     test = TestIsOptionalType()
-    test.run_tests()
+    test.execute_all()

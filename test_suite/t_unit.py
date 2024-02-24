@@ -39,4 +39,4 @@ class JsonTester(Unittest):
 
 
 if __name__ == "__main__":
-    JsonTester.run_tests()
+    JsonTester.execute_all()
