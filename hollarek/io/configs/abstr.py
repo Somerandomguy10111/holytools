@@ -15,14 +15,10 @@ class Settings(dict[str,str]):
 
 
 class Configs(Singleton):
-
     def __init__(self, *args, **kwargs):
-        try:
-            super().__init__(*args, **kwargs)
-            self._settings : Settings = Settings()
-            self.is_setup : bool = False
-        except ValueError:
-            pass
+        super().__init__(*args, **kwargs)
+        self._settings: Settings = Settings()
+        self.is_setup: bool = False
 
 
     def get(self, key : str) -> str:

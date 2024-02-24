@@ -40,12 +40,15 @@ class AWSConfigs(Configs):
 class LocalConfigs(Configs):
     def __init__(self, config_fpath : str = os.path.expanduser('~/.pyconfig'),
                        encryption_key : Optional[str] = None):
+        if LocalConfigs.is_initialized:
+            return
+
         super().__init__()
         self._config_fpath : str = config_fpath
         self._aes : AES = AES()
         self._encr_key : Optional[str] = encryption_key
-
         self.log(f'Initialized {self.__class__.__name__} with \"{self._config_fpath}\"')
+
 
     def set(self, key : str, value:  str):
         self._settings[key] = value

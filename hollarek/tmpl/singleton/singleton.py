@@ -1,10 +1,9 @@
 from ..loggable import Loggable
-from abc import abstractmethod, ABC
 
 
-class Singleton(Loggable, ABC):
+class Singleton(Loggable):
     _instance = None
-    _is_initialized = False
+    is_initialized = False
 
     def __new__(cls, *args, **kwargs):
         if not cls._instance:
@@ -14,18 +13,19 @@ class Singleton(Loggable, ABC):
 
     def __init__(self, *args, **kwargs):
         super().__init__()
-        self.is_initialized = self.__class__._is_initialized
+        self.is_initialized = self.__class__.is_initialized
         if (args or kwargs) and self.is_initialized:
             self.log("Warning: Additional arguments provided to an already initialized singleton")
 
         if not self.is_initialized:
-            self.__init__once__()
-            self.__class__._initialized = True
+            self.__class__.is_initialized = True
+            self.__class__._instance = self
         else:
-            raise ValueError(f'Cannot initialize {self.__class__} more than once')
+            raise AlreadyInitialized('Cannot initialize {self.__class__} more than once')
 
 
-
-    @abstractmethod
-    def __init__once__(self):
-        pass
+class AlreadyInitialized(Exception):
+    """Exception raised when a singleton instance is initialized more than once."""
+    def __init__(self, message="Singleton instance has already been initialized"):
+        self.message = message
+        super().__init__(self.message)

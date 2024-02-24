@@ -5,6 +5,7 @@ if __name__ == "__main__":
     another_configs = LocalConfigs(config_fpath='abcd')
 
     print(local_confs == another_configs)
+    print(local_confs.__class__ == another_configs.__class__)
 
     cloud_confs = AWSConfigs(secret_name='lotus_api_keys')
     cloud_confs.get(key='openai_api_key')
