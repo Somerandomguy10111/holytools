@@ -53,7 +53,7 @@ class SearchEngine:
 
 
 if __name__ == '__main__':
-    from ..configs.config_manager import ConfigManager, StdCategories
+    from ..configs.configs import ConfigManager, StdCategories
 
     new_conf_manger = ConfigManager()
     google_api_key = new_conf_manger.get_value(key='google_key',category=StdCategories.APIS)

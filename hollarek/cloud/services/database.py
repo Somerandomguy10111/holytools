@@ -1,10 +1,10 @@
 import boto3, logging
-from hollarek.cloud.entities.enums import AWSRegions
+from hollarek.cloud.entities.enums import AWSRegion
 
 # ----------------------------------------------
 
 class DatabaseAWS:
-    def __init__(self, region : AWSRegions):
+    def __init__(self, region : AWSRegion):
         self.region : str = region.value
         self.dynamodb_client = boto3.client('dynamodb', region_name=self.region)
 

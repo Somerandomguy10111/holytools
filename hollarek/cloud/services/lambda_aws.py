@@ -5,14 +5,14 @@ import subprocess
 from distutils.dir_util import copy_tree
 
 
-from hollarek.cloud.entities.enums import AWSRegions
+from hollarek.cloud.entities.enums import AWSRegion
 # ----------------------------------------------
 
 class LambdaAWS:
 
     lambda_filename = 'pyfunct'
 
-    def __init__(self, region : AWSRegions):
+    def __init__(self, region : AWSRegion):
         self.region : str = region.value
         self.lambda_client = boto3.client('lambda', region_name=self.region)
 

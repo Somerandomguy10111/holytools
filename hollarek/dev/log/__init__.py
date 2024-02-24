@@ -1,2 +1,2 @@
 from .log_settings import LogLevel, LogSettings
-from .logger import get_logger
+from .logger import get_logger, Logger

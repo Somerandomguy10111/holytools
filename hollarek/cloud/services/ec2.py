@@ -3,12 +3,12 @@ from botocore.exceptions import ClientError
 from typing import List
 
 from hollarek.cloud.entities.EC2Template import InstanceTemplate
-from hollarek.cloud.entities.enums import AWSRegions, InstanceState
+from hollarek.cloud.entities.enums import AWSRegion, InstanceState
 
 # ----------------------------------------------
 
 class EC2AWS:
-    def __init__(self, region : AWSRegions):
+    def __init__(self, region : AWSRegion):
         self.region : str = region.value
         self.ec2_client  = boto3.client('ec2', region_name=region.value)
 

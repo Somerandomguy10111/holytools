@@ -1,12 +1,12 @@
 import boto3, logging
 import json
 from typing import Optional
-from hollarek.cloud.entities.enums import AWSRegions, Service, Policy
+from hollarek.cloud.entities.enums import AWSRegion, Service, Policy
 
 # ----------------------------------------------
 
 class IAMAWS:
-    def __init__(self, region : AWSRegions):
+    def __init__(self, region : AWSRegion):
         self.region : str = region.value
         self.client = boto3.client('iam', region_name=self.region)
 
