@@ -1,7 +1,6 @@
 import io
 import os.path
 import boto3
-import json
 from configparser import ConfigParser
 from typing import Optional
 
@@ -17,27 +16,30 @@ from .abstr import Settings
 class AWSConfigs(Configs):
     def __init__(self, secret_name : str, region : AWSRegion):
         super().__init__()
-        self.secret_name  : str = secret_name
-        self.region_name : str = region.value
-        self.settings: dict[str, str] = self.retrieve_settings()
+        self.secret_name: str = secret_name
         session = boto3.session.Session()
-        self.client = session.client(service_name='secretsmanager', region_name=self.region_name)
+        self.client = session.client(service_name='secretsmanager', region_name=region.value)
+        self._settings: Settings = self.retrieve_settings()
 
 
     def set(self, key : str, value : str):
-        pass
+        self._settings[key] = value
+        self.client.update_secret(SecretId=self.secret_name, SecretString=self._settings.to_str())
 
 
     def retrieve_settings(self) -> Optional[Settings]:
         settings = None
         try:
             secret_value = self.client.get_secret_value(SecretId=self.secret_name)
-            settings = json.loads(secret_value['SecretString'])
+            settings = Settings.from_str(secret_value['SecretString'])
 
         except Exception as e:
             self.log(f'An error occurred while trying to read value from AWS: {e}', LogLevel.ERROR)
 
         return settings
+
+
+
 
 
 class LocalConfigs(Configs):
@@ -63,7 +65,8 @@ class LocalConfigs(Configs):
 
     def retrieve_settings(self) -> Settings:
         self._parser.read_string(self.get_decrypted_from_file())
-        return dict(self._parser.items(section=LocalConfigs.CATEGORY_NAME))
+        settings_dict = dict(self._parser.items(section=LocalConfigs.CATEGORY_NAME))
+        return Settings(settings_dict)
 
 
     def set(self, key : str, value:  str):
