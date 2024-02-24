@@ -1,6 +1,7 @@
 from __future__ import annotations
+
+import time
 from abc import abstractmethod
-from typing import Optional
 import json
 from hollarek.tmpl import Singleton
 
@@ -12,6 +13,9 @@ class Settings(dict[str,str]):
 
     def to_str(self) -> str:
         return json.dumps(self)
+
+    def is_empty(self):
+        return len(self) == 0
 
 
 class Configs(Singleton):
@@ -29,13 +33,14 @@ class Configs(Singleton):
             if not value:
                 raise KeyError
         except:
+            time.sleep(0.001)
             value = input(f'Could not find key {key} in settings: Please set it manually\n')
             value = self.set(key=key, value=value)
         return value
 
 
     @abstractmethod
-    def _retrieve_settings(self) -> Optional[Settings]:
+    def _retrieve_settings(self) -> Settings:
         pass
 
 

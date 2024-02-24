@@ -9,7 +9,6 @@ from hollarek.io.configs.abstr import Configs
 from .abstr import Settings
 # ---------------------------------------------------------
 
-
 class AWSConfigs(Configs):
     def __init__(self, secret_name : str, region : AWSRegion = AWSRegion.EU_NORTH_1):
         super().__init__()
@@ -24,14 +23,13 @@ class AWSConfigs(Configs):
         self.client.update_secret(SecretId=self.secret_name, SecretString=self._settings.to_str())
 
 
-    def _retrieve_settings(self) -> Optional[Settings]:
-        settings = None
+    def _retrieve_settings(self):
         try:
             secret_value = self.client.get_secret_value(SecretId=self.secret_name)
             settings = Settings.from_str(secret_value['SecretString'])
-
         except Exception as e:
             self.cls_log(f'An error occurred while trying to read value from AWS: {e}', LogLevel.ERROR)
+            settings = Settings()
 
         return settings
 
@@ -58,9 +56,13 @@ class LocalConfigs(Configs):
             configfile.write(encr)
 
 
-    def _retrieve_settings(self) -> Settings:
-        file_content = self._get_file_content()
-        settings = Settings.from_str(json_str=file_content)
+    def _retrieve_settings(self):
+        try:
+            file_content = self._get_file_content()
+            settings = Settings.from_str(json_str=file_content)
+        except FileNotFoundError:
+            settings = Settings()
+            self.log(msg=f'Config file \"{self._config_fpath}\" does not exist', level=LogLevel.WARNING)
         return settings
 
     # -------------------------------------------
