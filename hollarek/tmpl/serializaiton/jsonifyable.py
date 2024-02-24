@@ -83,13 +83,13 @@ class Person(Jsonifyable):
 class ComplexPerson(Jsonifyable):
     name: str
     data: dict  # This is to test_suite non-Jsonifyable, but still JSON-compatible
-    timestamp: datetime  # Testing proper serialization of datetime
+    timestamp: datetime  # Testing proper tmpl of datetime
 
-# Create another class intended to fail serialization due to unsupported type
+# Create another class intended to fail tmpl due to unsupported type
 @dataclass
 class FaultyPerson(Jsonifyable):
     name: str
-    unsupported: set  # 'set' is not directly JSON serialization
+    unsupported: set  # 'set' is not directly JSON tmpl
 
 # Testing
 if __name__ == "__main__":
@@ -102,7 +102,7 @@ if __name__ == "__main__":
     complex_person = ComplexPerson(name="Alice", data={"key": "value"}, timestamp=datetime.now())
     print(complex_person.to_str())
 
-    # Object intended to fail due to containing a non-serialization 'set'
+    # Object intended to fail due to containing a non-tmpl 'set'
     faulty_person = FaultyPerson(name="Faulty", unsupported={1, 2, 3})
     try:
         print(faulty_person.to_str())  # This should raise an exception

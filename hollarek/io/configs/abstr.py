@@ -2,7 +2,7 @@ from __future__ import annotations
 from abc import abstractmethod
 from typing import Optional
 import json
-from hollarek.dev import get_logger, LogSettings
+from hollarek.tmpl import Singleton
 
 
 class Settings(dict[str,str]):
@@ -14,26 +14,29 @@ class Settings(dict[str,str]):
         return json.dumps(self)
 
 
-class Configs:
-    def __init__(self):
-        self._settings : Settings = Settings()
-        self.is_initialized : bool = False
-        logger = get_logger(settings=LogSettings(), name=self.__class__.__name__)
-        self.log = logger.log
+class Configs(Singleton):
+
+    def __init__(self, *args, **kwargs):
+        try:
+            super().__init__(*args, **kwargs)
+            self._settings : Settings = Settings()
+            self.is_setup : bool = False
+        except ValueError:
+            pass
 
 
     def get(self, key : str) -> str:
-        if not self.is_initialized:
+        if not self.is_setup:
             self._settings  = self._retrieve_settings()
-            self.is_initialized = True
         try:
             value = self._settings.get(key)
             if not value:
                 raise KeyError
-        except Exception as e:
+        except:
             value = input(f'Could not find key {key} in settings: Please set it manually\n')
             value = self.set(key=key, value=value)
         return value
+
 
     @abstractmethod
     def _retrieve_settings(self) -> Optional[Settings]:
