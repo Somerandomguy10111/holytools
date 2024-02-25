@@ -3,9 +3,13 @@ from bs4 import BeautifulSoup
 from func_timeout import func_timeout, FunctionTimedOut
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
+
+from test_suite.t_web import visitor, test_url
 from .mail_addresses import get_mail_addresses_in_text
 import logging
+import trafilatura
 
+# ---------------------------------------------------------
 
 class SiteVisitor:
     max_site_loading_time = 10
@@ -39,11 +43,16 @@ class SiteVisitor:
         return get_mail_addresses_in_text(text=self.get_html(site_url=site_url))
 
 
-    def get_text(self, site_url: str) -> str:
-        page_source = self.get_html(site_url=site_url)
-
-        soup = BeautifulSoup(page_source, 'html.parser')
-        site_text = ' '.join(element for element in soup.stripped_strings)
+    def get_text(self, site_url: str, use_driver : bool = False) -> str:
+        if use_driver:
+            page_source = self.get_html(site_url=site_url)
+            soup = BeautifulSoup(page_source, 'html.parser')
+            site_text = ' '.join(element for element in soup.stripped_strings)
+        else:
+            def get_website_text():
+                downloaded = trafilatura.fetch_url(site_url)
+                return trafilatura.extract(downloaded)
+            site_text = func_timeout(timeout=SiteVisitor.max_site_loading_time, func=get_website_text)
         return site_text
 
 
@@ -59,5 +68,5 @@ class SiteVisitor:
 
 
 if __name__ == '__main__':
-    visitor = SiteVisitor()
-    print(visitor.get_text(site_url='https://en.wikipedia.org/wiki/Beaver'))
+    visitor.get_text(site_url=test_url)
+    visitor.get_text(site_url=test_url, use_driver=True)

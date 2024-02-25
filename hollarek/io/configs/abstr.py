@@ -2,7 +2,8 @@ from __future__ import annotations
 
 from abc import abstractmethod
 import json
-from hollarek.tmpl import Singleton, LogLevel
+from hollarek.tmpl import Singleton
+from hollarek.dev import LogLevel
 
 
 class Settings(dict[str,str]):

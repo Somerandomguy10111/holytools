@@ -10,7 +10,6 @@ from abc import ABC, abstractmethod
 from .test_runners import CustomTestResult, CustomTestRunner
 # ---------------------------------------------------------
 
-
 class Unittest(unittest.TestCase, ABC):
     _logger : Optional[Logger] = None
 

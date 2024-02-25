@@ -1,4 +1,4 @@
-from ..log import Loggable, LogLevel
+from hollarek.dev.log import Loggable, LogLevel
 
 
 class Singleton(Loggable):
