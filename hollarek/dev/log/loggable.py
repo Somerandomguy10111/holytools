@@ -1,4 +1,4 @@
-from hollarek.dev import get_logger, LogSettings, LogLevel, Logger
+from .logger import get_logger, LogSettings, LogLevel, Logger
 from typing import Optional
 
 class Loggable:

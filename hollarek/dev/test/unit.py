@@ -19,6 +19,7 @@ class Unittest(unittest.TestCase, ABC):
     def setUpClass(cls):
         pass
 
+
     def run(self, result=None):
         try:
             super().run(result)
@@ -26,16 +27,17 @@ class Unittest(unittest.TestCase, ABC):
             self.fail(f"Test failed with error: {e}")
 
     @classmethod
-    def execute_all(cls):
+    def execute_all(cls, show_run_times: bool = False, show_output : bool = False):
         cls._print_header()
-        results = cls._get_test_results()
-        cls.log(cls._get_final_status_msg(result=results))
+        results = cls._get_test_results(show_run_times=show_run_times)
+        summary = cls._get_final_status_msg(result=results)
+        cls.log(summary)
 
 
     @classmethod
-    def _get_test_results(cls) -> TestResult:
+    def _get_test_results(cls, show_run_times : bool) -> TestResult:
         suite = unittest.TestLoader().loadTestsFromTestCase(cls)
-        runner = CustomTestRunner(logger=cls._logger)
+        runner = CustomTestRunner(logger=cls._logger, show_run_times=show_run_times)
         return runner.run(suite)
 
     @classmethod

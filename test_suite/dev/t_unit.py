@@ -4,11 +4,12 @@ from hollarek.dev import Unittest
 
 
 class JsonTester(Unittest):
-    def setUpClass(self):
-        self.valid_str = '{"key": "value"}'
-        self.broken_str_newline = '{"key": "value with a new\nline"}'
-        self.broken_str_tab = '{"key": "value with a tab\t"}'
-        self.broken_str_multiple = '{"key": "new\nline and\ttab"}'
+    @classmethod
+    def setUpClass(cls):
+        cls.valid_str = '{"key": "value"}'
+        cls.broken_str_newline = '{"key": "value with a new\nline"}'
+        cls.broken_str_tab = '{"key": "value with a tab\t"}'
+        cls.broken_str_multiple = '{"key": "new\nline and\ttab"}'
 
     def run(self, result=None):
         try:
@@ -39,4 +40,4 @@ class JsonTester(Unittest):
 
 
 if __name__ == "__main__":
-    JsonTester.execute_all()
+    JsonTester.execute_all(show_run_times=True)
