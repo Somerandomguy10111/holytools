@@ -57,7 +57,7 @@ class InteractiveCLI(Loggable):
         while True:
             self.print_info()
             user_input = input()
-            if user_input.lower() == self._exit_str:
+            if user_input == self._exit_str:
                 break
 
             if not user_input.isdigit() or int(user_input) not in self.methods_dict:
@@ -83,9 +83,10 @@ class InteractiveCLI(Loggable):
 
     def _handle_mthd_call(self, index : int):
         mthd = self.methods_dict[index]
-        args_dict = mthd(self._get_args_dict(mthd=mthd))
+        args_dict = self._get_args_dict(mthd=mthd)
         result = mthd(**args_dict)
         return result
+
 
     def _get_args_dict(self, mthd: callable) -> dict:
         args_dict = {}
@@ -93,7 +94,8 @@ class InteractiveCLI(Loggable):
         annotations = spec.annotations
         for arg_name in spec.args[1:]:
             arg_type = annotations.get(arg_name, str)
-            user_input = input(f"Enter value for {arg_name} ({arg_type.__name__}): ")
+            self.log(f"Enter value for {arg_name} ({arg_type.__name__}): ")
+            user_input = input()
             args_dict[arg_name] = self.get_value(user_input=user_input, arg_type=arg_type, arg_name=arg_name)
         return args_dict
 
@@ -110,20 +112,3 @@ class InteractiveCLI(Loggable):
             except ValueError:
                 raise ValueError(f"Invalid input type for '{arg_name}'. Expected a value of type {arg_type.__name__}.")
         return val
-
-
-class TestClass:
-    def __init__(self, name):
-        self.name = name
-
-    def greet(self):
-        return f"Hello, {self.name}!"
-
-    def update_name(self, new_name):
-        self.name = new_name
-        return f"Name updated to {self.name}"
-
-
-if __name__ == "__main__":
-    cli = InteractiveCLI(TestClass)
-    cli.loop()
