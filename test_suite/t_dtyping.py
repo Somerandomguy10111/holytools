@@ -5,10 +5,17 @@ from hollarek.dev.dtyping.get_core import is_optional_type
 
 
 class TestIsOptionalType(Unittest):
+
+    @classmethod
+    def setUpClass(cls):
+        cls.optional_int= Optional[int]
+        cls.union_none_int= Union[None, int]
+
+
     def test_optional_type(self):
-        self.assertTrue(is_optional_type(Optional[int]))
-        self.assertTrue(is_optional_type(Union[None, int]))
-        self.assertTrue(is_optional_type(Union[int, None]))
+        optional_types = [self.optional_int, self.union_none_int]
+        for types in optional_types:
+            self.assertTrue(is_optional_type(types))
 
     def test_non_optional_type(self):
         self.assertFalse(is_optional_type(int))
@@ -19,8 +26,6 @@ class TestIsOptionalType(Unittest):
         self.assertTrue(is_optional_type(Optional[Union[int, str]]))
         self.assertTrue(is_optional_type(Union[None, int, str]))
 
-    def setUpClass(self):
-        pass
 
 
 if __name__ == "__main__":
