@@ -25,6 +25,7 @@ class InteractiveCLI(Loggable):
         desc_str = self.desc if self.desc else 'No description found'
         self.log(f"Description: {desc_str} \n")
 
+
     def _initialize_object(self):
         arg_names = inspect.getfullargspec(self.cls.__init__).args[1:]
         init_kwargs = {}
@@ -64,7 +65,7 @@ class InteractiveCLI(Loggable):
                 continue
 
             try:
-                result = self._call(int(user_input))
+                result = self._handle_mthd_call(int(user_input))
                 msg = f"Result : {result}"
                 level = LogLevel.INFO
             except Exception as e:
@@ -80,15 +81,35 @@ class InteractiveCLI(Loggable):
         self.log(msg=text)
 
 
-    def _call(self, index : int):
+    def _handle_mthd_call(self, index : int):
         mthd = self.methods_dict[index]
-        spec = inspect.getfullargspec(mthd)
-        if spec.args[1:]:
-            arg_value = input(f"Enter value for {spec.args[1]}: ")
-            result = mthd(arg_value)
-        else:
-            result = mthd()
+        args_dict = mthd(self._get_args_dict(mthd=mthd))
+        result = mthd(**args_dict)
         return result
+
+    def _get_args_dict(self, mthd: callable) -> dict:
+        args_dict = {}
+        spec = inspect.getfullargspec(mthd)
+        annotations = spec.annotations
+        for arg_name in spec.args[1:]:
+            arg_type = annotations.get(arg_name, str)
+            user_input = input(f"Enter value for {arg_name} ({arg_type.__name__}): ")
+            args_dict[arg_name] = self.get_value(user_input=user_input, arg_type=arg_type, arg_name=arg_name)
+        return args_dict
+
+
+    @staticmethod
+    def get_value(user_input : str, arg_type : type, arg_name : str):
+        if arg_type == bool:
+            if user_input not in ['0', '1']:
+                raise ValueError(f"For argument '{arg_name}', please enter '0' for False or '1' for True.")
+            val = bool(int(user_input))
+        else:
+            try:
+                val = arg_type(user_input)
+            except ValueError:
+                raise ValueError(f"Invalid input type for '{arg_name}'. Expected a value of type {arg_type.__name__}.")
+        return val
 
 
 class TestClass:
