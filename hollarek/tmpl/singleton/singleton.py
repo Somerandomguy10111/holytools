@@ -1,4 +1,4 @@
-from ..loggable import Loggable, LogLevel
+from ..log import Loggable, LogLevel
 
 
 class Singleton(Loggable):

@@ -1,3 +1,3 @@
 from .singleton import *
-from .serializaiton import *
-from .loggable import *
+from .serialization import *
+from .logging import *

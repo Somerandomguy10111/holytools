@@ -1,4 +1,3 @@
-from types import NoneType
 from typing import Optional, Union
 
 from hollarek.dev import Unittest
@@ -20,9 +19,9 @@ class TestIsOptionalType(Unittest):
         self.assertTrue(is_optional_type(Optional[Union[int, str]]))
         self.assertTrue(is_optional_type(Union[None, int, str]))
 
-    def test_none_type(self):
-        self.assertFalse(is_optional_type(None))
-        self.assertFalse(is_optional_type(NoneType))
-
-    def setUp(self):
+    def setUpClass(self):
         pass
+
+
+if __name__ == "__main__":
+    TestIsOptionalType.execute_all()

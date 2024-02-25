@@ -53,11 +53,11 @@ class SearchEngine:
 
 
 if __name__ == '__main__':
-    from ..configs.configs import ConfigManager, StdCategories
+    from hollarek.io.configs import LocalConfigs
 
-    new_conf_manger = ConfigManager()
-    google_api_key = new_conf_manger.get_value(key='google_key',category=StdCategories.APIS)
-    engine_id = new_conf_manger.get_value(key='search_engine_id', category=StdCategories.APIS)
+    new_conf_manger = LocalConfigs()
+    google_api_key = new_conf_manger.get(key='google_key')
+    engine_id = new_conf_manger.get(key='search_engine_id')
 
     tool = SearchEngine(google_key=google_api_key, searchengine_id=engine_id)
     urls = tool.get_urls('beavers')

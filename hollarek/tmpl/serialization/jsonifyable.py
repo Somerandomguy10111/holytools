@@ -7,8 +7,6 @@ from typing import  get_type_hints
 from hollarek.dev import get_core_type
 from abc import ABC
 
-from t_jsonifyable import person, complex_person, faulty_person
-
 
 # -------------------------------------------
 
