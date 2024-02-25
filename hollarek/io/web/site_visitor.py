@@ -4,7 +4,6 @@ from func_timeout import func_timeout, FunctionTimedOut
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 
-from test_suite.t_web import visitor, test_url
 from .mail_addresses import get_mail_addresses_in_text
 import logging
 import trafilatura
