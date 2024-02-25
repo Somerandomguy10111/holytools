@@ -12,7 +12,7 @@ class InteractiveCLI(Loggable):
         self.desc : str = description
 
         self._log_header()
-        self.obj : object = self._initialize_object()
+        self.obj : object = self._create_object()
         self.methods_dict : dict[int, callable] = self._get_methods_dict(obj=self.obj)
 
 
@@ -26,18 +26,16 @@ class InteractiveCLI(Loggable):
         self.log(f"Description: {desc_str} \n")
 
 
-    def _initialize_object(self):
-        arg_names = inspect.getfullargspec(self.cls.__init__).args[1:]
-        init_kwargs = {}
-        for arg in arg_names:
-            self.log(f"Enter value for {self.cls.__name__} {arg}: ")
-            init_kwargs[arg] = input()
-
+    def _create_object(self):
+        self.log(f'Initializing object {self.cls.__name__}:')
         try:
+            init_method = self.cls.__init__
+            init_kwargs = self._get_args_dict(mthd=init_method)
             return self.cls(**init_kwargs)
         except Exception as e:
-            self.log(f"Error initializing {self.cls.__name__}: {e}")
-            exit(1)
+            self.log(f"Error initializing {self.cls.__name__}: {e}. Please try again\n")
+            return self._create_object()
+
 
 
     def _get_methods_dict(self, obj) -> dict[int, callable]:
@@ -94,7 +92,7 @@ class InteractiveCLI(Loggable):
         annotations = spec.annotations
         for arg_name in spec.args[1:]:
             arg_type = annotations.get(arg_name, str)
-            self.log(f"Enter value for {arg_name} ({arg_type.__name__}): ")
+            self.log(f"Enter value for \"{mthd.__name__}\" argument \"{arg_name}\" ({arg_type.__name__}): ")
             user_input = input()
             args_dict[arg_name] = self.get_value(user_input=user_input, arg_type=arg_type, arg_name=arg_name)
         return args_dict
