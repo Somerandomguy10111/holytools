@@ -48,11 +48,11 @@ class FsysNode:
                 subnodes += child.get_subnodes(follow_symlinks=True)
         else:
             path_list = list(self._path_wrapper.rglob('*'))
-            self._subnodes: list[FsysNode] = [FsysNode(str(path)) for path in path_list]
+            subnodes: list[FsysNode] = [FsysNode(str(path)) for path in path_list]
         return subnodes
 
     # -------------------------------------------
-    # get
+    # get data
 
     def get_zip(self) -> bytes:
         with tempfile.TemporaryDirectory() as write_dir:
@@ -101,21 +101,3 @@ class FsysNode:
     def get_parent(self) -> FsysNode:
         return FsysNode(path=str(self._path_wrapper.parent))
 
-
-
-
-if __name__ == "__main__":
-    test_path = '/home/daniel/OneDrive/Downloads/'
-    test_node = FsysNode(path=test_path)
-    print(test_node.get_parent().get_path())
-    # test_zip_bytes  = test_node.get_zip()
-
-    # print(test_node.select_file_subnodes(['.dat', '.txt']))
-    # print(test_node.get_subnodes(follow_symlinks=True))
-
-    # with open('test_suite.zip', 'wb') as the_file:
-    #     the_file.write(test_zip_bytes)
-
-    # print(home_node.get_file_nodes())
-    # for node in home_node.select_file_nodes(allowed_formats=['png']):
-    #     print(node.name)
