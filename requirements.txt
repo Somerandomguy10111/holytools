@@ -13,3 +13,4 @@ notebook
 jupyterlab
 cryptography
 boto3
+trafilatura

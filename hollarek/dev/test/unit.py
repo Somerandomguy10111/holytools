@@ -27,7 +27,7 @@ class Unittest(unittest.TestCase, ABC):
             self.fail(f"Test failed with error: {e}")
 
     @classmethod
-    def execute_all(cls, show_run_times: bool = False, show_output : bool = False):
+    def execute_all(cls, show_run_times: bool = False):
         cls._print_header()
         results = cls._get_test_results(show_run_times=show_run_times)
         summary = cls._get_final_status_msg(result=results)

@@ -65,7 +65,3 @@ class SiteVisitor:
 
         return result
 
-
-if __name__ == '__main__':
-    visitor.get_text(site_url=test_url)
-    visitor.get_text(site_url=test_url, use_driver=True)
