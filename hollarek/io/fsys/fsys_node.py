@@ -53,14 +53,18 @@ class FsysNode:
         return subnodes
 
 
-    def get_yaml_tree(self) -> str:
-        return yaml.dump(data=self.get_dict())
+    def get_yaml_tree(self, skip_null : bool = True) -> str:
+        the_yaml = yaml.dump(data=self.get_dict())
+        if skip_null:
+            the_yaml = the_yaml.replace(f': null', '')
+
+        return the_yaml
 
 
     def get_dict(self) -> Optional[dict]:
         if not self.is_dir():
             return None
-        
+
         return {child.get_name() : child.get_dict() for child in self.get_child_nodes()}
 
 
