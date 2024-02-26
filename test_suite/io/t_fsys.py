@@ -50,6 +50,15 @@ class TestFsysNode(Unittest):
         file_subnodes = self.root_node.get_file_subnodes()
         self.assertEqual(len(file_subnodes), self.num_total_files)
 
+    def test_get_dict(self):
+        the_dict = self.root_node.get_dict()
+        print(the_dict)
+        self.assertIsInstance(the_dict, dict)
+
+    def test_get_yaml(self):
+        the_yaml = self.root_node.get_yaml_tree()
+        print(the_yaml)
+        self.assertIsInstance(the_yaml, str)
 
 # This allows the test script to be run from the command line
 if __name__ == '__main__':

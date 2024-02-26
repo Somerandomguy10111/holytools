@@ -3,6 +3,7 @@ from typing import Optional
 from pathlib import Path as PathWrapper
 import os
 import tempfile, shutil
+import yaml
 # -------------------------------------------
 
 class FsysNode:
@@ -50,6 +51,28 @@ class FsysNode:
             path_list = list(self._path_wrapper.rglob('*'))
             subnodes: list[FsysNode] = [FsysNode(str(path)) for path in path_list]
         return subnodes
+
+
+    def get_yaml_tree(self) -> str:
+        return yaml.dump(data=self.get_dict())
+
+
+    def get_dict(self) -> Optional[dict]:
+        if not self.is_dir():
+            return None
+        
+        return {child.get_name() : child.get_dict() for child in self.get_child_nodes()}
+
+
+    def get_child_nodes(self) -> list[FsysNode]:
+        return [self.try_make_child(name=name) for name in os.listdir(path=self.get_path())]
+
+
+    def try_make_child(self, name : str) -> Optional[FsysNode]:
+        try:
+            return FsysNode(path=os.path.join(self.get_path(), name))
+        except:
+            return None
 
     # -------------------------------------------
     # get data
@@ -100,4 +123,5 @@ class FsysNode:
 
     def get_parent(self) -> FsysNode:
         return FsysNode(path=str(self._path_wrapper.parent))
+
 
