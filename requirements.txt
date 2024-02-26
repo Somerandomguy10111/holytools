@@ -10,7 +10,6 @@ pympler
 beautifulsoup4
 dill
 notebook
-jupyterlab
 cryptography
 boto3
 trafilatura
