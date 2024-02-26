@@ -82,16 +82,20 @@ class FsysNode:
 
     def get_zip(self) -> bytes:
         with tempfile.TemporaryDirectory() as write_dir:
-            zip_basepath = os.path.join(write_dir,'zipfile')
-            if self.is_dir():
-                shutil.make_archive(base_name=zip_basepath, format='zip', root_dir=self.get_path())
-            else:
-                containing_dir_path = os.path.join(write_dir, 'dir')
-                os.makedirs(containing_dir_path, exist_ok=True)
-                shutil.copy(src=self.get_path(), dst=os.path.join(containing_dir_path, self.get_name()))
-                shutil.make_archive(base_name=zip_basepath, format='zip', root_dir=containing_dir_path)
+            zip_base_path = os.path.join(write_dir, 'zipfile')
+            args_dir = {
+                'base_name': zip_base_path,
+                'format': 'zip',
+            }
+            if self.is_file():
+                args_dir['root_dir'] = self.get_parent().get_path()
+                args_dir['base_dir'] = self.get_name()
 
-            with open(f'{zip_basepath}.zip', 'rb') as file:
+            if self.is_dir():
+                args_dir['root_dir'] = self.get_path()
+
+            shutil.make_archive(**args_dir)
+            with open(f'{zip_base_path}.zip', 'rb') as file:
                 zip_bytes = file.read()
 
         return zip_bytes
