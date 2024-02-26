@@ -9,7 +9,6 @@ psutil
 pympler
 beautifulsoup4
 dill
-notebook
 cryptography
 boto3
 trafilatura
