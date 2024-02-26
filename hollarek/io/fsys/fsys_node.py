@@ -17,12 +17,10 @@ class FsysNode:
     # sub
 
     def select_file_subnodes(self, allowed_formats : list[str]) -> list[FsysNode]:
-        fpaths = [str(path) for path in self._path_wrapper.rglob('*')]
-        fmt_with_dots = [fmt if fmt.startswith('.') else f'.{fmt}' for fmt in allowed_formats]
-        is_allowed_path = lambda path : any([path.endswith(fmt) for fmt in fmt_with_dots])
-        selected_paths = [path for path in fpaths if is_allowed_path(path)]
+        file_subnodes = self.get_file_subnodes()
+        fmts_without_dots = [fmt.replace('.','') for fmt in allowed_formats]
 
-        return [FsysNode(path=path) for path in selected_paths]
+        return [node for node in file_subnodes if node.get_suffix() in fmts_without_dots]
 
 
     def get_file_subnodes(self) -> list[FsysNode]:
@@ -33,25 +31,23 @@ class FsysNode:
         if not self.is_dir():
             return []
 
-        if self._subnodes is None:
-            self._subnodes = self._retrieve_subnodes(follow_symlinks=follow_symlinks)
+        if not self._subnodes is None:
+            return self._subnodes
+
+        self._subnodes = []
+        if follow_symlinks:
+            child_nodes = self.get_child_nodes()
+            for child in child_nodes:
+                self._subnodes.append(child)
+                self._subnodes += child.get_subnodes(follow_symlinks=True)
+        else:
+            path_list = list(self._path_wrapper.rglob('*'))
+            self._subnodes: list[FsysNode] = [FsysNode(str(path)) for path in path_list]
 
         return self._subnodes
 
-
-    def _retrieve_subnodes(self, follow_symlinks : bool = False) -> list[FsysNode]:
-        subnodes = []
-        if follow_symlinks:
-            child_paths = [os.path.join(self.get_path(), name) for name in os.listdir(self.get_path())]
-            child_nodes = [FsysNode(path=path) for path in child_paths]
-            for child in child_nodes:
-                subnodes.append(child)
-                subnodes += child.get_subnodes(follow_symlinks=True)
-        else:
-            path_list = list(self._path_wrapper.rglob('*'))
-            subnodes: list[FsysNode] = [FsysNode(str(path)) for path in path_list]
-        return subnodes
-
+    # -------------------------------------------
+    # repr
 
     def get_yaml_tree(self, skip_null : bool = True) -> str:
         the_yaml = yaml.dump(data=self.get_dict())
@@ -69,7 +65,8 @@ class FsysNode:
 
 
     def get_child_nodes(self) -> list[FsysNode]:
-        return [self.try_make_child(name=name) for name in os.listdir(path=self.get_path())]
+        potential_nodes = [self.try_make_child(name=name) for name in os.listdir(path=self.get_path())]
+        return [node for node in potential_nodes if node]
 
 
     def try_make_child(self, name : str) -> Optional[FsysNode]:
