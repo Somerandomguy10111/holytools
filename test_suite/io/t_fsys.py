@@ -43,7 +43,7 @@ class TestFsysNode(Unittest):
         self.assertEqual(len(subnodes), self.num_total_nodes)
 
     def test_select_dat_files(self):
-        dat_nodes = self.root_node.select_file_subnodes(['.dat'])
+        dat_nodes = self.root_node.get_file_subnodes(['.dat'])
         self.assertEqual(len(dat_nodes), self.num_total_dat_files)
 
     def test_get_file_subnodes(self):

@@ -16,15 +16,12 @@ class FsysNode:
     # -------------------------------------------
     # sub
 
-    def select_file_subnodes(self, allowed_formats : list[str]) -> list[FsysNode]:
-        file_subnodes = self.get_file_subnodes()
-        fmts_without_dots = [fmt.replace('.','') for fmt in allowed_formats]
-
-        return [node for node in file_subnodes if node.get_suffix() in fmts_without_dots]
-
-
-    def get_file_subnodes(self) -> list[FsysNode]:
-        return [des for des in self.get_subnodes() if des.is_file()]
+    def get_file_subnodes(self, select_formats: Optional[list[str]] = None) -> list[FsysNode]:
+        file_subnodes = [des for des in self.get_subnodes() if des.is_file()]
+        if select_formats is not None:
+            fmts_without_dots = [fmt.replace('.', '') for fmt in select_formats]
+            file_subnodes = [node for node in file_subnodes if node.get_suffix() in fmts_without_dots]
+        return file_subnodes
 
 
     def get_subnodes(self, follow_symlinks : bool = False) -> list[FsysNode]:
@@ -65,15 +62,20 @@ class FsysNode:
 
 
     def get_child_nodes(self) -> list[FsysNode]:
-        potential_nodes = [self.try_make_child(name=name) for name in os.listdir(path=self.get_path())]
-        return [node for node in potential_nodes if node]
+        children = []
+        for path in os.listdir(path=self.get_path()):
+            try:
+                node = FsysNode(path=path)
+                children.append(node)
+            except:
+                pass
+
+        return children
 
 
-    def try_make_child(self, name : str) -> Optional[FsysNode]:
-        try:
-            return FsysNode(path=os.path.join(self.get_path(), name))
-        except:
-            return None
+    def get_parent(self) -> FsysNode:
+        return FsysNode(path=str(self._path_wrapper.parent))
+
 
     # -------------------------------------------
     # get data
@@ -117,12 +119,9 @@ class FsysNode:
         return os.path.getsize(self.get_path()) / (1024 * 1024)
 
     def is_file(self) -> bool:
-        return os.path.isfile(self.get_path())
+        return self._path_wrapper.is_file()
 
     def is_dir(self) -> bool:
-        return os.path.isdir(self.get_path())
-
-    def get_parent(self) -> FsysNode:
-        return FsysNode(path=str(self._path_wrapper.parent))
+        return self._path_wrapper.is_dir()
 
 
