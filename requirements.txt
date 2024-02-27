@@ -10,5 +10,6 @@ pympler
 beautifulsoup4
 dill
 cryptography
-boto3
 trafilatura
+PyYAML
+boto3
