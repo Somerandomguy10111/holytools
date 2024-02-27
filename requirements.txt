@@ -1,5 +1,5 @@
-apscheduler==3.10.4
-pypdf==4.0.1
+apscheduler
+pypdf
 json-repair
 requests
 func-timeout
