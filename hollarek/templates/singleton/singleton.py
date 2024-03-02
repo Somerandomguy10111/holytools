@@ -1,7 +1,4 @@
-from hollarek.devtools import Loggable, LogLevel
-
-
-class Singleton(Loggable):
+class Singleton:
     _instance = None
     is_initialized = False
 
@@ -13,8 +10,7 @@ class Singleton(Loggable):
 
     def __new__(cls, *args, **kwargs):
         if (args or kwargs) and cls.is_initialized:
-            cls.cls_log("Warning: Additional arguments provided to an already initialized singleton",
-                        level=LogLevel.WARNING)
+            print("Warning: Additional arguments provided to an already initialized singleton")
 
         if not cls._instance:
             cls._instance = super().__new__(cls)

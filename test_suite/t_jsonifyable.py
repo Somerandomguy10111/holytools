@@ -4,44 +4,41 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Optional
 
-from hollarek.templates import Jsonifyable
+from hollarek.templates import JsonDataclass
 
 
 @dataclass
-class Person(Jsonifyable):
+class Person(JsonDataclass):
     name: str
     age: int
-    birthday: Optional[datetime] = None
 
 
 @dataclass
-class ComplexPerson(Jsonifyable):
-    name: str
-    data: dict  # This is to test_suite non-Jsonifyable, but still JSON-compatible
+class ComplexPerson(JsonDataclass):
     timestamp: datetime  # Testing proper templates of datetime
+    person : Person
 
 
 @dataclass
-class FaultyPerson(Jsonifyable):
+class FaultyPerson(JsonDataclass):
     name: str
     unsupported: set  # 'set' is not directly JSON templates
 
 
-person_json = '{"name": "John Doe", "age": 30, "birthday": "1992-05-01T00:00:00"}'
+person_json = '{"name": "John Doe", "age": 30}'
 person = Person.from_str(person_json)
-complex_person = ComplexPerson(name="Alice", data={"key": "value"}, timestamp=datetime.now())
+complex_person = ComplexPerson(person=person, timestamp=datetime.now())
 faulty_person = FaultyPerson(name="Faulty", unsupported={1, 2, 3})
 
 
 if __name__ == "__main__":
-    # Object expected to work
     print(person.to_str())  # Convert back to JSON string
+    complex_str = complex_person.to_str()
 
-    # Object with all JSON-compatible types but not Jsonifyable inherently
-    print(complex_person.to_str())
+    loaded_person = ComplexPerson.from_str(json_str=complex_str)
 
-    # Object intended to fail due to containing a non-templates 'set'
     try:
         print(faulty_person.to_str())  # This should raise an exception
     except TypeError as e:
         print(f"Expected error for non-serializable type: {e}")
+

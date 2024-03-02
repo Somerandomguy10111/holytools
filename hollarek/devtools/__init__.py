@@ -1,5 +1,5 @@
 from .hardware import *
 from .log import *
 from .test import *
-from .dtyping import *
+from .inspection import *
 from .spoof import Spoofer
