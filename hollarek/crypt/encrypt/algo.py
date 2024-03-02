@@ -1,7 +1,7 @@
-from abc import abstractmethod, ABC
+from abc import abstractmethod
 from typing import Optional
 
-class CryptoAlgo(ABC):
+class CryptoAlgo:
     @abstractmethod
     def encrypt(self, content: str, key: str) -> str:
         pass

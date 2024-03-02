@@ -1,6 +1,6 @@
+from typing import Optional
 from .logger import get_logger, Logger
 from .log_settings import LogSettings, LogLevel
-from typing import Optional
 
 class Loggable:
     _default_logger : Optional[Logger] = None

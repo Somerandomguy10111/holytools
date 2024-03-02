@@ -1,7 +1,7 @@
 import unittest
 from enum import Enum
 import time
-from hollarek.devtools import Logger, LogLevel
+from hollarek.devtools.log import Logger, LogLevel
 from unittest import TestCase
 
 class TestStatus(Enum):

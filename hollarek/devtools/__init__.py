@@ -1,4 +1,5 @@
 from .hardware import *
-from .logging import *
+from .log import *
 from .test import *
-from .typing import *
+from .dtyping import *
+from .spoof import Spoofer

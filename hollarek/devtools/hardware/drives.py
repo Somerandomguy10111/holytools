@@ -3,7 +3,7 @@ import logging
 import os
 import psutil
 
-from hollarek.devtools import get_logger, LogSettings
+from ..log import get_logger, LogSettings
 # -------------------------------------------
 
 
@@ -79,7 +79,7 @@ if __name__ == '__main__':
     test_part.print_free_space_info()
 
     # new_part = Partition.from_resource_path(resource_path='/media/daniel/STICKY1')
-    # logging(new_part.mount_point)
+    # log(new_part.mount_point)
     # new_part.print_free_space_info()
     #
     # for p in partitions:
