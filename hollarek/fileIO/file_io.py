@@ -1,7 +1,7 @@
 from abc import abstractmethod
 from hollarek.devtools import Loggable
 
-class FileIO(Loggable):
+class IO(Loggable):
     @staticmethod
     @abstractmethod
     def read(fpath : str):

@@ -1,8 +1,8 @@
 from docx import Document
 import textract
+from .file_io import IO
 
-
-class TextIO:
+class TextIO(IO):
     @staticmethod
     def read(fpath: str) -> str:
         text = textract.process(fpath)
@@ -22,7 +22,3 @@ class TextIO:
                 file.write(content)
         else:
             raise ValueError(f'Unsupported file type: {suffix}')
-
-
-if __name__ == "__main__":
-    content = TextIO.read()
