@@ -18,32 +18,23 @@ def create_temp_copy(filename: str) -> str:
         return ''
 
 
-def get_temp_test_png() -> str:
-    return create_temp_copy('test.png')
+class Spoofer:
+    @staticmethod
+    def png() -> str:
+        return create_temp_copy('test.png')
 
-def get_temp_test_jpg() -> str:
-    return create_temp_copy('test.jpg')
+    @staticmethod
+    def jpg() -> str:
+        return create_temp_copy('test.jpg')
 
-def get_temp_test_pdf() -> str:
-    return create_temp_copy('test.pdf')
+    @staticmethod
+    def pdf() -> str:
+        return create_temp_copy('test.pdf')
 
-def get_temp_test_txt() -> str:
-    return create_temp_copy('test.txt')
+    @staticmethod
+    def txt() -> str:
+        return create_temp_copy('test.txt')
 
-def get_temp_test_csv() -> str:
-    return create_temp_copy('test.csv')
-
-
-if __name__ == "__main__":
-    temp_png_path = get_temp_test_png()
-    temp_jpg_path = get_temp_test_jpg()
-    temp_pdf_path = get_temp_test_pdf()
-    temp_txt_path = get_temp_test_txt()
-    temp_csv_path = get_temp_test_csv()
-
-    # Print the paths of the temporary files
-    print(f"Temporary PNG file created at: {temp_png_path}")
-    print(f"Temporary JPG file created at: {temp_jpg_path}")
-    print(f"Temporary PDF file created at: {temp_pdf_path}")
-    print(f"Temporary TXT file created at: {temp_txt_path}")
-    print(f"Temporary CSV file created at: {temp_csv_path}")
+    @staticmethod
+    def csv() -> str:
+        return create_temp_copy('test.csv')
