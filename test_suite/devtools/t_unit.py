@@ -1,6 +1,6 @@
 import json
 from json_repair import repair_json
-from hollarek.dev import Unittest
+from hollarek.devtools import Unittest
 
 
 class JsonTester(Unittest):

@@ -22,8 +22,8 @@ class TestFsysNode(Unittest):
         self.subfiles = {'dir1': ['sub1.dat', 'sub2.dat', 'sub3.dat'],
                          'dir2': ['sub1png', 'sub2png', 'sub3png']}
 
-        for file in self.files:
-            open(os.path.join(self.test_dir, file), 'a').close()  # Create empty files
+        for the_file in self.files:
+            open(os.path.join(self.test_dir, the_file), 'a').close()  # Create empty files
 
         for subdir, subfiles in self.subfiles.items():
             subdir_path = os.path.join(self.test_dir, subdir)
