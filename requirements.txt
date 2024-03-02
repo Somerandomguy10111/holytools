@@ -13,3 +13,5 @@ cryptography
 trafilatura
 PyYAML
 boto3
+textract
+python-docx

@@ -1,1 +1,1 @@
-from .configs import AWSConfigs, LocalConfigs
+from .configs import AWSConfigs, LocalConfigs, Configs
