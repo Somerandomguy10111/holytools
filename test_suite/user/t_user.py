@@ -1,4 +1,4 @@
-from hollarek.user import InteractiveCLI
+from hollarek.misc.user import InteractiveCLI
 
 class Person:
     def __init__(self, name: str, active: bool = True):

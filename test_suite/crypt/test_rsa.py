@@ -1,4 +1,4 @@
-from hollarek.crypt import RSA
+from hollarek.misc.crypt import RSA
 
 
 if __name__ == "__main__":

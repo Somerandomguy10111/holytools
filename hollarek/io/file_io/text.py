@@ -25,4 +25,4 @@ class TextIO:
 
 
 if __name__ == "__main__":
-    content = TextIO.read(fpath)
+    content = TextIO.read()

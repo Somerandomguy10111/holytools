@@ -2,7 +2,7 @@ import os.path
 import boto3
 from typing import Optional
 
-from hollarek.crypt import AES
+from hollarek.misc.crypt import AES
 from hollarek.cloud import AWSRegion
 from hollarek.dev import LogLevel
 from hollarek.io.configs.abstr import Configs

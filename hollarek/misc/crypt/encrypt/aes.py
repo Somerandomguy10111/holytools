@@ -5,7 +5,7 @@ from cryptography.hazmat.backends import default_backend
 from hollarek.dev.log import get_logger, LogLevel
 from typing import Optional, Union
 
-from hollarek.crypt.hash import SHA
+from ..hash import SHA
 from .algo import CryptoAlgo
 # -------------------------------------------
 
