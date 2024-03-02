@@ -1,7 +1,7 @@
 import boto3, logging
 import json
 from typing import Optional
-from hollarek.cloud.entities.enums import AWSRegion, Service, Policy
+from ..entities.enums import AWSRegion, Service, Policy
 
 # ----------------------------------------------
 
