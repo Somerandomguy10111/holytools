@@ -25,13 +25,15 @@ class FaultyPerson(JsonDataclass):
     unsupported: set  # 'set' is not directly JSON templates
 
 
-person_json = '{"name": "John Doe", "age": 30}'
-person = Person.from_str(person_json)
-complex_person = ComplexPerson(person=person, timestamp=datetime.now())
-faulty_person = FaultyPerson(name="Faulty", unsupported={1, 2, 3})
+
 
 
 if __name__ == "__main__":
+    person_json = '{"name": "John Doe", "age": 30}'
+    person = Person.from_str(person_json)
+    complex_person = ComplexPerson(person=person, timestamp=datetime.now())
+    faulty_person = FaultyPerson(name="Faulty", unsupported={1, 2, 3})
+
     print(person.to_str())  # Convert back to JSON string
     complex_str = complex_person.to_str()
 

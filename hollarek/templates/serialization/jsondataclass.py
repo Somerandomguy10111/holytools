@@ -42,7 +42,7 @@ def get_json_entry(obj):
     return entry
 
 
-def from_json(cls, json_dict: dict):
+def from_json(cls : type, json_dict: dict):
     if not dataclasses.is_dataclass(cls):
         raise TypeError(f'{cls} must be a dataclass to be Jsonifyable')
 
@@ -51,25 +51,32 @@ def from_json(cls, json_dict: dict):
     for key, value in json_dict.items():
         core_type = get_core_type(dtype=type_hints.get(key))
         if not isinstance(value, dict):
-            if core_type in [str, int, float, bool]:
-                init_dict[key] = value
-            elif core_type is datetime:
-                init_dict[key] = datetime.fromisoformat(value) if value else None
-            elif core_type is date:
-                init_dict[key] = date.fromisoformat(value) if value else None
-            elif core_type is time:
-                init_dict[key] = time.fromisoformat(value) if value else None
-            elif core_type is Decimal:
-                init_dict[key] = Decimal(value)
-            elif issubclass(core_type, Enum):
-                init_dict[key] = core_type(value)
-            elif core_type is UUID:
-                init_dict[key] = UUID(value)
-            elif core_type is Path:
-                init_dict[key] = Path(value)
-            else:
-                raise TypeError(f"Unsupported type for key {key}: {core_type}")
+            init_dict[key] = make_elementary(cls=core_type,value=value)
         else:
             init_dict[key] = from_json(cls=core_type, json_dict=value)
 
     return cls(**init_dict)
+
+
+def make_elementary(cls, value : object):
+    identity = lambda x: x
+    conversion_map = {
+        str: identity,
+        int: identity,
+        float: identity,
+        bool: identity,
+        datetime: datetime.fromisoformat,
+        date: date.fromisoformat,
+        time: time.fromisoformat,
+        Decimal: Decimal,
+        UUID: UUID,
+        Path: Path,
+    }
+
+    if issubclass(cls, Enum):
+        return cls(value)
+
+    if cls in conversion_map:
+        return conversion_map[cls](value)
+    else:
+        raise TypeError(f'Unsupported type {cls}')
