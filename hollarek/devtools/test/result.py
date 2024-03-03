@@ -8,6 +8,7 @@ import linecache
 
 from hollarek.logging import LogLevel, Logger
 from .case import CaseStatus, CaseResult, get_case_name
+from .settings import TestSettings
 # ---------------------------------------------------------
 
 
@@ -16,12 +17,12 @@ class Result(unittest.TestResult):
     status_spaces = 10
     runtime_space = 10
 
-    def __init__(self, logger : Logger, show_run_times : bool, show_details : bool, *args, **kwargs):
+    def __init__(self, logger : Logger, settings : TestSettings, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.settings : TestSettings = settings
+
         self.log = logger.log
         self.start_times :dict = {}
-        self.show_run_times : bool = show_run_times
-        self.show_details : bool = show_details
         self.results : list[CaseResult] = []
         self.print_header(f'  Test suite for \"{self.__class__.__name__}\"  ')
 
@@ -57,7 +58,7 @@ class Result(unittest.TestResult):
                                  name=get_case_name(test), status=test_status)
         self.results.append(test_result)
 
-        conditional_err_msg = f'\n{self.get_err_details(err)}' if err and self.show_details else ''
+        conditional_err_msg = f'\n{self.get_err_details(err)}' if err and self.settings.show_details else ''
         finish_log_msg = f'Status: {test_status.value}{conditional_err_msg}\n'
         self.log(msg=finish_log_msg, level=test_status.get_log_level())
 
@@ -67,14 +68,15 @@ class Result(unittest.TestResult):
         for result in self.results:
             level = result.status.get_log_level()
             rounded_runtime = f'{round(result.runtime_sec,3)}s'
-            conditional_runtime_info = f'{rounded_runtime:^{self.runtime_space}}' if self.show_run_times else ''
+            conditional_runtime_info = f'{rounded_runtime:^{self.runtime_space}}' if self.settings.show_runtimes else ''
             self.log(f'{result.name:<{self.test_spaces}}{result.status.value:<{self.status_spaces}}{conditional_runtime_info}',level=level)
         self.log(self.get_final_status())
         self.print_header(msg=f'')
 
 
     def print_header(self, msg: str, seperator : str = '='):
-        total_len = self.test_spaces + self.status_spaces + self.runtime_space if self.show_run_times else 0
+        total_len = self.test_spaces + self.status_spaces
+        total_len += self.runtime_space if self.settings.show_runtimes else 0
         line_len = max(total_len- len(msg), 0)
         lines = seperator * int(line_len / 2.)
         self.log(f'{lines}{msg}{lines}')

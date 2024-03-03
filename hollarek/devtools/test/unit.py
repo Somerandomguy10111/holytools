@@ -1,14 +1,14 @@
 import unittest
 from hollarek.logging import get_logger, LogSettings, Logger
 from .runner import Runner
-
+from .settings import TestSettings
 # ---------------------------------------------------------
 
 class Unittest(unittest.TestCase):
     @classmethod
-    def execute_all(cls, show_run_times: bool = False, show_details : bool = True):
+    def execute_all(cls, settings : TestSettings = TestSettings()):
         suite = unittest.TestLoader().loadTestsFromTestCase(cls)
-        runner = Runner(logger=cls.get_logger(), show_run_times=show_run_times, show_details=show_details)
+        runner = Runner(logger=cls.get_logger(),settings=settings)
         results =  runner.run(suite)
         results.print_summary()
 

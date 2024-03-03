@@ -1,23 +1,20 @@
 import unittest
 from hollarek.logging import Logger
 from .result import Result
-
+from .settings import TestSettings
 # ---------------------------------------------------------
 
 
 class Runner(unittest.TextTestRunner):
-    def __init__(self, logger : Logger, show_run_times : bool = True, show_details : bool = True):
+    def __init__(self, logger : Logger, settings : TestSettings):
         super().__init__(resultclass=None)
         self.logger : Logger = logger
-        self.show_run_times = show_run_times
-        self.show_details : bool = show_details
-
+        self.settings : TestSettings = settings
 
     def run(self, test) -> Result:
         result = Result(logger=self.logger,
                         stream=self.stream,
-                        show_run_times=self.show_run_times,
-                        show_details=self.show_details,
+                        settings=self.settings,
                         descriptions=self.descriptions,
                         verbosity=2)
         test(result)
