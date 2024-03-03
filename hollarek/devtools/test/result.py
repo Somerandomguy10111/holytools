@@ -22,8 +22,9 @@ class Result(unittest.TestResult):
         self.settings : TestSettings = settings
 
         self.log = logger.log
-        self.start_times :dict = {}
-        self.results : list[CaseResult] = []
+        self.start_times : dict[str, float] = {}
+        self.case_results : list[CaseResult] = []
+
         self.print_header(f'  Test suite for \"{self.__class__.__name__}\"  ')
 
     def stopTestRun(self):
@@ -52,27 +53,43 @@ class Result(unittest.TestResult):
         self.report(test, CaseStatus.SKIPPED)
 
     # ---------------------------------------------------------
+    # logging
 
-    def report(self, test : TestCase, test_status: CaseStatus, err : Optional[tuple] = None):
-        test_result = CaseResult(runtime_sec=self.get_runtime_in_sec(test_id=test.id()),
-                                 name=get_case_name(test), status=test_status)
-        self.results.append(test_result)
+    def report(self, test : TestCase, status: CaseStatus, err : Optional[tuple] = None):
+        case_result = CaseResult(test=test, status=status, runtime=self.get_runtime(test=test))
+        self.case_results.append(case_result)
 
         conditional_err_msg = f'\n{self.get_err_details(err)}' if err and self.settings.show_details else ''
-        finish_log_msg = f'Status: {test_status.value}{conditional_err_msg}\n'
-        self.log(msg=finish_log_msg, level=test_status.get_log_level())
+        finish_log_msg = f'Status: {status.value}{conditional_err_msg}\n'
+        self.log(msg=finish_log_msg, level=status.get_log_level())
+
+
+    def get_runtime(self, test : TestCase) -> Optional[float]:
+        test_id = test.id()
+        if test_id in self.start_times:
+            time_in_sec =  time.time() - self.start_times[test_id]
+            return round(time_in_sec, 3)
+        else:
+            self.log(f'Couldnt find start time of test {test_id}. Current start_times : {self.start_times}', level=LogLevel.ERROR)
 
 
     def print_summary(self):
         self.print_header(msg=f' Summary ', seperator='-')
-        for result in self.results:
-            level = result.status.get_log_level()
-            rounded_runtime = f'{round(result.runtime_sec,3)}s'
-            conditional_runtime_info = f'{rounded_runtime:^{self.runtime_space}}' if self.settings.show_runtimes else ''
-            self.log(f'{result.name:<{self.test_spaces}}{result.status.value:<{self.status_spaces}}{conditional_runtime_info}',level=level)
+        for case in self.case_results:
+            level = case.status.get_log_level()
+            self.log(f'{self.get_name_msg(case)}{self.get_status_msg(case)}{self.get_runtime_msg(case)}', level=level)
         self.log(self.get_final_status())
         self.print_header(msg=f'')
 
+    def get_name_msg(self, result : CaseResult) -> str:
+        return f'{result.name:<{self.test_spaces}}'
+
+    def get_status_msg(self, result : CaseResult) -> str:
+        return f'{result.status.value:<{self.status_spaces}}'
+
+    def get_runtime_msg(self, result : CaseResult)-> str:
+        runtime_str = f'{result.runtime_sec}s'
+        return f'{runtime_str:^{self.runtime_space}}' if self.settings.show_runtimes else ''
 
     def print_header(self, msg: str, seperator : str = '='):
         total_len = self.test_spaces + self.status_spaces
@@ -80,13 +97,6 @@ class Result(unittest.TestResult):
         line_len = max(total_len- len(msg), 0)
         lines = seperator * int(line_len / 2.)
         self.log(f'{lines}{msg}{lines}')
-
-
-    def get_runtime_in_sec(self, test_id : str) -> Optional[float]:
-        if test_id in self.start_times:
-            return time.time() - self.start_times[test_id]
-        else:
-            self.log(f'Couldnt find start time of test {test_id}. Current start_times : {self.start_times}', level=LogLevel.ERROR)
 
 
     @staticmethod

@@ -33,4 +33,4 @@ class JsonTester(Unittest):
         self.assertEqual(parsed_json['keyy'], "new\nline and\ttab")
 
 if __name__ == "__main__":
-    JsonTester.execute_all(settings=TestSettings(show_details=False, show_runtimes=False))
+    JsonTester.execute_all(settings=TestSettings(show_details=True, show_runtimes=True))

@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from enum import Enum
 from unittest import TestCase
 from hollarek.logging import LogLevel
+from typing import Optional
 
 
 class CaseStatus(Enum):
@@ -20,11 +21,11 @@ class CaseStatus(Enum):
         return status_to_logging[self]
 
 
-@dataclass
 class CaseResult:
-    runtime_sec : float
-    name : str
-    status : CaseStatus
+    def __init__(self, test : TestCase, status : CaseStatus, runtime : float):
+        self.runtime_sec : float = runtime
+        self.name : str = get_case_name(test)
+        self.status : CaseStatus = status
 
 
 
