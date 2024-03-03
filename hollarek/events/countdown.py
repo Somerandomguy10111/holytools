@@ -20,19 +20,18 @@ class Countdown:
         self.scheduler.start()
 
 
-    def relaunch(self):
+    def restart(self):
         try:
             self.job.remove()
         except:
             pass
 
-        self.launch()
+        self.start()
 
-    def launch(self):
+    def start(self):
         run_time = datetime.now() + timedelta(seconds=self.initial_time)
         self.job = self.scheduler.add_job(func=self._release, trigger='date', next_run_time=run_time)
 
-    # Returns when the time has run out
     def finish(self):
         _ = self.one_time_lock.read()
 

@@ -1,31 +1,14 @@
 from __future__ import annotations
 import requests
 import logging
-from typing import Optional
-
 
 
 # ---------------------------------------------------------
 
 class SearchEngine:
-    _instance = None
-    _is_initialized = False
-
-    def __new__(cls, *args, **kwargs):
-        if not cls._instance:
-            cls._instance = super(SearchEngine, cls).__new__(cls)
-        return cls._instance
-
-    def __init__(self,google_key : Optional[str] = None,
-                 searchengine_id : Optional[str] = None):
-
-        if not SearchEngine._is_initialized:
-            if google_key is None or searchengine_id is None:
-                raise ValueError(f'Google API key and search engine ID must be provided but one of the arguments is None \n'
-                                 f'google_key : {google_key}; searchengine_id : {searchengine_id}')
-
-            self._GOOGLE_API_KEY : str = google_key
-            self._SEARCHENGINE_ID : str = searchengine_id
+    def __init__(self,google_key : str, searchengine_id : str):
+        self._GOOGLE_API_KEY : str = google_key
+        self._SEARCHENGINE_ID : str = searchengine_id
 
 
     def get_urls(self, search_term: str, num_results : int = 5) -> list[str]:

@@ -25,7 +25,7 @@ class Singleton:
             self.__class__.is_initialized = True
             self.__class__._instance = self
         else:
-            raise AlreadyInitialized('Cannot initialize {self.__class__} more than once')
+            raise AlreadyInitialized(f'Cannot initialize {self.__class__} more than once')
 
 
 class AlreadyInitialized(Exception):

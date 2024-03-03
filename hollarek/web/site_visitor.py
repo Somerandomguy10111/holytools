@@ -26,11 +26,11 @@ class SiteVisitor:
         self.is_busy = False
 
 
-    def fetch_site_html(self, site_url: str) -> str:
+    def fetch_site_html(self, url: str) -> str:
         self.is_busy = True
 
         def get_website_html():
-            self.engine.get(site_url)
+            self.engine.get(url)
             return self.engine.page_source
 
         content = func_timeout(timeout=SiteVisitor.max_site_loading_time, func=get_website_html)
@@ -38,29 +38,29 @@ class SiteVisitor:
         return content
 
 
-    def get_mail_addresses(self, site_url : str) -> list[str]:
-        return get_mail_addresses_in_text(text=self.get_html(site_url=site_url))
+    def get_mail_addresses(self, url : str) -> list[str]:
+        return get_mail_addresses_in_text(text=self.get_html(url=url))
 
 
-    def get_text(self, site_url: str, use_driver : bool = False) -> str:
+    def get_text(self, url: str, use_driver : bool = False) -> str:
         if use_driver:
-            page_source = self.get_html(site_url=site_url)
+            page_source = self.get_html(url=url)
             soup = BeautifulSoup(page_source, 'html.parser')
             site_text = ' '.join(element for element in soup.stripped_strings)
         else:
             def get_website_text():
-                downloaded = trafilatura.fetch_url(site_url)
+                downloaded = trafilatura.fetch_url(url)
                 return trafilatura.extract(downloaded)
             site_text = func_timeout(timeout=SiteVisitor.max_site_loading_time, func=get_website_text)
         return site_text
 
 
-    def get_html(self, site_url: str) -> str:
+    def get_html(self, url: str) -> str:
         try:
-            result = self.fetch_site_html(site_url)
+            result = self.fetch_site_html(url)
 
         except FunctionTimedOut:
-            logging.warning(f'Failed to retrieve text from website {site_url} due to timeout after {SiteVisitor.max_site_loading_time} seconds')
+            logging.warning(f'Failed to retrieve text from website {url} due to timeout after {SiteVisitor.max_site_loading_time} seconds')
             result = ''
 
         return result

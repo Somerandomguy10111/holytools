@@ -15,7 +15,7 @@ class VisitorTester(Unittest):
         self.beaver_test(use_driver=True)
 
     def beaver_test(self, use_driver : bool):
-        text = self.visitor.get_text(site_url=self.beavers_url, use_driver=use_driver)
+        text = self.visitor.get_text(url=self.beavers_url, use_driver=use_driver)
         self.assertTrue(self.contains_beavers(text=text))
 
     @staticmethod
