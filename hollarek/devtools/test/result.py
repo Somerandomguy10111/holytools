@@ -82,7 +82,7 @@ class Result(unittest.TestResult):
         self.print_header(msg=f'')
 
     def get_name_msg(self, result : CaseResult) -> str:
-        return f'{result.name:<{self.test_spaces}}'
+        return f'{result.name[:self.test_spaces-4]:<{self.test_spaces}}'
 
     def get_status_msg(self, result : CaseResult) -> str:
         return f'{result.status.value:<{self.status_spaces}}'
@@ -103,14 +103,16 @@ class Result(unittest.TestResult):
     def get_err_details(err) -> str:
         err_class, err_instance, err_traceback = err
         tb_list = traceback.extract_tb(err_traceback)
-        project_frames = [frame for frame in tb_list if os.getcwd() in frame.filename]
+        relevant_tb = [tb for tb in tb_list if not os.path.dirname(unittest.__file__) in tb.filename]
 
-        relevant_frame = project_frames[-1] if project_frames else tb_list[-1]
-        file_path = relevant_frame.filename
-        line_number = relevant_frame.lineno
-        tb_str = (f'File "{file_path}", line {line_number}, in {relevant_frame.name}\n'
-                  f'    {linecache.getline(file_path, line_number).strip()}')
-        return f'{err_class.__name__}: {err_instance}\n{tb_str}'
+        result = ''
+        for frame in relevant_tb:
+            file_path = frame.filename
+            line_number = frame.lineno
+            tb_str = (f'File "{file_path}", line {line_number}, in {frame.name}\n'
+                      f'    {linecache.getline(file_path, line_number).strip()}')
+            result += f'{err_class.__name__}: {err_instance}\n{tb_str}'
+        return result
 
 
     def get_final_status(self) -> str:

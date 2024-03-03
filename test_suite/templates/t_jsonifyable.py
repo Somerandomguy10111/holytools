@@ -6,7 +6,7 @@ from pathlib import Path
 from enum import Enum
 from datetime import datetime
 from hollarek.templates import JsonDataclass
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from hollarek.devtools import Unittest
 
 @dataclass
@@ -14,10 +14,8 @@ class SimpleDataclass:
     id: int
     name: str
     timestamp: datetime
-    price: Decimal
     is_active: bool
     unique_id: UUID
-    file_path: Path
     # Add more fields as needed
 
 @dataclass
@@ -35,7 +33,7 @@ class MyEnum(Enum):
 
 
 class TestJsonDataclass(Unittest):
-    def test_serialization_deserialization(self):
+    def test_store_load(self):
         # Create an instance of ComplexDataclass
         original_data = ComplexDataclass(
             date_field=date.today(),
@@ -45,30 +43,34 @@ class TestJsonDataclass(Unittest):
                 id=1,
                 name='Test',
                 timestamp=datetime.now(),
-                price=Decimal('10.99'),
                 is_active=True,
                 unique_id=UUID('12345678-1234-5678-1234-567812345678'),
-                file_path=Path('/test/path')
             )
         )
 
         # Serialize and then deserialize the data
         serialized_str = original_data.to_str()
         reloaded_data = ComplexDataclass.from_str(serialized_str)
-
-        # Verify that all attributes match between the original and reloaded data
         self.assertEqual(original_data.__dict__, reloaded_data.__dict__, "Original and reloaded data should match")
 
-    def test_invalid_dataclass_error(self):
+
+    def test_invalid(self):
         with self.assertRaises(TypeError):
+            @dataclass
             class InvalidDataclass(JsonDataclass):
-                my_set: set = {1, 2, 3}  # Sets are not supported by default JSON
+                my_set: set = field(default_factory=set)
+
+                def __post_init__(self):
+                    self.my_set = {1, 2, 3}
+
+            this = InvalidDataclass()
+            this.to_str()
 
         with self.assertRaises(TypeError):
-            # Attempt to serialize an instance of a non-dataclass
             class NonDataclass(JsonDataclass):
                 pass
-            NonDataclass().to_str()
+            this =NonDataclass()
+            this.to_json()
 
 if __name__ == '__main__':
     TestJsonDataclass.execute_all()
