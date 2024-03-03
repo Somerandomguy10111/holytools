@@ -1,35 +1,54 @@
 from __future__ import annotations
 from typing import Optional
-from abc import abstractmethod
+import yaml
 # -------------------------------------------
 
+from typing import TypeVar
+TreeNodeType = TypeVar('TreeNodeType', bound='TreeNode')
 
 class TreeNode:
-    def __init__(self, name : str, parent : Optional[TreeNode] = None):
-        self._name : str = name if parent else '/'
-        self._parent : TreeNode = parent
-        self._children : Optional[set[TreeNode]] = set()
+    def __init__(self, name : str, parent : Optional[TreeNodeType] = None):
+        self._name : str = name
+        self._parent : TreeNodeType = parent
+        self._children : Optional[list[TreeNodeType]] = None
 
-    def remove_child(self, node : TreeNode):
-        self._children.remove(node)
-
-    def _add_child(self, node : TreeNode):
+    def _add_child(self, node : TreeNodeType):
         if node.get_parent() != self:
             raise ValueError(f'Node already has parent')
-        self._children.add(node)
-
-    @abstractmethod
-    def _retrieve_children(self) -> set[TreeNode]:
-        pass
-
-    # -------------------------------------------
-    # get
+        self._children.append(node)
 
     def get_name(self) -> str:
         return self._name
 
+    # -------------------------------------------
+    # descendants
 
-    def get_ancestors(self) -> list[TreeNode]:
+    def get_subnodes(self) -> list[TreeNodeType]:
+        subnodes = []
+        for child in self.get_child_nodes():
+            subnodes.append(child)
+            subnodes += child.get_subnodes()
+        return subnodes
+
+    def get_child_nodes(self) -> list[TreeNodeType]:
+        return self._children
+
+    def get_yaml_tree(self, skip_null: bool = True) -> str:
+        the_yaml = yaml.dump(data=self.get_dict())
+        if skip_null:
+            the_yaml = the_yaml.replace(f': null', '')
+        return the_yaml
+
+    def get_dict(self) -> dict[str, dict]:
+        if not self.get_child_nodes():
+            return {}
+
+        return {child.get_name() : child.get_dict() for child in self.get_child_nodes()}
+
+    # -------------------------------------------
+    # ancestors
+
+    def get_ancestors(self) -> list[TreeNodeType]:
         current = self
         ancestors = []
         while current._parent:
@@ -37,28 +56,11 @@ class TreeNode:
             current = current._parent
         return ancestors
 
-
-    def get_child_nodes(self) -> set[TreeNode]:
-        if self._children is None:
-            self._children = self._retrieve_children()
-        return self._children
-
-
-    def get_dict(self) -> Optional[dict]:
-        if not self.get_child_nodes():
-            return None
-
-        return {child.get_name() : child.get_dict() for child in self.get_child_nodes()}
-
-
-    def get_root(self) -> TreeNode:
-        current = self
-        while current._parent:
-            current = current._parent
-        return current
-
-
-    def get_parent(self) -> Optional[TreeNode]:
+    def get_parent(self) -> Optional[TreeNodeType]:
         return self._parent
 
-
+    def get_root(self) -> TreeNodeType:
+        current = self
+        while current.get_parent():
+            current = current.get_parent()
+        return current

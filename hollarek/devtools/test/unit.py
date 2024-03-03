@@ -3,7 +3,7 @@ from typing import Optional
 import unittest
 from unittest.result import TestResult
 
-from hollarek.devtools.log import get_logger, LogSettings, Logger
+from hollarek.logging import get_logger, LogSettings, Logger
 from abc import ABC, abstractmethod
 
 from .test_runners import CustomTestResult, CustomTestRunner
