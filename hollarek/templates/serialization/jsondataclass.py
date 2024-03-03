@@ -4,7 +4,6 @@ import orjson
 import dataclasses
 from datetime import datetime, date, time
 from decimal import Decimal
-from enum import Enum
 from uuid import UUID
 from pathlib import Path
 from typing import get_type_hints

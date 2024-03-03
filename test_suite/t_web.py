@@ -24,4 +24,4 @@ class VisitorTester(Unittest):
 
 
 if __name__ == "__main__":
-    VisitorTester.execute_all(show_run_times=True)
+    VisitorTester.execute_all()

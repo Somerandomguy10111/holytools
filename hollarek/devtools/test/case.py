@@ -1,8 +1,6 @@
-from dataclasses import dataclass
 from enum import Enum
 from unittest import TestCase
 from hollarek.logging import LogLevel
-from typing import Optional
 
 
 class CaseStatus(Enum):
