@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import get_type_hints
 
 from hollarek.devtools import get_core_type
+from enum import Enum
 # -------------------------------------------
 
 
@@ -44,14 +45,20 @@ def get_json_entry(obj):
 
 def from_json(cls : type, json_dict: dict):
     if not dataclasses.is_dataclass(cls):
-        raise TypeError(f'{cls} must be a dataclass to be Jsonifyable')
+        raise TypeError(f'{cls} is not a dataclass. from_json can only be used with dataclasses')
 
     type_hints = get_type_hints(cls)
     init_dict = {}
     for key, value in json_dict.items():
+        if value is None:
+            init_dict[key] = value
+            continue
+
         core_type = get_core_type(dtype=type_hints.get(key))
         if not isinstance(value, dict):
             init_dict[key] = make_elementary(cls=core_type,value=value)
+        elif issubclass(core_type, Enum):
+            init_dict[key] = core_type(value['_value_'])
         else:
             init_dict[key] = from_json(cls=core_type, json_dict=value)
 
