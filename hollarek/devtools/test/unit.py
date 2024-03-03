@@ -3,13 +3,12 @@ from typing import Optional
 import unittest
 
 from hollarek.logging import get_logger, LogSettings, Logger
+from .runner import CustomTestRunner
 
-from .test_runners import UnittestResult, CustomTestRunner
 # ---------------------------------------------------------
 
 class Unittest(unittest.TestCase):
     _logger : Optional[Logger] = None
-
 
     def run(self, result=None):
         super().run(result)
