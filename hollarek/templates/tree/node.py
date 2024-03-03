@@ -33,11 +33,15 @@ class TreeNode:
     def get_child_nodes(self) -> list[TreeNodeType]:
         return self._children
 
-    def get_yaml_tree(self, skip_empty: bool = True) -> str:
-        the_yaml = yaml.dump(data=self.get_dict(), indent=4)
-        if skip_empty:
-            the_yaml = the_yaml.replace(f': {{}}', '')
-        return the_yaml
+    def get_tree(self, pretty : bool = True) -> str:
+        if pretty:
+            tree = get_pretty_tree(the_dict=self.get_dict())
+            to_replace = f'{{}}'
+        else:
+            tree = yaml.dump(data=self.get_dict(), indent=4)
+            to_replace = f': {{}}'
+        tree = tree.replace(f'{to_replace}', '')
+        return tree
 
     def get_dict(self) -> Optional[dict]:
         the_dict = {self._name: {}}
@@ -64,3 +68,20 @@ class TreeNode:
         while current.get_parent():
             current = current.get_parent()
         return current
+
+
+def get_pretty_tree(the_dict, prefix='', is_last=True) -> str:
+    output = ''
+    for index, (key, value) in enumerate(the_dict.items()):
+        connector = '└── ' if is_last else '├── '
+        new_prefix = prefix + ('    ' if is_last else '│   ')
+
+        if isinstance(value, dict) and value:
+            output = f'{prefix}{connector}{key}\n'
+            last_child = len(value) - 1
+            for sub_index, (sub_key, sub_value) in enumerate(value.items()):
+                sub_is_last = sub_index == last_child
+                output += get_pretty_tree({sub_key: sub_value}, new_prefix, sub_is_last)
+        else:
+            output += f'{prefix}{connector}{key} {value}\n'
+    return output

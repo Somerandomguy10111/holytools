@@ -56,7 +56,7 @@ class TestFsysNode(Unittest):
         self.assertIsInstance(the_dict, dict)
 
     def test_get_yaml(self):
-        the_yaml = self.root_node.get_yaml_tree()
+        the_yaml = self.root_node.get_yaml()
         # print(the_yaml)
         self.assertIsInstance(the_yaml, str)
 
