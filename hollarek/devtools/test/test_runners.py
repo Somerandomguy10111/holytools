@@ -24,6 +24,7 @@ class SingleResult:
 class UnittestResult(unittest.TestResult):
     test_spaces = 50
     status_spaces = 20
+    runtime_space = 20
 
 
     def __init__(self, logger : Logger, show_run_times : bool, show_details : bool, *args, **kwargs):
@@ -33,6 +34,7 @@ class UnittestResult(unittest.TestResult):
         self.show_run_times = show_run_times
         self.show_details : bool = show_details
         self.results : list[SingleResult] = []
+        self._print_header()
 
     def stopTestRun(self):
         super().stopTestRun()
@@ -40,10 +42,15 @@ class UnittestResult(unittest.TestResult):
 
     def print_summary(self) -> str:
         summary_msg = ''
+        self._print_header(msg=f' Summary ', seperator='-')
         for result in self.results:
             level = self.status_to_level(test_status=result.status)
-            self.log(f'{result.name:<{self.test_spaces}} {result.status.value:<{self.status_spaces}} {result.runtime_sec:.2f}s',level=level)
+            rounded_runtime = f'{round(result.runtime_sec,3)}s'
+            conditional_runtime_info = f'{rounded_runtime:<{self.runtime_space}}' if self.show_run_times else ''
+            self.log(f'{result.name:<{self.test_spaces}} {result.status.value:<{self.status_spaces}}{conditional_runtime_info}',level=level)
         self.log(self._get_final_status())
+        self._print_header(msg=f'')
+
         return summary_msg
 
     def startTest(self, test):
@@ -81,6 +88,16 @@ class UnittestResult(unittest.TestResult):
         self.log(msg=finish_log_msg, level=log_level)
 
 
+    def _print_header(self, msg: Optional[str] = None, seperator : str = '='):
+        if msg is None:
+            msg = f'  Test suite for \"{self.__class__.__name__}\"  '
+        total_len = UnittestResult.test_spaces + UnittestResult.status_spaces
+        total_len += UnittestResult.runtime_space if self.show_run_times else 0
+        line_len = max(total_len- len(msg), 0)
+        lines = seperator * int(line_len / 2.)
+        self.log(f'{lines}{msg}{lines}')
+
+
     def get_runtime_in_sec(self, test_id : str) -> Optional[float]:
         if test_id in self.start_times:
             return time.time() - self.start_times[test_id]
@@ -103,7 +120,6 @@ class UnittestResult(unittest.TestResult):
         error_line = linecache.getline(file_path, line_number).strip()
 
         tb_str = f'File "{file_path}", line {line_number}, in {function_name}\n    {error_line}'
-
         return f'{err_class.__name__}: {err_instance}\n{tb_str}'
 
 
