@@ -23,8 +23,8 @@ class SingleResult:
 
 class UnittestResult(unittest.TestResult):
     test_spaces = 50
-    status_spaces = 20
-    runtime_space = 20
+    status_spaces = 10
+    runtime_space = 10
 
 
     def __init__(self, logger : Logger, show_run_times : bool, show_details : bool, *args, **kwargs):
@@ -46,8 +46,8 @@ class UnittestResult(unittest.TestResult):
         for result in self.results:
             level = self.status_to_level(test_status=result.status)
             rounded_runtime = f'{round(result.runtime_sec,3)}s'
-            conditional_runtime_info = f'{rounded_runtime:<{self.runtime_space}}' if self.show_run_times else ''
-            self.log(f'{result.name:<{self.test_spaces}} {result.status.value:<{self.status_spaces}}{conditional_runtime_info}',level=level)
+            conditional_runtime_info = f'{rounded_runtime:^{self.runtime_space}}' if self.show_run_times else ''
+            self.log(f'{result.name:<{self.test_spaces}}{result.status.value:<{self.status_spaces}}{conditional_runtime_info}',level=level)
         self.log(self._get_final_status())
         self._print_header(msg=f'')
 

@@ -29,8 +29,8 @@ class JsonTester(Unittest):
     def test_multiple_control_characters(self):
         repaired_str = repair_json(self.broken_str_multiple)
         parsed_json = json.loads(repaired_str)
-        if not 'keyy' in parsed_json:
-            raise KeyError(f'No key keyy')
+        # if not 'keyy' in parsed_json:
+        #     raise KeyError(f'No key keyy')
         self.assertEqual(parsed_json['keyy'], "new\nline and\ttab")
 
 if __name__ == "__main__":
