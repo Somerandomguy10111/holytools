@@ -127,3 +127,4 @@ if __name__ == "__main__":
     print(f'test childpaths {len(test_childpaths)}')
     print(f'test sub paths {len(test_sub_paths)}')
     print(f'test sub paths {len(test_sub_paths2)}')
+    print(test_node.get_yaml_tree())

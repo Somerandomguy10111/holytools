@@ -33,17 +33,17 @@ class TreeNode:
     def get_child_nodes(self) -> list[TreeNodeType]:
         return self._children
 
-    def get_yaml_tree(self, skip_null: bool = True) -> str:
-        the_yaml = yaml.dump(data=self.get_dict())
-        if skip_null:
-            the_yaml = the_yaml.replace(f': null', '')
+    def get_yaml_tree(self, skip_empty: bool = True) -> str:
+        the_yaml = yaml.dump(data=self.get_dict(), indent=4)
+        if skip_empty:
+            the_yaml = the_yaml.replace(f': {{}}', '')
         return the_yaml
 
-    def get_dict(self) -> dict[str, dict]:
-        if not self.get_child_nodes():
-            return {}
-
-        return {child.get_name() : child.get_dict() for child in self.get_child_nodes()}
+    def get_dict(self) -> Optional[dict]:
+        the_dict = {self._name: {}}
+        for child in self.get_child_nodes():
+            the_dict[self._name].update(child.get_dict())
+        return the_dict
 
     # -------------------------------------------
     # ancestors
