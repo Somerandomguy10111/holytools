@@ -71,4 +71,4 @@ class TestJsonDataclass(Unittest):
             NonDataclass().to_str()
 
 if __name__ == '__main__':
-    unittest.main()
+    TestJsonDataclass.execute_all()

@@ -12,12 +12,6 @@ class Unittest(unittest.TestCase):
     _logger : Optional[Logger] = None
 
 
-    @classmethod
-    @abstractmethod
-    def setUpClass(cls):
-        pass
-
-
     def run(self, result=None):
         super().run(result)
 
@@ -31,11 +25,12 @@ class Unittest(unittest.TestCase):
 
         cls._print_header(msg=f' Summary ')
         results.print_summary()
+        cls._print_header(msg=f'')
 
 
     @classmethod
     def _print_header(cls, msg : Optional[str] = None):
-        if not msg:
+        if msg is None:
             msg = f'  Test suite for \"{cls.__name__}\"  '
         line_len = max(UnittestResult.test_spaces + UnittestResult.status_spaces - len(msg), 0)
         lines = '=' * int(line_len/2.)
