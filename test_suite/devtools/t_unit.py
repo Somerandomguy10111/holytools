@@ -19,7 +19,7 @@ class JsonTester(Unittest):
     def test_single_newline(self):
         repaired_str = repair_json(self.broken_str_newline)
         parsed_json = json.loads(repaired_str)
-        self.assertEqual(parsed_json['key'], "value with a new\nline")
+        self.assertEqual(parsed_json['key'], "value with a new\nlinee")
 
     def test_tab_and_backslash(self):
         repaired_str = repair_json(self.broken_str_tab)
@@ -29,8 +29,9 @@ class JsonTester(Unittest):
     def test_multiple_control_characters(self):
         repaired_str = repair_json(self.broken_str_multiple)
         parsed_json = json.loads(repaired_str)
+        if not 'keyy' in parsed_json:
+            raise KeyError(f'No key keyy')
         self.assertEqual(parsed_json['keyy'], "new\nline and\ttab")
-
 
 if __name__ == "__main__":
     JsonTester.execute_all(show_run_times=True)

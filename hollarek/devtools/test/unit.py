@@ -4,12 +4,12 @@ import unittest
 from unittest.result import TestResult
 
 from hollarek.logging import get_logger, LogSettings, Logger
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 
 from .test_runners import CustomTestResult, CustomTestRunner
 # ---------------------------------------------------------
 
-class Unittest(unittest.TestCase, ABC):
+class Unittest(unittest.TestCase):
     _logger : Optional[Logger] = None
 
 
@@ -20,31 +20,26 @@ class Unittest(unittest.TestCase, ABC):
 
 
     def run(self, result=None):
-        try:
-            super().run(result)
-        except Exception as e:
-            self.fail(f"Test failed with error: {e}")
+        super().run(result)
 
     @classmethod
-    def execute_all(cls, show_run_times: bool = False):
+    def execute_all(cls, show_run_times: bool = False, show_details : bool = True):
         cls._print_header()
-        results : TestResult = cls._get_test_results(show_run_times=show_run_times)
+
+        suite = unittest.TestLoader().loadTestsFromTestCase(cls)
+        runner = CustomTestRunner(logger=cls.get_logger(), show_run_times=show_run_times, show_details=show_details)
+        results =  runner.run(suite)
         summary = cls._get_final_status_msg(result=results)
+
         cls.log(summary)
 
-
-    @classmethod
-    def _get_test_results(cls, show_run_times : bool) -> TestResult:
-        suite = unittest.TestLoader().loadTestsFromTestCase(cls)
-        runner = CustomTestRunner(logger=cls._logger, show_run_times=show_run_times)
-        return runner.run(suite)
 
     @classmethod
     def _print_header(cls):
         name_info = f'  Test suite for \"{cls.__name__}\"  '
         line_len = max(CustomTestResult.test_spaces + CustomTestResult.status_spaces - len(name_info), 0)
-        lines = '-' * int(line_len/2.)
-        cls.log(f'{lines}{name_info}{lines}\n')
+        lines = '=' * int(line_len/2.)
+        cls.log(f'{lines}{name_info}{lines}')
 
 
     @staticmethod
@@ -80,3 +75,14 @@ class Unittest(unittest.TestCase, ABC):
         logger.log(msg=msg,level=logging.INFO)
 
 
+    def assertEqual(self, first, second, *args, **kwargs):
+        if not first == second:
+            first_str = str(first).__repr__()
+            second_str =str(second).__repr__()
+            raise AssertionError(f'{first_str} != {second_str}')
+
+    def assertIn(self, member, container, msg = None):
+        if not member in container:
+            member_str = str(member).__repr__()
+            container_str = str(container).__repr__()
+            raise AssertionError(f'{member_str} not in {container_str}')

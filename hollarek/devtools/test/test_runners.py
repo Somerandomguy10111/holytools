@@ -1,8 +1,11 @@
+import os
 import unittest
 from enum import Enum
 import time
 from hollarek.logging import Logger, LogLevel
 from unittest import TestCase
+from typing import Optional
+import traceback
 
 class TestStatus(Enum):
     SUCCESS = "SUCCESS"
@@ -15,41 +18,66 @@ class CustomTestResult(unittest.TestResult):
     test_spaces = 50
     status_spaces = 20
 
-    def __init__(self, logger : Logger, show_run_times : bool, *args, **kwargs):
+    def __init__(self, logger : Logger, show_run_times : bool, show_details : bool, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.logger : Logger = logger
+        self.log = logger.log
         self.start_times = {}
         self.show_run_times = show_run_times
-
+        self.show_details : bool = show_details
 
     def startTest(self, test):
         super().startTest(test)
+        test_info = f' {self.get_test_name(test=test)} '
+        self.log(msg = f'------>{test_info}', level=LogLevel.INFO)
+
         self.start_times[test.id()] = time.time()
 
     def addSuccess(self, test):
         super().addSuccess(test)
-        self.log(test, "SUCCESS", TestStatus.SUCCESS)
+        self.report(test, TestStatus.SUCCESS)
 
     def addError(self, test, err):
         super().addError(test, err)
-        self.log(test, "ERROR", TestStatus.ERROR)
+        self.report(test, TestStatus.ERROR, err)
 
     def addFailure(self, test, err):
         super().addFailure(test, err)
-        self.log(test, "FAIL", TestStatus.FAIL)
+        self.report(test, TestStatus.FAIL, err)
 
     def addSkip(self, test, reason):
         super().addSkip(test, reason)
-        self.log(test, "SKIPPED", TestStatus.SKIPPED)
+        self.report(test, TestStatus.SKIPPED)
 
-
-    def log(self, test : TestCase, reason : str, test_status: TestStatus):
-        test_name = self.get_test_name(test=test)
+    def report(self, test : TestCase, test_status: TestStatus, err : Optional[tuple] = None):
         run_time_str = self.get_run_time_str(test.id()) if self.show_run_times else ''
 
-        log_message = f'{test_name:<{self.test_spaces}}: {reason:<{self.status_spaces}} {run_time_str}'
+        # log_message = f'{test_info:<{self.test_spaces}}: {test_status.value:<{self.status_spaces}} {run_time_str}'
+        finish_log_msg = f'Status: {test_status.value}'
+        if err and self.show_details:
+            finish_log_msg += f'\n{self.get_err_dails(err)}'
+        finish_log_msg += '\n'
+
         log_level = self.status_to_level(test_status)
-        self.logger.log(msg=log_message, level=log_level)
+        self.log(msg=finish_log_msg, level=log_level)
+
+
+    @staticmethod
+    def get_err_dails(err) -> str:
+        import linecache
+
+        err_class, err_instance, err_traceback = err
+        tb_list = traceback.extract_tb(err_traceback)
+        project_frames = [frame for frame in tb_list if os.getcwd() in frame.filename]
+
+        relevant_frame = project_frames[-1] if project_frames else tb_list[-1]
+        file_path = relevant_frame.filename
+        line_number = relevant_frame.lineno
+        function_name = relevant_frame.name
+        error_line = linecache.getline(file_path, line_number).strip()
+
+        tb_str = f'File "{file_path}", line {line_number}, in {function_name}\n    {error_line}'
+
+        return f'{err_class.__name__}: {err_instance}\n{tb_str}'
 
 
     def get_run_time_str(self, test_id : str) -> str:
@@ -59,7 +87,7 @@ class CustomTestResult(unittest.TestResult):
             runtime_str = f'{base:<{self.status_spaces}}'
             return runtime_str
         else:
-            self.logger.log(f'Couldnt find start time of test {test_id}. Current start_times : {self.start_times}', level=LogLevel.ERROR)
+            self.log(f'Couldnt find start time of test {test_id}. Current start_times : {self.start_times}', level=LogLevel.ERROR)
             return ''
 
 
@@ -70,6 +98,7 @@ class CustomTestResult(unittest.TestResult):
         last_parts = parts[-2:]
         test_name = '.'.join(last_parts)[:CustomTestResult.test_spaces]
         return test_name
+
 
     @staticmethod
     def status_to_level(test_status : TestStatus) -> LogLevel:
@@ -83,16 +112,18 @@ class CustomTestResult(unittest.TestResult):
 
 
 class CustomTestRunner(unittest.TextTestRunner):
-    def __init__(self, logger : Logger, show_run_times : bool):
+    def __init__(self, logger : Logger, show_run_times : bool = True, show_details : bool = True):
         super().__init__(resultclass=None)
         self.logger : Logger = logger
         self.show_run_times = show_run_times
+        self.show_details : bool = show_details
 
 
     def run(self, test):
         result = CustomTestResult(logger=self.logger,
                                   stream=self.stream,
                                   show_run_times=self.show_run_times,
+                                  show_details=self.show_details,
                                   descriptions=self.descriptions,
                                   verbosity=2)
         test(result)
