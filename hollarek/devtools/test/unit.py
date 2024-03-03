@@ -1,12 +1,11 @@
 import logging
 from typing import Optional
 import unittest
-from unittest.result import TestResult
 
 from hollarek.logging import get_logger, LogSettings, Logger
 from abc import abstractmethod
 
-from .test_runners import CustomTestResult, CustomTestRunner
+from .test_runners import UnittestResult, CustomTestRunner
 # ---------------------------------------------------------
 
 class Unittest(unittest.TestCase):
@@ -29,38 +28,19 @@ class Unittest(unittest.TestCase):
         suite = unittest.TestLoader().loadTestsFromTestCase(cls)
         runner = CustomTestRunner(logger=cls.get_logger(), show_run_times=show_run_times, show_details=show_details)
         results =  runner.run(suite)
-        summary = cls._get_final_status_msg(result=results)
 
-        cls.log(summary)
+        cls._print_header(msg=f' Summary ')
+        results.print_summary()
 
 
     @classmethod
-    def _print_header(cls):
-        name_info = f'  Test suite for \"{cls.__name__}\"  '
-        line_len = max(CustomTestResult.test_spaces + CustomTestResult.status_spaces - len(name_info), 0)
+    def _print_header(cls, msg : Optional[str] = None):
+        if not msg:
+            msg = f'  Test suite for \"{cls.__name__}\"  '
+        line_len = max(UnittestResult.test_spaces + UnittestResult.status_spaces - len(msg), 0)
         lines = '=' * int(line_len/2.)
-        cls.log(f'{lines}{name_info}{lines}')
+        cls.log(f'{lines}{msg}{lines}')
 
-
-    @staticmethod
-    def _get_final_status_msg(result  : TestResult) -> str:
-        total_tests = result.testsRun
-        errors = len(result.errors)
-        failures = len(result.failures)
-        successful_tests = total_tests - errors - failures
-
-        RED = '\033[91m'
-        GREEN = '\033[92m'
-        RESET = '\033[0m'
-        CHECKMARK = '✓'
-        CROSS = '❌'
-
-        if errors + failures == 0:
-            final_status = f"{GREEN}\n{CHECKMARK} {successful_tests}/{total_tests} tests ran successfully!{RESET}"
-        else:
-            final_status = f"{RED}\n{CROSS} {total_tests - successful_tests}/{total_tests} tests had errors or failures!{RESET}"
-
-        return final_status
 
 
     @classmethod
