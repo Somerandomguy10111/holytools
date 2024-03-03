@@ -15,19 +15,6 @@ class EC2AWS:
     # ----------------------------------------------
     # set
 
-    def launch_instances(self, num: int, template: InstanceTemplate = InstanceTemplate.make_default()):
-        params = template.get_params(num=num)
-
-        try:
-            response = self.ec2_client.run_instances(**params)
-            instance_ids = [inst['InstanceId'] for inst in response['Instances']]
-            logging.info(f"Launching instances: {instance_ids}")
-            self.wait(instance_ids=instance_ids, instance_state=InstanceState.RUNNING)
-
-        except Exception as e:
-            logging.error(f"An error occurred: {e}")
-
-
     def shutdown_all_instances(self) -> None:
         instances = self.get_all_instance_ids()
         if instances:
@@ -36,15 +23,14 @@ class EC2AWS:
             self.wait(instance_ids=instances, instance_state=InstanceState.STOPPED)
 
 
-    def reach_number_of_instances(self, desired_count: int) -> None:
+    def reach_number_of_instances(self, count: int) -> None:
         instances = self.get_all_instance_ids()
         num_running_instances = len(instances)
 
-        self.start_all_instances()
-        if num_running_instances < desired_count:
-            missing_instances = desired_count - num_running_instances
+        if num_running_instances < count:
+            missing_instances = count - num_running_instances
             self.launch_instances(num=missing_instances)
-            logging.info(f"Started additional instances to reach {desired_count}")
+            logging.info(f"Started additional instances to reach {count}")
 
 
     def start_all_instances(self) -> None:
@@ -56,6 +42,18 @@ class EC2AWS:
         else:
             logging.info(f'No instances found')
 
+
+    def launch_instances(self, num: int, template: InstanceTemplate = InstanceTemplate.make_default()):
+        params = template.get_params(num=num)
+
+        try:
+            response = self.ec2_client.run_instances(**params)
+            instance_ids = [inst['InstanceId'] for inst in response['Instances']]
+            logging.info(f"Launching instances: {instance_ids}")
+            self.wait(instance_ids=instance_ids, instance_state=InstanceState.RUNNING)
+
+        except Exception as e:
+            logging.error(f"An error occurred: {e}")
     # ----------------------------------------------
     # get
 
