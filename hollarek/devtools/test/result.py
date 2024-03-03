@@ -2,37 +2,16 @@ import os
 import time
 import traceback
 import unittest
-from dataclasses import dataclass
-from enum import Enum
 from typing import Optional
 from unittest import TestCase
+import linecache
+
 from hollarek.logging import LogLevel, Logger
+from .case import CaseStatus, CaseResult, get_case_name
 # ---------------------------------------------------------
 
-class TestStatus(Enum):
-    SUCCESS = "SUCCESS"
-    ERROR = "ERROR"
-    FAIL = "FAIL"
-    SKIPPED = "SKIPPED"
 
-    def get_log_level(self) -> LogLevel:
-        status_to_logging = {
-            TestStatus.SUCCESS: LogLevel.INFO,
-            TestStatus.ERROR: LogLevel.CRITICAL,
-            TestStatus.FAIL: LogLevel.ERROR,
-            TestStatus.SKIPPED: LogLevel.INFO
-        }
-        return status_to_logging[self]
-
-
-@dataclass
-class SingleResult:
-    runtime_sec : float
-    name : str
-    status : TestStatus
-
-
-class UnittestResult(unittest.TestResult):
+class Result(unittest.TestResult):
     test_spaces = 50
     status_spaces = 10
     runtime_space = 10
@@ -40,10 +19,10 @@ class UnittestResult(unittest.TestResult):
     def __init__(self, logger : Logger, show_run_times : bool, show_details : bool, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.log = logger.log
-        self.start_times = {}
-        self.show_run_times = show_run_times
+        self.start_times :dict = {}
+        self.show_run_times : bool = show_run_times
         self.show_details : bool = show_details
-        self.results : list[SingleResult] = []
+        self.results : list[CaseResult] = []
         self.print_header(f'  Test suite for \"{self.__class__.__name__}\"  ')
 
     def stopTestRun(self):
@@ -52,28 +31,30 @@ class UnittestResult(unittest.TestResult):
 
     def startTest(self, test):
         super().startTest(test)
-        self.log(msg = f'------> {self.get_test_name(test=test)} ', level=LogLevel.INFO)
+        self.log(msg = f'------> {get_case_name(test=test)[:self.test_spaces]} ', level=LogLevel.INFO)
         self.start_times[test.id()] = time.time()
-
 
     def addSuccess(self, test):
         super().addSuccess(test)
-        self.report(test, TestStatus.SUCCESS)
+        self.report(test, CaseStatus.SUCCESS)
 
     def addError(self, test, err):
         super().addError(test, err)
-        self.report(test, TestStatus.ERROR, err)
+        self.report(test, CaseStatus.ERROR, err)
 
     def addFailure(self, test, err):
         super().addFailure(test, err)
-        self.report(test, TestStatus.FAIL, err)
+        self.report(test, CaseStatus.FAIL, err)
 
     def addSkip(self, test, reason):
         super().addSkip(test, reason)
-        self.report(test, TestStatus.SKIPPED)
+        self.report(test, CaseStatus.SKIPPED)
 
-    def report(self, test : TestCase, test_status: TestStatus, err : Optional[tuple] = None):
-        test_result = SingleResult(runtime_sec=self.get_runtime_in_sec(test_id=test.id()), name=self.get_test_name(test), status=test_status)
+    # ---------------------------------------------------------
+
+    def report(self, test : TestCase, test_status: CaseStatus, err : Optional[tuple] = None):
+        test_result = CaseResult(runtime_sec=self.get_runtime_in_sec(test_id=test.id()),
+                                 name=get_case_name(test), status=test_status)
         self.results.append(test_result)
 
         conditional_err_msg = f'\n{self.get_err_details(err)}' if err and self.show_details else ''
@@ -93,8 +74,7 @@ class UnittestResult(unittest.TestResult):
 
 
     def print_header(self, msg: str, seperator : str = '='):
-        total_len = UnittestResult.test_spaces + UnittestResult.status_spaces
-        total_len += UnittestResult.runtime_space if self.show_run_times else 0
+        total_len = self.test_spaces + self.status_spaces + self.runtime_space if self.show_run_times else 0
         line_len = max(total_len- len(msg), 0)
         lines = seperator * int(line_len / 2.)
         self.log(f'{lines}{msg}{lines}')
@@ -109,7 +89,6 @@ class UnittestResult(unittest.TestResult):
 
     @staticmethod
     def get_err_details(err) -> str:
-        import linecache
         err_class, err_instance, err_traceback = err
         tb_list = traceback.extract_tb(err_traceback)
         project_frames = [frame for frame in tb_list if os.getcwd() in frame.filename]
@@ -138,11 +117,3 @@ class UnittestResult(unittest.TestResult):
             final_status = f"{RED}\n{CROSS} {num_unsuccessful}/{num_total} tests had errors or failures!{RESET}"
 
         return final_status
-
-    @staticmethod
-    def get_test_name(test) -> str:
-        full_test_name = test.id()
-        parts = full_test_name.split('.')
-        last_parts = parts[-2:]
-        test_name = '.'.join(last_parts)[:UnittestResult.test_spaces]
-        return test_name

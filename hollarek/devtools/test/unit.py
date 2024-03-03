@@ -1,39 +1,23 @@
-import logging
-from typing import Optional
 import unittest
-
 from hollarek.logging import get_logger, LogSettings, Logger
-from .runner import CustomTestRunner
+from .runner import Runner
 
 # ---------------------------------------------------------
 
 class Unittest(unittest.TestCase):
-    _logger : Optional[Logger] = None
-
-    def run(self, result=None):
-        super().run(result)
-
     @classmethod
     def execute_all(cls, show_run_times: bool = False, show_details : bool = True):
         suite = unittest.TestLoader().loadTestsFromTestCase(cls)
-        runner = CustomTestRunner(logger=cls.get_logger(), show_run_times=show_run_times, show_details=show_details)
+        runner = Runner(logger=cls.get_logger(), show_run_times=show_run_times, show_details=show_details)
         results =  runner.run(suite)
-
-
         results.print_summary()
-
 
     @classmethod
     def get_logger(cls) -> Logger:
-        if not cls._logger:
-            cls._logger = get_logger(settings=LogSettings(include_call_location=False, use_timestamp=False), name=cls.__name__)
-        return cls._logger
+        return get_logger(settings=LogSettings(include_call_location=False, use_timestamp=False), name=cls.__name__)
 
-    @classmethod
-    def log(cls,msg : str):
-        logger = cls.get_logger()
-        logger.log(msg=msg,level=logging.INFO)
-
+    # ---------------------------------------------------------
+    # assertions
 
     def assertEqual(self, first, second, *args, **kwargs):
         if not first == second:
