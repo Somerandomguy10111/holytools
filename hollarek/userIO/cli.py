@@ -1,5 +1,5 @@
 import inspect
-from hollarek.devtools import Loggable, LogSettings, LogLevel
+from hollarek.logging import Loggable, LogSettings, LogLevel
 # ---------------------------------------------------------
 
 

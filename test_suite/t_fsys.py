@@ -52,12 +52,10 @@ class TestFsysNode(Unittest):
 
     def test_get_dict(self):
         the_dict = self.root_node.get_dict()
-        # print(the_dict)
         self.assertIsInstance(the_dict, dict)
 
     def test_get_yaml(self):
-        the_yaml = self.root_node.get_yaml()
-        # print(the_yaml)
+        the_yaml = self.root_node.get_tree()
         self.assertIsInstance(the_yaml, str)
 
 # This allows the test script to be run from the command line

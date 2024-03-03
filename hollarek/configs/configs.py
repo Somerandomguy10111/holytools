@@ -4,7 +4,7 @@ from typing import Optional
 
 from hollarek.crypt import AES
 from hollarek.cloud import AWSRegion
-from hollarek.devtools import LogLevel
+from hollarek.logging import LogLevel
 from .abstr import Settings, Configs
 # ---------------------------------------------------------
 
@@ -14,7 +14,7 @@ class AWSConfigs(Configs):
         self.secret_name: str = secret_name
         session = boto3.session.Session()
         self.client = session.client(service_name='secretsmanager', region_name=region.value)
-        self.cls_log(f'Initialized {self.__class__.__name__} with region \"{region.value}\"')
+        self.log(f'Initialized {self.__class__.__name__} with region \"{region.value}\"')
 
 
     def set(self, key : str, value : str):
@@ -27,7 +27,7 @@ class AWSConfigs(Configs):
             secret_value = self.client.get_secret_value(SecretId=self.secret_name)
             settings = Settings.from_str(secret_value['SecretString'])
         except Exception as e:
-            self.cls_log(f'An error occurred while trying to read value from AWS: {e}', LogLevel.ERROR)
+            self.log(f'An error occurred while trying to read value from AWS: {e}', LogLevel.ERROR)
             settings = Settings()
 
         return settings
@@ -44,7 +44,7 @@ class LocalConfigs(Configs):
         self._config_fpath : str = config_fpath
         self._aes : AES = AES()
         self._encr_key : Optional[str] = encryption_key
-        self.cls_log(f'Initialized {self.__class__.__name__} with \"{self._config_fpath}\"')
+        self.log(f'Initialized {self.__class__.__name__} with \"{self._config_fpath}\"')
 
 
     def set(self, key : str, value:  str):

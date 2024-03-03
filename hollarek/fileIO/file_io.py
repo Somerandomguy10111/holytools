@@ -1,5 +1,5 @@
 from abc import abstractmethod
-from hollarek.devtools import Loggable
+from hollarek.logging import Loggable
 
 class IO(Loggable):
     @staticmethod

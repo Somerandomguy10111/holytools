@@ -3,7 +3,7 @@ from __future__ import annotations
 from abc import abstractmethod
 import json
 from hollarek.templates import Singleton
-from hollarek.devtools import LogLevel
+from hollarek.logging import LogLevel, get_logger
 
 
 class Settings(dict[str,str]):
@@ -23,7 +23,7 @@ class Configs(Singleton):
         super().__init__(*args, **kwargs)
         self._settings: Settings = Settings()
         self.is_setup: bool = False
-
+        self.log = get_logger(name=self.__class__.__name__).log
 
     def get(self, key : str) -> str:
         if not self.is_setup:
