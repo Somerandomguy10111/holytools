@@ -21,20 +21,20 @@ def create_temp_copy(filename: str) -> str:
 class Spoofer:
     @staticmethod
     def get_png() -> str:
-        return create_temp_copy('test.png')
+        return create_temp_copy('spoof.png')
 
     @staticmethod
     def get_jpg() -> str:
-        return create_temp_copy('test.jpg')
+        return create_temp_copy('spoof.jpg')
 
     @staticmethod
     def get_pdf() -> str:
-        return create_temp_copy('test.pdf')
+        return create_temp_copy('spoof.pdf')
 
     @staticmethod
     def get_txt() -> str:
-        return create_temp_copy('test.txt')
+        return create_temp_copy('spoof.txt')
 
     @staticmethod
     def get_csv() -> str:
-        return create_temp_copy('test.csv')
+        return create_temp_copy('spoof.csv')

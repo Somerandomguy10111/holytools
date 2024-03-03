@@ -11,12 +11,6 @@ class JsonTester(Unittest):
         cls.broken_str_tab = '{"key": "value with a tab\t"}'
         cls.broken_str_multiple = '{"key": "new\nline and\ttab"}'
 
-    def run(self, result=None):
-        try:
-            super().run(result)
-        except Exception as e:
-            self.fail(f"Test failed with error: {e}")
-
     def test_no_control_characters(self):
         repaired_str = repair_json(self.valid_str)
         parsed_json = json.loads(repaired_str)
@@ -36,7 +30,6 @@ class JsonTester(Unittest):
         repaired_str = repair_json(self.broken_str_multiple)
         parsed_json = json.loads(repaired_str)
         self.assertEqual(parsed_json['keyy'], "new\nline and\ttab")
-
 
 
 if __name__ == "__main__":

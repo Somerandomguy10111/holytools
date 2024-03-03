@@ -28,7 +28,7 @@ class Unittest(unittest.TestCase, ABC):
     @classmethod
     def execute_all(cls, show_run_times: bool = False):
         cls._print_header()
-        results = cls._get_test_results(show_run_times=show_run_times)
+        results : TestResult = cls._get_test_results(show_run_times=show_run_times)
         summary = cls._get_final_status_msg(result=results)
         cls.log(summary)
 
@@ -48,7 +48,7 @@ class Unittest(unittest.TestCase, ABC):
 
 
     @staticmethod
-    def _get_final_status_msg(result) -> str:
+    def _get_final_status_msg(result  : TestResult) -> str:
         total_tests = result.testsRun
         errors = len(result.errors)
         failures = len(result.failures)
