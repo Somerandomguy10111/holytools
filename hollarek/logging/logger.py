@@ -26,9 +26,11 @@ def update_defaults(new_settings : LogSettings):
 
 
 class Logger(BaseLogger):
-    def log(self, msg : str, level : Union[int, LogLevel] = LogLevel.INFO, *args, **kwargs):
+    def log(self, msg : str, level : Union[int, LogLevel] = LogLevel.INFO, leading_newline : bool = False, *args, **kwargs):
         if isinstance(level, LogLevel):
             level = level.value
+        if leading_newline:
+            msg = '\n' + msg
 
         super().log(msg=msg, level=level, *args, **kwargs)
 

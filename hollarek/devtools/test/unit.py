@@ -2,11 +2,18 @@ import unittest
 from hollarek.logging import get_logger, LogSettings, Logger
 from .runner import Runner
 from .settings import TestSettings
+from abc import abstractmethod
 # ---------------------------------------------------------
 
 class Unittest(unittest.TestCase):
     @classmethod
+    @abstractmethod
+    def setup(cls):
+        pass
+
+    @classmethod
     def execute_all(cls, settings : TestSettings = TestSettings()):
+        cls.setup()
         suite = unittest.TestLoader().loadTestsFromTestCase(cls)
         runner = Runner(logger=cls.get_logger(),settings=settings)
         results =  runner.run(suite)
