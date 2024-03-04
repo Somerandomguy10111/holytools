@@ -12,7 +12,7 @@ class TestFsysNode(Unittest):
     num_total_nodes= num_total_files+num_hard_folders
 
     @classmethod
-    def setUpClass(cls):
+    def setup(cls):
         pass
 
     def setUp(self):

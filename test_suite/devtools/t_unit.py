@@ -3,8 +3,9 @@ from json_repair import repair_json
 from hollarek.devtools import Unittest, TestSettings
 
 class JsonTester(Unittest):
+
     @classmethod
-    def setUpClass(cls):
+    def setup(cls):
         cls.valid_str = '{"key": "value"}'
         cls.broken_str_newline = '{"key": "value with a new\nline"}'
         cls.broken_str_tab = '{"key": "value with a tab\t"}'

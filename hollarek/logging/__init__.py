@@ -1,3 +1,3 @@
-from .log_settings import LogLevel, LogSettings
-from .logger import get_logger, Logger
-from .loggable import Loggable
+from .settings import LogLevel, LogSettings
+from .logger import Logger
+from .interface import Loggable, get_logger

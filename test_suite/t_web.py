@@ -4,7 +4,7 @@ from hollarek.devtools import Unittest
 
 class VisitorTester(Unittest):
     @classmethod
-    def setUpClass(cls):
+    def setup(cls):
         cls.visitor = SiteVisitor()
         cls.beavers_url = 'https://en.wikipedia.org/wiki/Beaver'
 

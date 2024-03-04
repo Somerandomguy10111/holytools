@@ -5,7 +5,7 @@ from hollarek.devtools import Unittest, is_optional_type
 class TestIsOptionalType(Unittest):
 
     @classmethod
-    def setUpClass(cls):
+    def setup(cls):
         cls.optional_int= Optional[int]
         cls.union_none_int= Union[None, int]
 

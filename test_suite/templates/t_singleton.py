@@ -2,6 +2,10 @@ from hollarek.templates import Singleton, AlreadyInitialized
 from hollarek.devtools import Unittest
 
 class SingletonTest(Unittest):
+    @classmethod
+    def setup(cls):
+        pass
+
     class SingletonSubclass(Singleton):
         def __init__(self, *args, **kwargs):
             if self.is_initialized:

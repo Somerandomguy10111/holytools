@@ -21,7 +21,7 @@ class Unittest(unittest.TestCase):
 
     @classmethod
     def get_logger(cls) -> Logger:
-        return get_logger(settings=LogSettings(include_call_location=False, use_timestamp=False), name=cls.__name__)
+        return get_logger(settings=LogSettings(call_location=False, timestamp=False), name=cls.__name__)
 
     # ---------------------------------------------------------
     # assertions

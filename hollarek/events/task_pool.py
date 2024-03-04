@@ -3,7 +3,8 @@ import threading
 from concurrent.futures import ThreadPoolExecutor
 from queue import Queue
 from dataclasses import dataclass, field
-from hollarek.devtools import get_logger
+from hollarek.logging import get_logger
+
 
 # ---------------------------------------------------------
 

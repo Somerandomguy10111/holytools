@@ -30,6 +30,11 @@ class MyEnum(Enum):
 
 
 class TestJsonDataclass(Unittest):
+
+    @classmethod
+    def setup(cls):
+        pass
+
     def test_store_load(self):
         # Create an instance of ComplexDataclass
         original_data = ComplexDataclass(

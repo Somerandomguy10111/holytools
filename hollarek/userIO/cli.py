@@ -7,7 +7,7 @@ class InteractiveCLI(Loggable):
     _exit_str = 'q'
 
     def __init__(self, cls : type, description : str = ''):
-        super().__init__(settings=LogSettings(use_timestamp=False))
+        super().__init__(settings=LogSettings(timestamp=False))
         self.cls : type = cls
         self.desc : str = description
 
@@ -29,7 +29,7 @@ class InteractiveCLI(Loggable):
     def _create_object(self):
         self.log(f'Initializing object {self.cls.__name__}:')
         try:
-            init_method = self.cls.__init__
+            init_method = self.__init__
             init_kwargs = self._get_args_dict(mthd=init_method)
             return self.cls(**init_kwargs)
         except Exception as e:
