@@ -58,6 +58,7 @@ class TestFsysNode(Unittest):
         the_yaml = self.root_node.get_tree()
         self.assertIsInstance(the_yaml, str)
 
+
 # This allows the test script to be run from the command line
 if __name__ == '__main__':
     # TestFsysNode.execute_all(show_run_times=True)
