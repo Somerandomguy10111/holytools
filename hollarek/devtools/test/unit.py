@@ -26,7 +26,7 @@ class Unittest(unittest.TestCase):
     # ---------------------------------------------------------
     # assertions
 
-    def assertEqual(self, first, second, msg : Optional[str] = None):
+    def assertEqual(self, first : object, second : object, msg : Optional[str] = None):
         if not first == second:
             first_str = str(first).__repr__()
             second_str =str(second).__repr__()
@@ -35,7 +35,7 @@ class Unittest(unittest.TestCase):
             raise AssertionError(msg)
 
 
-    def assertIn(self, member, container, msg : Optional[str] = None):
+    def assertIn(self, member : object, container, msg : Optional[str] = None):
         if not member in container:
             member_str = str(member).__repr__()
             container_str = str(container).__repr__()
@@ -44,7 +44,7 @@ class Unittest(unittest.TestCase):
             raise AssertionError(msg)
 
 
-    def assertIsInstance(self, obj, cls, msg : Optional[str] = None):
+    def assertIsInstance(self, obj : object, cls : type, msg : Optional[str] = None):
         if not isinstance(obj, cls):
             obj_str = str(obj).__repr__()
             cls_str = str(cls).__repr__()

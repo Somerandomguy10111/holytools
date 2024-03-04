@@ -9,7 +9,7 @@ class Singleton:
         
 
     def __new__(cls, *args, **kwargs):
-        print(f'new called with args: {args} and kwargs: {kwargs}')
+        # print(f'new called with args: {args} and kwargs: {kwargs}')
         if (args or kwargs) and cls.get_is_initialized():
             raise AlreadyInitialized("Additional arguments provided to an already initialized singleton."
                                      "Cannot re-initialize or modify singleton after it is initialized.")

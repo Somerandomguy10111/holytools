@@ -2,7 +2,7 @@ import json
 from json_repair import repair_json
 from hollarek.devtools import Unittest, TestSettings
 
-class JsonTester(Unittest):
+class TestJsonRepair(Unittest):
 
     @classmethod
     def setUpClass(cls):
@@ -20,7 +20,7 @@ class JsonTester(Unittest):
         repaired_str = repair_json(self.broken_str_newline)
         parsed_json = json.loads(repaired_str)
         with self.assertRaises(AssertionError):
-            self.assertTrue(parsed_json['key'], "value with a new\nlinee")
+            self.assertEqual(parsed_json['key'], "value with a new\nlinee")
 
     def test_tab_and_backslash(self):
         repaired_str = repair_json(self.broken_str_tab)
@@ -34,4 +34,4 @@ class JsonTester(Unittest):
             self.assertEqual(parsed_json['keyy'], "new\nline and\ttab")
 
 if __name__ == "__main__":
-    JsonTester.execute_all(settings=TestSettings(show_details=True, show_runtimes=True))
+    TestJsonRepair.execute_all(settings=TestSettings(show_details=True, show_runtimes=True))

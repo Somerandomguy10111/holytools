@@ -19,8 +19,7 @@ class SingletonTest(Unittest):
     def test_same_instance(self):
         instance1 = self.SingletonSubclass('arg')
         instance2 = self.SingletonSubclass()
-        new = 'abc'
-        self.assertIs(instance1, new)
+        self.assertIs(instance1, instance2)
 
     def test_handle_invalid_init(self):
         with self.assertRaises(AlreadyInitialized):
