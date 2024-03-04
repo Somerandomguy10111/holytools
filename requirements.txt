@@ -16,3 +16,4 @@ boto3
 textract
 python-docx
 orjson
+devtools

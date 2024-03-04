@@ -40,6 +40,9 @@ class Countdown:
         self.one_time_lock.write('open sesame')
         self.on_countdown_finsh()
 
+class Timer:
+    pass
+
 
 class InputWaiter:
     def __init__(self):
