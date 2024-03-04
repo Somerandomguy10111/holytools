@@ -1,4 +1,6 @@
 from __future__ import annotations
+import os
+import inspect
 import logging
 from typing import Union
 from logging import Logger as BaseLogger
@@ -13,7 +15,13 @@ class Logger(BaseLogger):
         if leading_newline:
             msg = '\n' + msg
 
-        super().log(msg=msg, level=level, *args, **kwargs)
+        frame = inspect.currentframe()
+        caller_frame = inspect.getouterframes(frame)[1]
+        file_name = os.path.basename(caller_frame.filename)
+        line_no = caller_frame.lineno
+
+        extra_info = {'custom_file_name': file_name, 'custom_line_no': line_no}
+        super().log(msg=msg, level=level, extra=extra_info, *args, **kwargs)
 
     def setLevel(self, level : Union[int, LogLevel]):
         if isinstance(level, LogLevel):
