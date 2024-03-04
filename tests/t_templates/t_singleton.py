@@ -3,7 +3,7 @@ from hollarek.devtools import Unittest
 
 class SingletonTest(Unittest):
     @classmethod
-    def setup(cls):
+    def setUpClass(cls):
         pass
 
     class SingletonSubclass(Singleton):

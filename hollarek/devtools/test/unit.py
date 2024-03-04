@@ -3,17 +3,17 @@ from hollarek.logging import get_logger, LogSettings, Logger
 from .runner import Runner
 from .settings import TestSettings
 from abc import abstractmethod
+from typing import Optional
 # ---------------------------------------------------------
 
 class Unittest(unittest.TestCase):
     @classmethod
     @abstractmethod
-    def setup(cls):
+    def setUpClass(cls):
         pass
 
     @classmethod
     def execute_all(cls, settings : TestSettings = TestSettings()):
-        cls.setup()
         suite = unittest.TestLoader().loadTestsFromTestCase(cls)
         runner = Runner(logger=cls.get_logger(),settings=settings)
         results =  runner.run(suite)
@@ -26,26 +26,35 @@ class Unittest(unittest.TestCase):
     # ---------------------------------------------------------
     # assertions
 
-    def assertEqual(self, first, second, *args, **kwargs):
+    def assertEqual(self, first, second, msg : Optional[str] = None):
         if not first == second:
             first_str = str(first).__repr__()
             second_str =str(second).__repr__()
-            raise AssertionError(f'{first_str} != {second_str}')
+            if msg is None:
+                msg = f'{first_str} != {second_str}'
+            raise AssertionError(msg)
 
 
-    def assertIn(self, member, container, msg = None):
+    def assertIn(self, member, container, msg : Optional[str] = None):
         if not member in container:
             member_str = str(member).__repr__()
             container_str = str(container).__repr__()
-            raise AssertionError(f'{member_str} not in {container_str}')
+            if msg is None:
+                msg = f'{member_str} not in {container_str}'
+            raise AssertionError(msg)
 
 
-    def assertIsInstance(self, obj, cls, msg = None):
+    def assertIsInstance(self, obj, cls, msg : Optional[str] = None):
         if not isinstance(obj, cls):
             obj_str = str(obj).__repr__()
             cls_str = str(cls).__repr__()
-            raise AssertionError(f'{obj_str} not an instance of {cls_str}')
+            if msg is None:
+                msg = f'{obj_str} not an instance of {cls_str}'
+            raise AssertionError(msg)
 
 
-    def assertTrue(self, expr, msg = None):
-        raise AssertionError(f'Tested expression should be true')
+    def assertTrue(self, expr : bool, msg : Optional[str] = None):
+        if not expr:
+            if msg is None:
+                msg = f'Tested expression should be true'
+            raise AssertionError(msg)

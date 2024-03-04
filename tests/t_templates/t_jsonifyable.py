@@ -32,7 +32,7 @@ class MyEnum(Enum):
 class TestJsonDataclass(Unittest):
 
     @classmethod
-    def setup(cls):
+    def setUpClass(cls):
         pass
 
     def test_store_load(self):

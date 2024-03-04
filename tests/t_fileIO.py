@@ -7,7 +7,7 @@ from hollarek.devtools import Unittest
 class TestFileIO(Unittest):
 
     @classmethod
-    def setup(cls):
+    def setUpClass(cls):
         pass
 
     def test_text_io(self):
