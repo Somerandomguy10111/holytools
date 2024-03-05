@@ -6,6 +6,9 @@ from PIL import Image, ImageDraw
 from mss import mss
 from screeninfo import get_monitors
 from screeninfo import Monitor as BaseMonitor
+from .types import Grid, LatticePoint
+
+# ----------------------------------------------
 
 
 class Display(BaseMonitor):
@@ -27,6 +30,8 @@ class Display(BaseMonitor):
     def from_base(cls, base_monitor : BaseMonitor) -> Display:
         return cls(x=base_monitor.x, y=base_monitor.y, width=base_monitor.width, height=base_monitor.height, is_primary=base_monitor.is_primary)
 
+    # ----------------------------------------------
+    # screenshot
 
     def get_screenshot(self, grid : Optional[Grid] = None):
         with mss() as sct:
@@ -34,71 +39,38 @@ class Display(BaseMonitor):
             sct_img = sct.grab(monitor_dict)
             image = Image.frombytes('RGB', sct_img.size, sct_img.bgra, 'raw', 'BGRX')
         if grid:
-            grid_mapper = DisplayMapper(display=self, natural_grid=grid)
-            image = self.draw_grid(image, grid_mapper)
+            image = self._draw_grid(image, grid)
 
         return image
 
-    @staticmethod
-    def draw_grid(image, display_mapper : DisplayMapper):
-        natural_x = range(0, display_mapper.natural_grid.x_size+1)
-        natural_y = range(0, display_mapper.natural_grid.y_size+1)
-        x_pixel_list = [display_mapper.get_px_x(x) for x in natural_x]
-        y_pixel_list = [display_mapper.get_px_y(y) for y in natural_y]
 
-        for x_px in x_pixel_list:
+    def _draw_grid(self, image, grid):
+        display_mapper = DisplayMapper(display=self, input_grid=grid)
+        for x in range(0, display_mapper.input_grid.x_size + 1):
+            x_px = display_mapper.map_horizontal(x=x)
             draw_vertical_line(image, x_px)
-        for y_px in y_pixel_list:
+        for y in range(0, display_mapper.input_grid.y_size + 1):
+            y_px = display_mapper.map_vertical(y=y)
             draw_horizontal_line(image, y_px)
         return image
 
-
-@dataclass
-class Grid:
-    x_size : int
-    y_size : int
-
-    def in_bounds(self, lattice_point : LatticePoint) -> bool:
-        return 0 <= lattice_point.x <= self.x_size and 0 <= lattice_point.y <= self.y_size
-
-
-@dataclass
-class LatticePoint:
-    x: int
-    y: int
 
 
 @dataclass
 class DisplayMapper:
     display : Display
-    natural_grid : Grid
+    input_grid : Grid
 
-    @classmethod
-    def create_default(cls, display : Display = Display.get_primary(), small_dim : int = 100) -> DisplayMapper:
-        scale_factor = small_dim / min(display.width, display.height)
-        x_length = int(display.width * scale_factor)
-        y_length = int(display.height * scale_factor)
-        grid = Grid(x_size=x_length, y_size=y_length)
+    def get_pixel(self, point : LatticePoint) -> LatticePoint:
+        if not self.input_grid.is_in_bounds(lattice_point=point):
+            raise ValueError(f"Lattice point {point} is outside of the grid bounds")
+        return LatticePoint(x=self.map_horizontal(point.x), y=self.map_vertical(point.y))
 
-        return cls(display=display, natural_grid=grid)
+    def map_horizontal(self, x : int) -> int:
+        return round(x * self.display.width / self.input_grid.x_size)
 
-    def get_pixel(self, natural_point : LatticePoint) -> LatticePoint:
-        if not self.natural_grid.in_bounds(lattice_point=natural_point):
-            raise ValueError(f"Lattice point {natural_point} is outside of the grid bounds")
-        pixel_x = round(natural_point.x * self.display.width / self.natural_grid.x_size)
-        pixel_y = round(natural_point.y * self.display.height / self.natural_grid.y_size)
-        return LatticePoint(x=pixel_x, y=pixel_y)
-
-    def get_px_x(self, natural_x : int) -> int:
-        return round(natural_x * self.display.width / self.natural_grid.x_size)
-
-    def get_px_y(self, natural_y : int) -> int:
-        return round(natural_y * self.display.height / self.natural_grid.y_size)
-
-
-
-
-
+    def map_vertical(self, y : int) -> int:
+        return round(y * self.display.height / self.input_grid.y_size)
 
 
 def draw_horizontal_line(img, y_pos, line_color=(255, 0, 0), line_width=1):

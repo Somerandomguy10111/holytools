@@ -1,10 +1,11 @@
 from hollarek.hardware.display import Display
-from hollarek.hardware.display.display import DisplayMapper, Grid
+from hollarek.hardware.display.display import DisplayMapper
+from hollarek.hardware.display.types import Grid
 
 
-class Clicker:
-    def __init__(self, natural_grid: DisplayMapper = DisplayMapper.create_default()):
-        self.natural_grid = natural_grid
+# class Clicker:
+#     def __init__(self, natural_grid: DisplayMapper = DisplayMapper.create_default()):
+#         self.natural_grid = natural_grid
 
     # def click(self, lattice_point: LatticePoint, display : Display = Display.get_primary()):
     #     pixel_x = round(lattice_point.x * display.width / self.natural_grid.x_length)
@@ -15,9 +16,9 @@ class Clicker:
     #     else:
     #         raise ValueError("Lattice point translates to a position outside the display boundaries")
 
-
-    def get_gridded_screenshot(self):
-        pass
+    #
+    # def get_gridded_screenshot(self):
+    #     pass
 
 
 # my_grid = DisplayMapper(x_length=10, y_length=5)
