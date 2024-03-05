@@ -1,7 +1,7 @@
 from typing import Optional
 import inspect
 from .logger import Logger
-from .settings import LogSettings, LogLevel
+from .log_settings import LogSettings
 from .logger import LoggerFactory
 import devtools as externalDevtools
 from enum import *

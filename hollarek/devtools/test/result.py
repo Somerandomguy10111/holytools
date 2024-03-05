@@ -19,7 +19,7 @@ class Result(unittest.TestResult):
 
     def __init__(self, logger : Logger, settings : TestSettings, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.settings : TestSettings = settings
+        self.test_settings : TestSettings = settings
 
         self.log = logger.log
         self.start_times : dict[str, float] = {}
@@ -59,7 +59,7 @@ class Result(unittest.TestResult):
         case_result = CaseResult(test=test, status=status, runtime=self.get_runtime(test=test))
         self.case_results.append(case_result)
 
-        conditional_err_msg = f'\n{self.get_err_details(err)}' if err and self.settings.show_details else ''
+        conditional_err_msg = f'\n{self.get_err_details(err)}' if err and self.test_settings.show_details else ''
         finish_log_msg = f'Status: {status.value}{conditional_err_msg}\n'
         self.log(msg=finish_log_msg, level=status.get_log_level())
 
@@ -89,11 +89,11 @@ class Result(unittest.TestResult):
 
     def get_runtime_msg(self, result : CaseResult)-> str:
         runtime_str = f'{result.runtime_sec}s'
-        return f'{runtime_str:^{self.runtime_space}}' if self.settings.show_runtimes else ''
+        return f'{runtime_str:^{self.runtime_space}}' if self.test_settings.show_runtimes else ''
 
     def print_header(self, msg: str, seperator : str = '='):
         total_len = self.test_spaces + self.status_spaces
-        total_len += self.runtime_space if self.settings.show_runtimes else 0
+        total_len += self.runtime_space if self.test_settings.show_runtimes else 0
         line_len = max(total_len- len(msg), 0)
         lines = seperator * int(line_len / 2.)
         self.log(f'{lines}{msg}{lines}')

@@ -5,11 +5,14 @@ from typing import Optional
 from hollarek.crypt import AES
 from hollarek.cloud import AWSRegion
 from hollarek.logging import LogLevel
-from .abstr import Settings, Configs
+from .abstr import StrMap, Configs
 # ---------------------------------------------------------
 
 class AWSConfigs(Configs):
     def __init__(self, secret_name : str, region : AWSRegion = AWSRegion.EU_NORTH_1):
+        if self.get_is_initialized():
+            return
+
         super().__init__()
         self.secret_name: str = secret_name
         session = boto3.session.Session()
@@ -18,17 +21,17 @@ class AWSConfigs(Configs):
 
 
     def set(self, key : str, value : str):
-        self._settings[key] = value
-        self.client.update_secret(SecretId=self.secret_name, SecretString=self._settings.to_str())
+        self._map[key] = value
+        self.client.update_secret(SecretId=self.secret_name, SecretString=self._map.to_str())
 
 
-    def _retrieve_settings(self):
+    def _retrieve_map(self):
         try:
             secret_value = self.client.get_secret_value(SecretId=self.secret_name)
-            settings = Settings.from_str(secret_value['SecretString'])
+            settings = StrMap.from_str(secret_value['SecretString'])
         except Exception as e:
             self.log(f'An error occurred while trying to read value from AWS: {e}', LogLevel.ERROR)
-            settings = Settings()
+            settings = StrMap()
 
         return settings
 
@@ -37,7 +40,7 @@ class AWSConfigs(Configs):
 class LocalConfigs(Configs):
     def __init__(self, config_fpath : str = os.path.expanduser('~/.pyconfig'),
                        encryption_key : Optional[str] = None):
-        if LocalConfigs.is_initialized:
+        if self.get_is_initialized():
             return
 
         super().__init__()
@@ -48,21 +51,21 @@ class LocalConfigs(Configs):
 
 
     def set(self, key : str, value:  str):
-        self._settings[key] = value
+        self._map[key] = value
         parent_dir = os.path.basename(self._config_fpath)
         os.makedirs(parent_dir)
         with open(self._config_fpath, 'w') as configfile:
-            config_str = self._settings.to_str()
+            config_str = self._map.to_str()
             encr = self._encrypt(content=config_str)
             configfile.write(encr)
 
 
-    def _retrieve_settings(self):
+    def _retrieve_map(self):
         try:
             file_content = self._get_file_content()
-            settings = Settings.from_str(json_str=file_content)
+            settings = StrMap.from_str(json_str=file_content)
         except FileNotFoundError:
-            settings = Settings()
+            settings = StrMap()
             self.log(msg=f'Config file \"{self._config_fpath}\" does not exist', level=LogLevel.WARNING)
         return settings
 

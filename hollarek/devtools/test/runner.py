@@ -9,12 +9,12 @@ class Runner(unittest.TextTestRunner):
     def __init__(self, logger : Logger, settings : TestSettings):
         super().__init__(resultclass=None)
         self.logger : Logger = logger
-        self.settings : TestSettings = settings
+        self.test_settings : TestSettings = settings
 
     def run(self, test) -> Result:
         result = Result(logger=self.logger,
                         stream=self.stream,
-                        settings=self.settings,
+                        settings=self.test_settings,
                         descriptions=self.descriptions,
                         verbosity=2)
         test(result)

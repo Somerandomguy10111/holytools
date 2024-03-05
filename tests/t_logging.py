@@ -13,9 +13,10 @@ class NewClass(Loggable):
     def say_hi(self):
         self.log(msg='hi there')
 
-a = NewClass()
-a.say_hi()
 
+if __name__ == "__main__":
+    a = NewClass()
+    a.say_hi()
 
-new_logger = get_logger(LogSettings(call_location=True))
-new_logger.log(f'new')
+    new_logger = get_logger(LogSettings(call_location=True))
+    new_logger.log(f'new')

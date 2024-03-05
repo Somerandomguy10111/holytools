@@ -6,10 +6,10 @@ from hollarek.templates import Singleton
 from hollarek.logging import LogLevel, get_logger
 
 
-class Settings(dict[str,str]):
+class StrMap(dict[str,str]):
     @staticmethod
-    def from_str(json_str : str) -> Settings:
-        return Settings(json.loads(json_str))
+    def from_str(json_str : str) -> StrMap:
+        return StrMap(json.loads(json_str))
 
     def to_str(self) -> str:
         return json.dumps(self)
@@ -21,18 +21,18 @@ class Settings(dict[str,str]):
 class Configs(Singleton):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self._settings: Settings = Settings()
+        self._map: StrMap = StrMap()
         self.is_setup: bool = False
         self.log = get_logger(name=self.__class__.__name__).log
 
     def get(self, key : str) -> str:
         if not self.is_setup:
-            self._settings  = self._retrieve_settings()
+            self._map  = self._retrieve_map()
 
-        if self._settings.is_empty():
+        if self._map.is_empty():
             self.log(msg=f'No settings found', level=LogLevel.WARNING)
         try:
-            value = self._settings.get(key)
+            value = self._map.get(key)
             if not value:
                 raise KeyError
         except:
@@ -43,7 +43,7 @@ class Configs(Singleton):
 
 
     @abstractmethod
-    def _retrieve_settings(self) -> Settings:
+    def _retrieve_map(self) -> StrMap:
         pass
 
 
@@ -54,5 +54,5 @@ class Configs(Singleton):
 
 if __name__ == '__main__':
     sts = { 'abc' : 'value'}
-    the_settings = Settings(sts)
+    the_settings = StrMap(sts)
     print(the_settings.to_str())

@@ -1,20 +1,19 @@
 class Singleton:
     _instance = None
-    is_initialized = False
+    _is_initialized = False
 
     @classmethod
     def reset_instance(cls):
-        cls._instance = None
-        cls.is_initialized = False
+        cls.set_instance(instance=None)
+        cls.set_initialized(val=False)
         
 
     def __new__(cls, *args, **kwargs):
-        # print(f'new called with args: {args} and kwargs: {kwargs}')
         if (args or kwargs) and cls.get_is_initialized():
             raise AlreadyInitialized("Additional arguments provided to an already initialized singleton."
                                      "Cannot re-initialize or modify singleton after it is initialized.")
 
-        if not cls._instance:
+        if not cls.get_instance():
             cls._instance = super().__new__(cls)
 
         return cls._instance
@@ -30,11 +29,19 @@ class Singleton:
 
     @classmethod
     def get_is_initialized(cls):
-        return cls.is_initialized
+        return cls._is_initialized
 
     @classmethod
-    def set_initialized(cls):
-        cls.is_initialized = True
+    def set_initialized(cls, val : bool = True):
+        cls._is_initialized = val
+
+    @classmethod
+    def set_instance(cls, instance : object):
+        cls._instance = instance
+
+    @classmethod
+    def get_instance(cls):
+        return cls._instance
 
 class AlreadyInitialized(Exception):
     """Exception raised when a singleton instance is initialized more than once."""

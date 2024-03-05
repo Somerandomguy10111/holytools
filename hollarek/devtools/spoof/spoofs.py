@@ -38,3 +38,4 @@ class Spoofer:
     @staticmethod
     def get_csv() -> str:
         return create_temp_copy('spoof.csv')
+

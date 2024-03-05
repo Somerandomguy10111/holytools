@@ -1,25 +1,17 @@
 from __future__ import annotations
 
 import psutil
-from typing import Optional
-
+from hollarek.templates import Singleton
 # -------------------------------------------
 
 
-class RAM:
-    _instance : Optional[RAM] = None
-    _is_intialized : bool = False
-
-    def __new__(cls, *args, **kwargs):
-        if not RAM._instance:
-            RAM._instance = super().__new__(cls)
-        return RAM._instance
-
+class RAM(Singleton):
     def __init__(self, include_swap : bool = False):
-        if RAM._is_intialized:
+        if self.get_is_initialized():
             return
 
         self.include_swap = include_swap
+        super().__init__()
 
 
     def get_available_in_GB(self) -> float:

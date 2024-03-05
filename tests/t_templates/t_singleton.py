@@ -8,7 +8,7 @@ class SingletonTest(Unittest):
 
     class SingletonSubclass(Singleton):
         def __init__(self, *args, **kwargs):
-            if self.is_initialized:
+            if self._is_initialized:
                 return
 
             super().__init__(*args, **kwargs)

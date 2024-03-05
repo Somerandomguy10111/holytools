@@ -4,7 +4,7 @@ import inspect
 import logging
 from typing import Union
 from logging import Logger as BaseLogger
-from .settings import LogSettings, LogLevel, LogTarget
+from .log_settings import LogSettings, LogLevel, LogTarget
 # ---------------------------------------------------------
 
 
@@ -70,7 +70,7 @@ class Formatter(logging.Formatter):
     }
 
     def __init__(self, settings : LogSettings, log_target : LogTarget):
-        self.settings : LogSettings = settings
+        self.log_settings : LogSettings = settings
         self.log_target : LogTarget = log_target
         super().__init__()
 
@@ -78,13 +78,13 @@ class Formatter(logging.Formatter):
     def format(self, record):
         log_fmt = "%(message)s"
 
-        if self.settings.timestamp:
+        if self.log_settings.timestamp:
             custom_time = self.formatTime(record, "%Y-%m-%d %H:%M:%S")
-            conditional_millis = f" {int(record.msecs)}ms" if self.settings.include_ms else ""
+            conditional_millis = f" {int(record.msecs)}ms" if self.log_settings.include_ms else ""
             timestamp = f"[{custom_time}{conditional_millis}]"
             log_fmt = f"{timestamp}: {log_fmt}"
 
-        if self.settings.call_location:
+        if self.log_settings.call_location:
             filename = getattr(record, Formatter.custom_file_name, record.filename)
             lineno = getattr(record, Formatter.custom_line_no, record.lineno)
             log_fmt += f" {filename}:{lineno}"

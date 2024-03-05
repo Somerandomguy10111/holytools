@@ -1,29 +1,16 @@
 from __future__ import annotations
 import os
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 from typing import Optional
-
+from hollarek.templates import Singleton
 # -------------------------------------------
 
-class LocationManager(ABC):
-    instance = None
-    _is_initialized : bool = False
-
-    @classmethod
-    def initialize(cls,root_dir : str):
-        cls(root_dir=root_dir)
-
-
-    def __new__(cls, root_dir: Optional[str] = None):
-        if cls.instance is None:
-            cls.instance = super(LocationManager, cls).__new__(cls)
-        return cls.instance
-
-
-    def __init(self, root_dir: Optional[str] = None):
-        if LocationManager._is_initialized:
+class LocationManager(Singleton):
+    def __init__(self, root_dir: Optional[str] = None):
+        if self.get_is_initialized():
             return
 
+        super().__init__()
         if root_dir is None:
             raise ValueError(f'Cannot initialize {self.__name__}. Given root_dir is None')
 
@@ -34,7 +21,7 @@ class LocationManager(ABC):
         self._directories : list[str] = []
         self.setup_dirs()
 
-        LocationManager._is_initialized = True
+
 
 
     def add_dir(self, relative_path : str) -> str:

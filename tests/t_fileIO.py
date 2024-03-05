@@ -36,7 +36,7 @@ class TestFileIO(Unittest):
         ImageIO.write(png_path, new_image)
         # Reopen the image to verify changes
         modified_image = ImageIO.read(png_path)
-        self.assertTrue(modified_image.size, new_image.size)
+        self.assertEqual(modified_image.size, new_image.size)
         original_image.save(png_path)
 
 if __name__ == '__main__':
