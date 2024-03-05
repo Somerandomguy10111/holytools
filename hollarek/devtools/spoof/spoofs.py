@@ -17,25 +17,31 @@ def create_temp_copy(filename: str) -> str:
         print(f"File {filename} not found.")
         return ''
 
-
 class Spoofer:
-    @staticmethod
-    def get_png() -> str:
-        return create_temp_copy('spoof.png')
+    def __init__(self):
+        self.tempfile_paths = []
 
-    @staticmethod
-    def get_jpg() -> str:
-        return create_temp_copy('spoof.jpg')
+    def lend_png(self) -> str:
+        path = create_temp_copy('spoof.png')
+        self.tempfile_paths.append(path)
+        return path
 
-    @staticmethod
-    def get_pdf() -> str:
-        return create_temp_copy('spoof.pdf')
+    def lend_jpg(self) -> str:
+        path = create_temp_copy('spoof.jpg')
+        self.tempfile_paths.append(path)
+        return path
 
-    @staticmethod
-    def get_txt() -> str:
-        return create_temp_copy('spoof.txt')
+    def lend_pdf(self) -> str:
+        path = create_temp_copy('spoof.pdf')
+        self.tempfile_paths.append(path)
+        return path
 
-    @staticmethod
-    def get_csv() -> str:
-        return create_temp_copy('spoof.csv')
+    def lend_txt(self) -> str:
+        path = create_temp_copy('spoof.txt')
+        self.tempfile_paths.append(path)
+        return path
 
+    def lend_csv(self) -> str:
+        path = create_temp_copy('spoof.csv')
+        self.tempfile_paths.append(path)
+        return path

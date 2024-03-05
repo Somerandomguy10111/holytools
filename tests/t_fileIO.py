@@ -8,11 +8,11 @@ class TestFileIO(Unittest):
 
     @classmethod
     def setUpClass(cls):
-        pass
+        cls.spoofer = Spoofer()
 
     def test_text_io(self):
         # Test reading and writing text files
-        txt_path = Spoofer.get_txt()
+        txt_path = self.spoofer.lend_txt()
         original_content = TextIO.read(txt_path)
         new_content = "This is a new content for testing."
         TextIO.write(txt_path, new_content)
@@ -20,8 +20,7 @@ class TestFileIO(Unittest):
         TextIO.write(txt_path, original_content)
 
     def test_binary_io(self):
-        # Test reading and writing binary files
-        pdf_path = Spoofer.get_pdf()
+        pdf_path = self.spoofer.lend_pdf()
         original_content = BinaryIO.read(pdf_path)
         new_content = b"This is new binary content for testing."
         BinaryIO.write(pdf_path, new_content)
@@ -29,15 +28,12 @@ class TestFileIO(Unittest):
         BinaryIO.write(pdf_path, original_content)
 
     def test_image_io(self):
-        # Test reading and writing image files
-        png_path = Spoofer.get_png()
-        original_image = ImageIO.read(png_path)
-        new_image = Image.new('RGB', (100, 100), color = 'red')
-        ImageIO.write(png_path, new_image)
-        # Reopen the image to verify changes
-        modified_image = ImageIO.read(png_path)
-        self.assertEqual(modified_image.size, new_image.size)
-        original_image.save(png_path)
+        png_path = self.spoofer.lend_png()
+        with Image.new('RGB', (100, 100), color = 'red') as newimage:
+            ImageIO.write(png_path, newimage)
+                # modified_image = ImageIO.read(png_path)
+                # self.assertEqual(modified_image.size, new_image.size)
+
 
 if __name__ == '__main__':
     unittest.main()

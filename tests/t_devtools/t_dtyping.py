@@ -13,11 +13,8 @@ class TestOptionalTyping(Unittest):
 
     def test_optional_type(self):
         optional_types = [self.optional_int, self.union_none_int]
-        print(is_optional_type(dtype=self.optional_int))
-        print(is_optional_type(dtype=self.union_none_int))
         for dtype in optional_types:
             self.assertTrue(is_optional_type(dtype), msg=f'\"{dtype}\" should be recognized as Optional')
-
 
     def test_complex_optional_type(self):
         for dtype in [self.nested_optional, self.triple_union]:
