@@ -1,16 +1,26 @@
+import threading
+
 from PyQt5.QtWidgets import QApplication, QWidget, QGraphicsOpacityEffect
 from PyQt5.QtCore import QPropertyAnimation, QEasingCurve, Qt, QTimer, QSize
 import math
+import sys
 
 
 class Indicator(QWidget):
-    def __init__(self, min_radius: int = 15, max_radius: int = 30, flare_duration: float = 0.75):
+    def __init__(self, monitor_index: int = 0, min_radius: int = 15, max_radius: int = 30, flare_duration: float = 0.75):
         super().__init__()
         self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint | Qt.WindowTransparentForInput)
         self.setAttribute(Qt.WA_TranslucentBackground)
 
-        self.screen_width = 1080
-        self.screen_height = 1920
+        screens = QApplication.screens()
+        if monitor_index < 0 or monitor_index >= len(screens):
+            raise ValueError(f"Invalid monitor index: {monitor_index}. Available screens: {len(screens)}")
+
+        screen = screens[monitor_index]
+        geometry = screen.geometry()
+        self.move(geometry.x(), geometry.y())  # Move the window to the screen
+        self.screen_width = geometry.width()
+        self.screen_height = geometry.height()
         self.resize(self.screen_width, self.screen_height)
 
         self.visual = self._get_visual(size=2 * min_radius)  # Start with the min_radius
@@ -31,6 +41,7 @@ class Indicator(QWidget):
 
         self.old_size = min_radius*2
         self.delta = 0
+
 
     # ----------------------------------------------
 
@@ -76,22 +87,63 @@ class Indicator(QWidget):
         self.old_size = new_radius * 2
 
 
-if __name__ == "__main__":
-    def main():
-        app = QApplication([])
 
+
+class ClickIndicator:
+    def __init__(self):
+        pass
+
+    # def visualize_click(self, x : int, y : int, on_primary : bool):
+    #     monitor_index = 0 if on_primary else 1
+    #     indicator = self.indicator_map[monitor_index]
+    #     indicator.flare(x, y)
+
+    @staticmethod
+    def start():
+        app = QApplication([])
         indicator = Indicator()
         indicator.show()
 
-        def trigger_flare():
-            print('Triggered flare')
-            indicator.flare(500, 500)
+        # indicator_map : dict[int, Indicator] = {}
+        # for index, monitor in enumerate(QApplication.screens()):
+        #     indicator = Indicator(monitor_index=index)
+        #     indicator_map[index] = indicator
+        #     indicator.show()
 
+        # Set up a QTimer to trigger the flare
         timer = QTimer()
-        timer.timeout.connect(trigger_flare)
-        timer.setSingleShot(True)
-        timer.start(500)
+        timer.singleShot(300, lambda: indicator.flare(100, 100))  # Set for 5000 milliseconds (5 seconds)
 
         app.exec_()
 
-    main()
+    # def handle_msg(self, msg : str):
+
+
+        # while True:
+        #     if conn.poll():  # Check if there is a message
+        #         msg = conn.recv()  # Receive the message
+        #         print(f'recieved mesage : {msg}')
+        #         if msg == 'flare':
+        #             primary = self.indicator_map[0]
+        #             timer = QTimer()
+        #             timer.singleShot(50, lambda: primary.flare(100, 100))  # Set for 5000 milliseconds (5 seconds)
+        #         elif msg == 'exit':
+        #             break
+
+def good():
+    app = QApplication([])
+    indicator = Indicator()
+    indicator.show()
+
+    # Set up a QTimer to trigger the flare
+    timer = QTimer()
+    timer.singleShot(300, lambda: indicator.flare(100, 100))  # Set for 5000 milliseconds (5 seconds)
+
+    app.exec_()
+
+
+
+if __name__ == "__main__":
+    from multiprocessing import Process
+    p = Process(target=good)
+    p.start()

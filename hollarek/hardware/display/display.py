@@ -33,7 +33,7 @@ class Display(BaseMonitor):
     # ----------------------------------------------
     # navigation
 
-    def map_relative_to_primary(self, pixel : LatticePoint) -> LatticePoint:
+    def get_relative_to_primary(self, pixel : LatticePoint) -> LatticePoint:
         if self.is_primary:
             return pixel
         else:
