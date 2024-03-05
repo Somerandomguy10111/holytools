@@ -1,5 +1,8 @@
+import time
+
 import pyautogui
 from hollarek.hardware.display import Display, LatticePoint
+from hollarek.hardware.input.keyboard import Keyboard
 
 
 class Mouse:
@@ -24,3 +27,4 @@ if __name__ == "__main__":
 
     secondary_display = Display.get_secondary()
     print(secondary_display.map_relative_to_primary(pixel=LatticePoint(0, 0)))
+
