@@ -1,9 +1,8 @@
-import threading
+import sys
 
 from PyQt5.QtWidgets import QApplication, QWidget, QGraphicsOpacityEffect
 from PyQt5.QtCore import QPropertyAnimation, QEasingCurve, Qt, QTimer, QSize
-import math
-import sys
+from .types import Click
 
 
 class Indicator(QWidget):
@@ -95,14 +94,6 @@ class ClickIndicator:
     def __init__(self):
         self.conn  = None
 
-    # def visualize_click(self, x : int, y : int, on_primary : bool):
-    #     monitor_index = 0 if on_primary else 1
-    #     indicator = self.indicator_map[monitor_index]
-    #     indicator.flare(x, y)
-
-
-
-
     def start(self, conn):
         self.conn = conn
         app = QApplication([])
@@ -112,33 +103,38 @@ class ClickIndicator:
             self.indicator_map[index] = indicator
             indicator.show()
 
-
         primary = self.indicator_map[0]
         # Set up a QTimer to trigger the flare
-        timer = QTimer()
-        timer.singleShot(300, lambda: primary.flare(100, 100))  # Set for 5000 milliseconds (5 seconds)
+        # self.timer = QTimer()
+        # self.timer.singleShot(300, lambda: primary.flare(300, 300))  # Set for 5000 milliseconds (5 seconds)
         self.threadpool = QThreadPool()
         worker = Worker(indicator_map=self.indicator_map, conn=self.conn)
         self.threadpool.start(worker)
 
+        worker.signals.trigger_flare.connect(self.trigger_flare)
         app.exec_()
 
 
+    def trigger_flare(self, display_index, x, y):
+        # This method will be called in the main thread
+        indicator = self.indicator_map[display_index]
+        indicator.flare(x, y)
+
+class WorkerSignals(QObject):
+    # Define a signal you want to emit from the worker thread
+    trigger_flare = pyqtSignal(int, int, int)  # Arguments are display_index, x, y
 
 class Worker(QRunnable):
-
     def __init__(self, indicator_map : dict[int, Indicator], conn):
         super().__init__()
         self.indicator_map = indicator_map
         self.conn = conn
+        self.signals = WorkerSignals()
 
     def run(self):
         while True:
             if self.conn.poll():  # Check if there is a message
                 msg = self.conn.recv()  # Receive the message
-                print(f'recieved mesage : {msg}')
-                if msg == 'flare':
-                    primary = self.indicator_map[0]
-                    primary.flare(100,100)
-                elif msg == 'exit':
-                    break
+                click = Click.from_str(dill_str=msg)
+                # Emit the signal instead of directly calling the method in the separate thread
+                self.signals.trigger_flare.emit(click.display_index, click.point.x, click.point.y)

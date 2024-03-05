@@ -33,14 +33,8 @@ class Display(BaseMonitor):
     # ----------------------------------------------
     # navigation
 
-    def get_relative_to_primary(self, pixel : LatticePoint) -> LatticePoint:
-        if self.is_primary:
-            return pixel
-        else:
-            primary_origin = Display.get_primary().get_origin()
-            secondary_origin = self.get_origin()
-            return secondary_origin-primary_origin+pixel
-
+    def get_virtual_display_pos(self, pixel : LatticePoint) -> LatticePoint:
+        return self.get_origin() + pixel
 
     def in_bounds(self, pixel : LatticePoint):
         return 0 <= pixel.x <= self.width and 0 <= pixel.y <= self.height

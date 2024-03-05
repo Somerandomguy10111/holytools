@@ -3,6 +3,7 @@ import time
 import pyautogui
 from hollarek.hardware.display import Display, LatticePoint, ClickIndicator
 from multiprocessing import Process, Pipe
+from hollarek.hardware.display import Click
 
 
 class Mouse:
@@ -17,14 +18,14 @@ class Mouse:
         display = Display.get_primary() if on_primary_display else Display.get_secondary()
         if not display.in_bounds(point):
             raise ValueError(f"Point {point} is outside of the display bounds")
-        rel_to_primary = display.get_relative_to_primary(pixel=point)
+        rel_to_primary = display.get_virtual_display_pos(pixel=point)
 
         pyautogui.click(rel_to_primary.x, rel_to_primary.y)
 
         if visualize:
             print(f'Visualized click')
-            # self.click_indicator.visualize_click(rel_to_primary.x, rel_to_primary.y, on_primary_display)
-            self.parent_conn.send('flare')  # Trigger flare
+            click = Click(point=point, display_index=0 if on_primary_display else 1)
+            self.parent_conn.send(click.to_str())
 
     def __del__(self):
         self.p.join()
@@ -32,6 +33,11 @@ class Mouse:
 if __name__ == "__main__":
     mouse = Mouse()
     time.sleep(1)
-    mouse.click(100, 100)
+    mouse.click(500, 500, on_primary_display= True)
 
     time.sleep(100)
+
+
+    # while True:
+    #     time.sleep(0.1)
+    #     print(pyautogui.position())

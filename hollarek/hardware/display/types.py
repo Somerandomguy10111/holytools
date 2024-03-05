@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from hollarek.templates import Dillable
 
 
 @dataclass
@@ -36,6 +37,10 @@ class LatticePoint:
         else:
             raise TypeError("Can only subtract LatticePoint from another LatticePoint")
 
+@dataclass
+class Click(Dillable):
+    point : LatticePoint
+    display_index : int
 
 if __name__ == "__main__":
     point1 = LatticePoint(3, 5)
