@@ -17,3 +17,6 @@ textract
 python-docx
 orjson
 devtools
+mss
+pyautogui
+screeninfo

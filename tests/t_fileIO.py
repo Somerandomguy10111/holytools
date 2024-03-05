@@ -5,7 +5,6 @@ from hollarek.devtools import Spoofer
 from hollarek.devtools import Unittest
 
 class TestFileIO(Unittest):
-
     @classmethod
     def setUpClass(cls):
         cls.spoofer = Spoofer()
