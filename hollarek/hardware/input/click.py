@@ -1,28 +1,6 @@
-from dataclasses import dataclass
 import pyautogui
 from hollarek.hardware.display import Display
-
-
-@dataclass
-class Grid:
-    x_length: int
-    y_length: int
-
-    @classmethod
-    def create_display_grid(cls, display : Display = Display.get_primary(), small_dim : int = 100):
-        scale_factor = small_dim / min(display.width, display.height)
-        x_length = int(display.width * scale_factor)
-        y_length = int(display.height * scale_factor)
-
-        return cls(x_length=x_length, y_length=y_length)
-
-    def __str__(self):
-        return f"Grid(x_length={self.x_length}, y_length={self.y_length})"
-
-@dataclass
-class LatticePoint:
-    x: int
-    y: int
+from hollarek.hardware.display.display import Grid, LatticePoint
 
 
 class Clicker:
