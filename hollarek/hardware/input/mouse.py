@@ -9,7 +9,7 @@ class Mouse:
     def __init__(self):
         self.click_indicator : ClickIndicator = ClickIndicator()
         self.parent_conn, child_conn = Pipe()
-        self.p = Process(target=self.click_indicator.start)
+        self.p = Process(target=self.click_indicator.start, args=(child_conn,))
         self.p.start()
 
     def click(self, pixel_x : int, pixel_y : int, on_primary_display: bool = True, visualize : bool = True):
@@ -30,15 +30,6 @@ class Mouse:
         self.p.join()
 
 if __name__ == "__main__":
-    # primary = Display.get_primary()
-    # secondary = Display.get_secondary()
-    #
-    # print(f'primary display coordinates are: {primary.x}, {primary.y}')
-    # print(f'secondary display coordinates are: {secondary.x}, {secondary.y}')
-    #
-    # secondary_display = Display.get_secondary()
-    # print(secondary_display.get_relative_to_primary(pixel=LatticePoint(0, 0)))
-    #
     mouse = Mouse()
     time.sleep(1)
     mouse.click(100, 100)

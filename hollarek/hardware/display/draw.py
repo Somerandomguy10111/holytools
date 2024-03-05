@@ -7,16 +7,16 @@ import sys
 
 
 class Indicator(QWidget):
-    def __init__(self, monitor_index: int = 0, min_radius: int = 15, max_radius: int = 30, flare_duration: float = 0.75):
+    def __init__(self, display_index: int = 0, min_radius: int = 15, max_radius: int = 30, flare_duration: float = 0.75):
         super().__init__()
         self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint | Qt.WindowTransparentForInput)
         self.setAttribute(Qt.WA_TranslucentBackground)
 
         screens = QApplication.screens()
-        if monitor_index < 0 or monitor_index >= len(screens):
-            raise ValueError(f"Invalid monitor index: {monitor_index}. Available screens: {len(screens)}")
+        if display_index < 0 or display_index >= len(screens):
+            raise ValueError(f"Invalid monitor index: {display_index}. Available screens: {len(screens)}")
 
-        screen = screens[monitor_index]
+        screen = screens[display_index]
         geometry = screen.geometry()
         self.move(geometry.x(), geometry.y())  # Move the window to the screen
         self.screen_width = geometry.width()
@@ -87,63 +87,58 @@ class Indicator(QWidget):
         self.old_size = new_radius * 2
 
 
-
+from PyQt5.QtGui import *
+from PyQt5.QtWidgets import *
+from PyQt5.QtCore import *
 
 class ClickIndicator:
     def __init__(self):
-        pass
+        self.conn  = None
 
     # def visualize_click(self, x : int, y : int, on_primary : bool):
     #     monitor_index = 0 if on_primary else 1
     #     indicator = self.indicator_map[monitor_index]
     #     indicator.flare(x, y)
 
-    @staticmethod
-    def start():
+
+
+
+    def start(self, conn):
+        self.conn = conn
         app = QApplication([])
-        indicator = Indicator()
-        indicator.show()
+        self.indicator_map : dict[int, Indicator] = {}
+        for index, monitor in enumerate(QApplication.screens()):
+            indicator = Indicator(display_index=index)
+            self.indicator_map[index] = indicator
+            indicator.show()
 
-        # indicator_map : dict[int, Indicator] = {}
-        # for index, monitor in enumerate(QApplication.screens()):
-        #     indicator = Indicator(monitor_index=index)
-        #     indicator_map[index] = indicator
-        #     indicator.show()
 
+        primary = self.indicator_map[0]
         # Set up a QTimer to trigger the flare
         timer = QTimer()
-        timer.singleShot(300, lambda: indicator.flare(100, 100))  # Set for 5000 milliseconds (5 seconds)
+        timer.singleShot(300, lambda: primary.flare(100, 100))  # Set for 5000 milliseconds (5 seconds)
+        self.threadpool = QThreadPool()
+        worker = Worker(indicator_map=self.indicator_map, conn=self.conn)
+        self.threadpool.start(worker)
 
         app.exec_()
 
-    # def handle_msg(self, msg : str):
 
 
-        # while True:
-        #     if conn.poll():  # Check if there is a message
-        #         msg = conn.recv()  # Receive the message
-        #         print(f'recieved mesage : {msg}')
-        #         if msg == 'flare':
-        #             primary = self.indicator_map[0]
-        #             timer = QTimer()
-        #             timer.singleShot(50, lambda: primary.flare(100, 100))  # Set for 5000 milliseconds (5 seconds)
-        #         elif msg == 'exit':
-        #             break
+class Worker(QRunnable):
 
-def good():
-    app = QApplication([])
-    indicator = Indicator()
-    indicator.show()
+    def __init__(self, indicator_map : dict[int, Indicator], conn):
+        super().__init__()
+        self.indicator_map = indicator_map
+        self.conn = conn
 
-    # Set up a QTimer to trigger the flare
-    timer = QTimer()
-    timer.singleShot(300, lambda: indicator.flare(100, 100))  # Set for 5000 milliseconds (5 seconds)
-
-    app.exec_()
-
-
-
-if __name__ == "__main__":
-    from multiprocessing import Process
-    p = Process(target=good)
-    p.start()
+    def run(self):
+        while True:
+            if self.conn.poll():  # Check if there is a message
+                msg = self.conn.recv()  # Receive the message
+                print(f'recieved mesage : {msg}')
+                if msg == 'flare':
+                    primary = self.indicator_map[0]
+                    primary.flare(100,100)
+                elif msg == 'exit':
+                    break
