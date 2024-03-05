@@ -31,6 +31,21 @@ class Display(BaseMonitor):
         return cls(x=base_monitor.x, y=base_monitor.y, width=base_monitor.width, height=base_monitor.height, is_primary=base_monitor.is_primary)
 
     # ----------------------------------------------
+    # navigation
+
+    def map_relative_to_primary(self, pixel : LatticePoint) -> LatticePoint:
+        if self.is_primary:
+            return pixel
+        else:
+            primary_origin = Display.get_primary().get_origin()
+            secondary_origin = self.get_origin()
+            return secondary_origin-primary_origin+pixel
+
+
+    def in_bounds(self, pixel : LatticePoint):
+        return 0 <= pixel.x <= self.width and 0 <= pixel.y <= self.height
+
+    # ----------------------------------------------
     # screenshot
 
     def get_screenshot(self, grid : Optional[Grid] = None):
@@ -54,6 +69,9 @@ class Display(BaseMonitor):
             draw_horizontal_line(image, y_px)
         return image
 
+
+    def get_origin(self) -> LatticePoint:
+        return LatticePoint(x=self.x, y=self.y)
 
 
 @dataclass
@@ -85,3 +103,4 @@ def draw_horizontal_line(img, y_pos, line_color=(255, 0, 0), line_width=1):
 def draw_vertical_line(img, x_pos, line_color=(255, 0, 0), line_width=1):
     draw = ImageDraw.Draw(img)
     draw.line([(x_pos, 0), (x_pos, img.height)], fill=line_color, width=line_width)
+

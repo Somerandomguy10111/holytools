@@ -1,33 +1,26 @@
-from hollarek.hardware.display import Display
-from hollarek.hardware.display.display import DisplayMapper
-from hollarek.hardware.display.types import Grid
+import pyautogui
+from hollarek.hardware.display import Display, LatticePoint
 
 
-# class Clicker:
-#     def __init__(self, natural_grid: DisplayMapper = DisplayMapper.create_default()):
-#         self.natural_grid = natural_grid
+class Mouse:
+    @staticmethod
+    def click(pixel_x : int, pixel_y : int, on_primary_display: bool, visuals : bool = False):
+        point = LatticePoint(pixel_x, pixel_y)
+        display = Display.get_primary() if on_primary_display else Display.get_secondary()
 
-    # def click(self, lattice_point: LatticePoint, display : Display = Display.get_primary()):
-    #     pixel_x = round(lattice_point.x * display.width / self.natural_grid.x_length)
-    #     pixel_y = round(lattice_point.y * display.height / self.natural_grid.y_length)
-    #
-    #     if 0 <= pixel_x < display.width and 0 <= pixel_y < display.height:
-    #         pyautogui.click(display.x + pixel_x, display.y + pixel_y)
-    #     else:
-    #         raise ValueError("Lattice point translates to a position outside the display boundaries")
+        if not display.in_bounds(point):
+            raise ValueError(f"Point {point} is outside of the display bounds")
 
-    #
-    # def get_gridded_screenshot(self):
-    #     pass
+        rel_to_primary = display.map_relative_to_primary(pixel=point)
+        pyautogui.click(rel_to_primary.x, rel_to_primary.y)
 
 
-# my_grid = DisplayMapper(x_length=10, y_length=5)
-# my_point = LatticePoint(x=3, y=1)
+if __name__ == "__main__":
+    primary = Display.get_primary()
+    secondary = Display.get_secondary()
 
-# print(my_grid)
-# print(my_point)
+    print(f'primary display coordinates are: {primary.x}, {primary.y}')
+    print(f'secondary display coordinates are: {secondary.x}, {secondary.y}')
 
-grid =Grid(x_size=100, y_size=100)
-
-display = Display.get_primary()
-display.get_screenshot(grid=grid).show()
+    secondary_display = Display.get_secondary()
+    print(secondary_display.map_relative_to_primary(pixel=LatticePoint(0, 0)))
