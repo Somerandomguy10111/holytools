@@ -58,18 +58,22 @@ class Display(BaseMonitor):
 
 @dataclass
 class DisplayMapper:
-    display : Display
     input_grid : Grid
+    display : Display
 
     def get_pixel(self, point : LatticePoint) -> LatticePoint:
-        if not self.input_grid.is_in_bounds(lattice_point=point):
+        if not self.input_grid.is_in_bounds(point=point):
             raise ValueError(f"Lattice point {point} is outside of the grid bounds")
         return LatticePoint(x=self.map_horizontal(point.x), y=self.map_vertical(point.y))
 
     def map_horizontal(self, x : int) -> int:
+        if not self.input_grid.in_horizontal_bounds(x=x):
+            raise ValueError(f"X value {x} is outside of the grid bounds")
         return round(x * self.display.width / self.input_grid.x_size)
 
     def map_vertical(self, y : int) -> int:
+        if not self.input_grid.is_in_vertical_bounds(y=y):
+            raise ValueError(f"Y value {y} is outside of the grid bounds")
         return round(y * self.display.height / self.input_grid.y_size)
 
 
