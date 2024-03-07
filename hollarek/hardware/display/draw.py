@@ -2,7 +2,7 @@ import sys
 
 from PyQt5.QtWidgets import QApplication, QWidget, QGraphicsOpacityEffect
 from PyQt5.QtCore import QPropertyAnimation, QEasingCurve, Qt, QTimer, QSize
-from .types import Click
+from .types import Click, LatticePoint
 
 
 class Indicator(QWidget):
@@ -120,6 +120,7 @@ class ClickIndicator:
         indicator = self.indicator_map[display_index]
         indicator.flare(x, y)
 
+
 class WorkerSignals(QObject):
     # Define a signal you want to emit from the worker thread
     trigger_flare = pyqtSignal(int, int, int)  # Arguments are display_index, x, y
@@ -137,4 +138,6 @@ class Worker(QRunnable):
                 msg = self.conn.recv()  # Receive the message
                 click = Click.from_str(dill_str=msg)
                 # Emit the signal instead of directly calling the method in the separate thread
-                self.signals.trigger_flare.emit(click.display_index, click.point.x, click.point.y)
+                delta = LatticePoint(17,-9)
+                flash_point = delta+click.point
+                self.signals.trigger_flare.emit(click.display_index, flash_point.x, flash_point.y)

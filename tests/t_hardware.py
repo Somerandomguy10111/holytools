@@ -1,4 +1,4 @@
-from hollarek.devtools import PartitionInfo
+from hollarek.hardware import PartitionInfo
 
 if __name__ == '__main__':
     import psutil
