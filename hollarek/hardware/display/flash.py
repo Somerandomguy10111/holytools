@@ -141,3 +141,4 @@ class Worker(QRunnable):
                 delta = LatticePoint(17,-9)
                 flash_point = delta+click.point
                 self.signals.trigger_flare.emit(click.display_index, flash_point.x, flash_point.y)
+

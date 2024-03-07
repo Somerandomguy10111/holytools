@@ -1,5 +1,7 @@
+import time
+
 import pyautogui
-from hollarek.hardware.display import Display, LatticePoint, ClickIndicator
+from hollarek.hardware.display import Display, LatticePoint, ClickIndicator, Indicator
 from multiprocessing import Process, Pipe
 from hollarek.hardware.display import Click, Grid
 from typing import Optional
@@ -69,9 +71,24 @@ if __name__ == "__main__":
     # img = teset.get_screenshot(grid=Grid(25, 25))
     # img.show()
     text_mouse = TextMouse()
-
+    # #
     while True:
         view = text_mouse.get_view()
         view.show()
         num = int(input(f'Click on cell:'))
         text_mouse.click(num)
+        time.sleep(1)
+
+    # from PyQt5.QtGui import *
+    # from PyQt5.QtWidgets import *
+    # from PyQt5.QtCore import *
+    #
+    # app = QApplication([])
+    # indicator = Indicator()
+    # indicator.show()
+    # indicator.flare(100,100)
+    #
+    # # Set up a QTimer to trigger the flare
+    # timer = QTimer()
+    # timer.singleShot(1000, lambda: indicator.flare(300, 300))  # Set for 5000 milliseconds (5 seconds)
+    # app.exec_()
