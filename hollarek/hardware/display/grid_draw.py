@@ -7,7 +7,6 @@ from PIL import ImageDraw, Image, ImageFont
 from PIL.Image import Image as PILImage
 from .types import Grid, LatticePoint, Vector
 
-
 class Orientation(Enum):
     HORIZONTAL = 0
     VERTICAL = 1
@@ -33,10 +32,10 @@ class EditableImage:
 
     def draw_cell_labels(self):
         grid = self.mapper.input_grid
-        for cell_number, lattice_vector in enumerate(grid.get_lattice_vectors(), start=1):
+        for lattice_vector in grid.get_lattice_vectors():
             center = self.mapper.get_pixel(lattice_vector + Vector(x=0.5, y=0.5))
-            hex_number = hex(cell_number)[2:].upper()
-            self.draw_text(text=hex_number, point=center, font_size=int(400 / grid.x_size))
+            text = str(lattice_vector.y*grid.x_size+lattice_vector.x)
+            self.draw_text(text=text, point=center, font_size=int(400 / grid.x_size))
 
 
     def draw_grid_lines(self):
@@ -60,13 +59,20 @@ class EditableImage:
         self.overlay_draw.line([start_pos, end_pos], fill=color_vector, width=1)
 
 
-    def draw_text(self, text : str, point : LatticePoint, font_size=20, opacity = 128):
+    def draw_text(self, text: str, point: LatticePoint, font_size=20, opacity=256):
         font = ImageFont.load_default(size=font_size)
-        color = (0, 0, 0, opacity)
-        delta = LatticePoint(font_size//2, font_size//2)
+        delta = LatticePoint(font_size // 2, font_size // 2)
         centered_point = point - delta
-        self.overlay_draw.text(centered_point.as_tuple(), text, fill=color, font=font)
 
+        background_color = self.pil_image.getpixel(centered_point.as_tuple())
+        brightness = sum(background_color[:3]) / (3 * 255)
+        print(brightness)
+        if brightness < 0.5:
+            color = (255, 255,255 , opacity)
+        else:
+            color = (0, 0, 0, opacity)
+        print(color)
+        self.overlay_draw.text(centered_point.as_tuple(), text, fill=color, font=font)
 
 @dataclass
 class PixelMapper:
