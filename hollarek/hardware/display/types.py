@@ -9,6 +9,12 @@ class Grid:
     x_size : int
     y_size : int
 
+    def get_lattice_vectors(self) -> list[Vector]:
+        return [lattice_point.to_vector() for lattice_point in self.get_lattice_points()]
+
+    def get_lattice_points(self) -> list[LatticePoint]:
+        return [LatticePoint(x, y) for x in range(self.x_size) for y in range(self.y_size)]
+
     def in_horizontal_bounds(self, x : int) -> bool:
         return 0 <= x <= self.x_size
 
@@ -19,11 +25,33 @@ class Grid:
         return self.in_horizontal_bounds(point.x) and self.is_in_vertical_bounds(point.y)
 
 
+@dataclass
+class Vector:
+    x : float
+    y : float
+
+    def __add__(self, other : Vector):
+        return Vector(self.x + other.x, self.y + other.y)
+
+    def __sub__(self, other):
+        return Vector(self.x - other.x, self.y - other.y)
+
+    def __mul__(self, other):
+        return Vector(self.x * other, self.y * other)
 
 @dataclass
 class LatticePoint:
     x: int
     y: int
+
+    def to_vector(self) -> Vector:
+        return Vector(x=self.x, y=self.y)
+
+    def as_tuple(self) -> (int, int):
+        return self.x, self.y
+
+    def __mul__(self, other : float):
+        return LatticePoint(int(self.x * other), int(self.y * other))
 
     def __add__(self, other : LatticePoint):
         if isinstance(other, LatticePoint):

@@ -1,5 +1,3 @@
-import time
-
 import pyautogui
 from hollarek.hardware.display import Display, LatticePoint, ClickIndicator
 from multiprocessing import Process, Pipe
