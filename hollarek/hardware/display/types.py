@@ -2,12 +2,23 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from hollarek.templates import Dillable
-
+from typing import Union
 
 @dataclass
 class Grid:
     x_size : int
     y_size : int
+
+    def get_num(self, pt : LatticePoint) -> int:
+        if not self.is_in_bounds(pt):
+            raise ValueError(f"Point {pt} is outside of the grid bounds")
+
+        return pt.y * self.x_size + pt.x
+
+    def get_pt(self, num : int) -> LatticePoint:
+        if num < 0 or num >= self.x_size * self.y_size:
+            raise ValueError(f"Number {num} is outside of the grid bounds")
+        return LatticePoint(num % self.x_size, num // self.x_size)
 
     def get_lattice_vectors(self) -> list[Vector]:
         return [lattice_point.to_vector() for lattice_point in self.get_lattice_points()]
@@ -21,14 +32,17 @@ class Grid:
     def is_in_vertical_bounds(self, y : int) -> bool:
         return 0 <= y <= self.y_size
 
-    def is_in_bounds(self, point : LatticePoint) -> bool:
-        return self.in_horizontal_bounds(point.x) and self.is_in_vertical_bounds(point.y)
+    def is_in_bounds(self, vec : Union[LatticePoint, Vector]) -> bool:
+        return self.in_horizontal_bounds(vec.x) and self.is_in_vertical_bounds(vec.y)
 
 
 @dataclass
 class Vector:
     x : float
     y : float
+
+    def as_tuple(self):
+        return self.x, self.y
 
     def __add__(self, other : Vector):
         return Vector(self.x + other.x, self.y + other.y)
@@ -38,6 +52,10 @@ class Vector:
 
     def __mul__(self, other):
         return Vector(self.x * other, self.y * other)
+
+    def to_lattice(self) -> LatticePoint:
+        return LatticePoint(round(self.x), round(self.y))
+
 
 @dataclass
 class LatticePoint:

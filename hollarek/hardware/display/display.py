@@ -32,11 +32,24 @@ class Display(BaseMonitor):
     def from_base(cls, base_monitor : BaseMonitor) -> Display:
         return cls(x=base_monitor.x, y=base_monitor.y, width=base_monitor.width, height=base_monitor.height, is_primary=base_monitor.is_primary)
 
-
     # ----------------------------------------------
-    # navigation
 
-    def map_to_virtual_display(self, pixel : LatticePoint) -> LatticePoint:
+    def get_screenshot(self, grid : Optional[Grid] = None):
+        with mss() as sct:
+            monitor_dict = {"top": self.y, "left": self.x, "width": self.width, "height": self.height}
+            sct_img = sct.grab(monitor_dict)
+            img = Image.frombytes('RGB', sct_img.size, sct_img.bgra, 'raw', 'BGRX')
+        if grid:
+            editable = EditableImage(img=img, mapper=self.get_mapper(grid=grid))
+            img = editable.get_grid_overlay()
+
+        return img
+
+    def get_mapper(self, grid : Grid):
+        pixel_grid = Grid(x_size=self.width, y_size=self.height)
+        return PixelMapper(input_grid=grid, output_grid=pixel_grid)
+
+    def to_virtual_display(self, pixel : LatticePoint) -> LatticePoint:
         origin = LatticePoint(x=self.x, y = self.y)
         return origin + pixel
 
@@ -48,20 +61,3 @@ class Display(BaseMonitor):
 
     def is_vertical(self):
         return self.height > self.width
-
-    # ----------------------------------------------
-    # screenshot
-
-    def get_screenshot(self, grid : Optional[Grid] = None):
-        with mss() as sct:
-            monitor_dict = {"top": self.y, "left": self.x, "width": self.width, "height": self.height}
-            sct_img = sct.grab(monitor_dict)
-            img = Image.frombytes('RGB', sct_img.size, sct_img.bgra, 'raw', 'BGRX')
-        if grid:
-            pixel_grid= Grid(x_size=img.width, y_size=img.height)
-            editable = EditableImage(img=img, mapper=PixelMapper(input_grid=grid, output_grid=pixel_grid))
-            img = editable.get_grid_overlay()
-
-        return img
-
-

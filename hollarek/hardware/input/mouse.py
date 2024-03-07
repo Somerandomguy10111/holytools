@@ -2,7 +2,7 @@ import pyautogui
 from hollarek.hardware.display import Display, LatticePoint, ClickIndicator
 from multiprocessing import Process, Pipe
 from hollarek.hardware.display import Click, Grid
-
+from typing import Optional
 
 class Mouse:
     def __init__(self):
@@ -16,7 +16,7 @@ class Mouse:
         display = Display.get_primary() if on_primary_display else Display.get_secondary()
         if not display.in_bounds(point):
             raise ValueError(f"Point {point} is outside of the display bounds")
-        rel_to_primary = display.map_to_virtual_display(pixel=point)
+        rel_to_primary = display.to_virtual_display(pixel=point)
 
         pyautogui.click(rel_to_primary.x, rel_to_primary.y)
 
@@ -27,6 +27,29 @@ class Mouse:
 
     def __del__(self):
         self.p.join()
+
+
+class TextMouse:
+    def __init__(self, input_grid: Grid = Grid(x_size=25, y_size=25)):
+        self.mouse : Mouse = Mouse()
+        self.input_grid : Grid = input_grid
+        self.primary : Display = Display.get_primary()
+        self.secondary : Optional[Display] = Display.get_secondary()
+
+    def get_view(self, on_primary_display : bool = True):
+        display = self.primary if on_primary_display else self.secondary
+        return display.get_screenshot(grid=self.input_grid)
+
+    def click(self, cell_num : int, on_primary_display : bool = True):
+        pt = self.input_grid.get_pt(num=cell_num)
+        display = self.primary if on_primary_display else self.secondary
+        if not display:
+            raise ValueError("There is no secondary display")
+        mapper = display.get_mapper(grid=self.input_grid)
+        px = mapper.map_pt(point=pt)
+        self.mouse.click(pixel_x=px.x, pixel_y=px.y, on_primary_display=on_primary_display, visualize=True)
+
+
 
 if __name__ == "__main__":
     # mouse = Mouse()
@@ -40,8 +63,15 @@ if __name__ == "__main__":
     #     time.sleep(0.1)
     #     print(pyautogui.position())
 
-    from hollarek.hardware.display import Display
+    # from hollarek.hardware.display import Display
 
-    display = Display.get_primary()
-    img = display.get_screenshot(grid=Grid(25,25))
-    img.show()
+    # teset = Display.get_primary()
+    # img = teset.get_screenshot(grid=Grid(25, 25))
+    # img.show()
+    text_mouse = TextMouse()
+
+    while True:
+        view = text_mouse.get_view()
+        view.show()
+        num = int(input(f'Click on cell:'))
+        text_mouse.click(num)

@@ -26,16 +26,17 @@ class EditableImage:
     def get_grid_overlay(self) -> PILImage:
         self.draw_cell_labels()
         self.draw_grid_lines()
-        print(self.pil_image.mode, self.overlay.mode)
         return Image.alpha_composite(self.pil_image, self.overlay)
 
 
     def draw_cell_labels(self):
         grid = self.mapper.input_grid
-        for lattice_vector in grid.get_lattice_vectors():
-            center = self.mapper.get_pixel(lattice_vector + Vector(x=0.5, y=0.5))
-            text = str(lattice_vector.y*grid.x_size+lattice_vector.x)
-            self.draw_text(text=text, point=center, font_size=int(400 / grid.x_size))
+        for pt in grid.get_lattice_points():
+            input_vector = pt.to_vector() + Vector(x=0.5, y=0.5)
+            output_vector = self.mapper.map_vector(vector=input_vector)
+            output_pt = output_vector.to_lattice()
+            text = str(grid.get_num(pt=pt))
+            self.draw_text(text=text, point=output_pt, font_size=int(400 / grid.x_size))
 
 
     def draw_grid_lines(self):
@@ -59,37 +60,44 @@ class EditableImage:
         self.overlay_draw.line([start_pos, end_pos], fill=color_vector, width=1)
 
 
-    def draw_text(self, text: str, point: LatticePoint, font_size=20, opacity=256):
+    def draw_text(self, text: str, point: LatticePoint, font_size=20, opacity=255):
         font = ImageFont.load_default(size=font_size)
         delta = LatticePoint(font_size // 2, font_size // 2)
         centered_point = point - delta
 
         background_color = self.pil_image.getpixel(centered_point.as_tuple())
         brightness = sum(background_color[:3]) / (3 * 255)
-        print(brightness)
         if brightness < 0.5:
             color = (255, 255,255 , opacity)
         else:
             color = (0, 0, 0, opacity)
         print(color)
-        self.overlay_draw.text(centered_point.as_tuple(), text, fill=color, font=font)
+        print(centered_point)
+        self.overlay_draw.text(centered_point.as_tuple(), text=text, fill=color, font=font)
+
 
 @dataclass
 class PixelMapper:
     input_grid : Grid
     output_grid : Grid
 
-    def get_pixel(self, point : LatticePoint) -> LatticePoint:
-        if not self.input_grid.is_in_bounds(point=point):
+    def map_vector(self, vector : Vector):
+        if not self.input_grid.is_in_bounds(vec=vector):
+            raise ValueError(f"Vector {vector} is outside of the grid bounds")
+
+        return Vector(x=self.map_horizontal(vector.x), y=self.map_vertical(vector.y))
+
+    def map_pt(self, point : LatticePoint) -> LatticePoint:
+        if not self.input_grid.is_in_bounds(vec=point):
             raise ValueError(f"Lattice point {point} is outside of the grid bounds")
         return LatticePoint(x=self.map_horizontal(point.x), y=self.map_vertical(point.y))
 
-    def map_horizontal(self, x : int) -> int:
-        if not self.input_grid.in_horizontal_bounds(x=x):
+    def map_horizontal(self, x : float) -> int:
+        if not self.input_grid.in_horizontal_bounds(x=round(x)):
             raise ValueError(f"X value {x} is outside of the grid bounds")
         return round(x * self.output_grid.x_size / self.input_grid.x_size)
 
-    def map_vertical(self, y : int) -> int:
-        if not self.input_grid.is_in_vertical_bounds(y=y):
+    def map_vertical(self, y : float) -> int:
+        if not self.input_grid.is_in_vertical_bounds(y=round(y)):
             raise ValueError(f"Y value {y} is outside of the grid bounds")
         return round(y * self.output_grid.y_size / self.input_grid.y_size)
