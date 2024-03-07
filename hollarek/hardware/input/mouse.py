@@ -1,19 +1,15 @@
 import time
 
 import pyautogui
-from hollarek.hardware.display import Display, LatticePoint, ClickIndicator, Indicator
-from multiprocessing import Process, Pipe
-from hollarek.hardware.display import Click, Grid
+from hollarek.hardware.display import Display, LatticePoint
+from hollarek.hardware.display import Grid
 from typing import Optional
 
 class Mouse:
     def __init__(self):
-        self.click_indicator : ClickIndicator = ClickIndicator()
-        self.parent_conn, child_conn = Pipe()
-        self.p = Process(target=self.click_indicator.start, args=(child_conn,))
-        self.p.start()
+        pass
 
-    def click(self, pixel_x : int, pixel_y : int, on_primary_display: bool = True, visualize : bool = True):
+    def click(self, pixel_x : int, pixel_y : int, on_primary_display: bool = True):
         point = LatticePoint(pixel_x, pixel_y)
         display = Display.get_primary() if on_primary_display else Display.get_secondary()
         if not display.in_bounds(point):
@@ -21,14 +17,6 @@ class Mouse:
         rel_to_primary = display.to_virtual_display(pixel=point)
 
         pyautogui.click(rel_to_primary.x, rel_to_primary.y)
-
-        if visualize:
-            print(f'Visualized click')
-            click = Click(point=point, display_index=0 if on_primary_display else 1)
-            self.parent_conn.send(click.to_str())
-
-    def __del__(self):
-        self.p.join()
 
 
 class TextMouse:
@@ -49,46 +37,15 @@ class TextMouse:
             raise ValueError("There is no secondary display")
         mapper = display.get_mapper(grid=self.input_grid)
         px = mapper.map_pt(point=pt)
-        self.mouse.click(pixel_x=px.x, pixel_y=px.y, on_primary_display=on_primary_display, visualize=True)
+        self.mouse.click(pixel_x=px.x, pixel_y=px.y, on_primary_display=on_primary_display)
 
 
 
 if __name__ == "__main__":
-    # mouse = Mouse()
-    # # mouse.click(500, 500, on_primary_display= True)
-    # mouse.click(500, 500, on_primary_display= False)
-
-    # time.sleep(100)
-
-
-    # while True:
-    #     time.sleep(0.1)
-    #     print(pyautogui.position())
-
-    # from hollarek.hardware.display import Display
-
-    # teset = Display.get_primary()
-    # img = teset.get_screenshot(grid=Grid(25, 25))
-    # img.show()
     text_mouse = TextMouse()
-    # #
     while True:
         view = text_mouse.get_view()
         view.show()
         num = int(input(f'Click on cell:'))
         text_mouse.click(num)
         time.sleep(1)
-
-    # from PyQt5.QtGui import *
-    # from PyQt5.QtWidgets import *
-    # from PyQt5.QtCore import *
-    #
-    # app = QApplication([])
-    # indicator = Indicator()
-    # indicator.show()
-    # indicator.flare(100,100)
-    #
-    # # Set up a QTimer to trigger the flare
-    # timer = QTimer()
-    # timer.singleShot(1000, lambda: indicator.flare(300, 300))  # Set for 5000 milliseconds (5 seconds)
-    # app.exec_()
