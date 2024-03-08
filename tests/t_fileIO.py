@@ -1,9 +1,9 @@
-from hollarek.fileIO import BinaryIO, TextIO, ImageIO
+from hollarek.fileIO import BinaryIO, TextIO, ImageIO, Image, ImageFormat
 from hollarek.devtools import Spoofer, Unittest
 from hollarek.fsys import FsysNode
-from PIL.Image import Image as PILImage
 from unittest.mock import patch
 import io
+# ---------------------------------------------------------
 
 
 class TestIO(Unittest):
@@ -39,7 +39,7 @@ class TestIO(Unittest):
     def test_valid_image_read(self):
         image_io = ImageIO(fpath=self.png_file)
         result = image_io.read()
-        self.assertIsInstance(obj=result, cls=PILImage)
+        self.assertIsInstance(obj=result, cls=Image)
 
     def test_invalid_image_read(self):
         image_io = ImageIO(fpath=self.text_file)
@@ -56,5 +56,28 @@ class TestIO(Unittest):
         tio.view()
 
 
+
+class TestImage(Unittest):
+    def setUp(self):
+        spoofer = Spoofer()
+        self.text_file = spoofer.lend_txt()
+        self.jpg_file = spoofer.lend_jpg()
+        self.png_file = spoofer.lend_png()
+
+    def test_png_to_jpeg(self):
+        image_io = ImageIO(fpath=self.png_file)
+        image = image_io.read()
+        image.convert(target_format=ImageFormat.JPG)
+        self.assertTrue(image.get_format() == 'JPEG')
+
+
+    def test_jpg_to_png(self):
+        image_io = ImageIO(fpath=self.jpg_file)
+        image = image_io.read()
+        image.convert(target_format=ImageFormat.PNG)
+        self.assertTrue(image.get_format() == 'PNG')
+
+
 if __name__ == '__main__':
-    TestIO.execute_all()
+    # TestIO.execute_all()
+    TestImage.execute_all()

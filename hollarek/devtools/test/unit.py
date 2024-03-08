@@ -9,11 +9,6 @@ from typing import Optional
 
 class Unittest(unittest.TestCase):
     @classmethod
-    @abstractmethod
-    def setUpClass(cls):
-        pass
-
-    @classmethod
     def execute_all(cls, settings : TestSettings = TestSettings()):
         suite = unittest.TestLoader().loadTestsFromTestCase(cls)
         runner = Runner(logger=cls.get_logger(),settings=settings)
