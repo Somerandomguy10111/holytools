@@ -1,4 +1,3 @@
-import time
 from datetime import datetime, timedelta
 from threading import Event
 from typing import Callable, Optional
@@ -23,7 +22,7 @@ class Countdown:
         self.duration : float = duration
         self.scheduler : BackgroundScheduler = BackgroundScheduler()
         self.job: Optional[Job] = None
-        self.on_expiration : callable = on_expiration
+        self.on_expiration : Callable = on_expiration
 
         self.one_time_lock = Event()
         self.scheduler.start()
@@ -53,16 +52,15 @@ class Countdown:
 class Timer(DevtoolsTimer):
     pass
 
-
 class Clock(Loggable):
     pass
 
 
-def say_hi():  # This function has no parameters
-    print(f'sup mah man')
-
-def transmit(msg : str):
-    print(msg)
+# def say_hi():  # This function has no parameters
+#     print(f'sup mah man')
+#
+# def transmit(msg : str):
+#     print(msg)
 
 # # This will work as expected
 # countdown = Countdown(duration=3, on_expiration=say_hi)

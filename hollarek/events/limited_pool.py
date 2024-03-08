@@ -4,13 +4,13 @@ from concurrent.futures import ThreadPoolExecutor
 from queue import Queue
 from dataclasses import dataclass, field
 from hollarek.logging import get_logger
-
+from typing import Callable
 
 # ---------------------------------------------------------
 
 @dataclass
 class Task:
-    function: callable
+    function: Callable
     args: tuple = field(default_factory=tuple)
     kwargs: dict = field(default_factory=dict)
 

@@ -1,3 +1,4 @@
+from typing import Callable
 import inspect
 from hollarek.logging import Loggable, LogSettings, LogLevel
 # ---------------------------------------------------------
@@ -13,7 +14,7 @@ class InteractiveCLI(Loggable):
 
         self._log_header()
         self.obj : object = self._create_object()
-        self.methods_dict : dict[int, callable] = self._get_methods_dict(obj=self.obj)
+        self.methods_dict : dict[int, Callable] = self._get_methods_dict(obj=self.obj)
 
 
     def _log_header(self):
@@ -38,7 +39,7 @@ class InteractiveCLI(Loggable):
 
 
 
-    def _get_methods_dict(self, obj) -> dict[int, callable]:
+    def _get_methods_dict(self, obj) -> dict[int, Callable]:
         public_methods_names = self._get_public_method_names()
         return {i + 1: getattr(obj,name) for i, name in enumerate(public_methods_names)}
 

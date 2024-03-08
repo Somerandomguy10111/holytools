@@ -2,7 +2,7 @@ import logging
 from apscheduler.schedulers.background import BackgroundScheduler
 from hollarek.templates import Singleton
 from typing import Optional
-
+from typing import Callable
 
 class ScheduleHandler(Singleton):
     scheduler : Optional[BackgroundScheduler]= None
@@ -16,6 +16,6 @@ class ScheduleHandler(Singleton):
         return cls.scheduler
 
 
-def schedule(callback: callable, interval_in_sec: int):
+def schedule(callback: Callable, interval_in_sec: int):
     scheduler = ScheduleHandler.get_scheduler()
     scheduler.add_job(callback, 'interval', seconds=interval_in_sec)

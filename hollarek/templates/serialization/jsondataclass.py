@@ -8,7 +8,7 @@ from uuid import UUID
 from pathlib import Path
 from typing import get_type_hints
 
-from hollarek.devtools import get_core_type
+from hollarek.devtools import TypeInspector
 from enum import Enum
 # -------------------------------------------
 
@@ -53,7 +53,7 @@ def from_json(cls : type, json_dict: dict):
             init_dict[key] = value
             continue
 
-        core_type = get_core_type(dtype=type_hints.get(key))
+        core_type = TypeInspector.get_core_type(dtype=type_hints.get(key))
         if not isinstance(value, dict):
             init_dict[key] = make_elementary(cls=core_type,value=value)
         elif issubclass(core_type, Enum):

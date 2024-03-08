@@ -1,5 +1,6 @@
 from typing import Optional, Union
-from hollarek.devtools import Unittest, is_optional_type
+from hollarek.devtools import Unittest, TypeInspector
+
 
 
 class TestOptionalTyping(Unittest):
@@ -14,17 +15,16 @@ class TestOptionalTyping(Unittest):
     def test_optional_type(self):
         optional_types = [self.optional_int, self.union_none_int]
         for dtype in optional_types:
-            self.assertTrue(is_optional_type(dtype), msg=f'\"{dtype}\" should be recognized as Optional')
+            self.assertTrue(TypeInspector.is_optional_type(dtype), msg=f'\"{dtype}\" should be recognized as Optional')
 
     def test_complex_optional_type(self):
         for dtype in [self.nested_optional, self.triple_union]:
-            self.assertTrue(is_optional_type(dtype), msg=f'\"{dtype}\" should be recognized as Optional')
+            self.assertTrue(TypeInspector.is_optional_type(dtype), msg=f'\"{dtype}\" should be recognized as Optional')
 
 
     def test_non_optional_type(self):
-        self.assertFalse(is_optional_type(int))
-        self.assertFalse(is_optional_type(Union[int, str]))
-        self.assertFalse(is_optional_type(float))
+        for dtype in [int, Union[int, str], float]:
+            self.assertFalse(TypeInspector.is_optional_type(dtype), msg=f'\"{dtype}\" should not be recognized as Optional')
 
 
 

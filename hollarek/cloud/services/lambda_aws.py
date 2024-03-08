@@ -3,6 +3,7 @@ import inspect, logging
 import os, tempfile, shutil, sys
 import subprocess
 from distutils.dir_util import copy_tree
+from typing import Callable
 
 from hollarek.cloud.entities.enums import AWSRegion
 # ----------------------------------------------
@@ -16,7 +17,7 @@ class LambdaAWS:
         self.lambda_client = boto3.client('lambda', region_name=self.region)
 
 
-    def cloud_lambda_function(self, the_function : callable, role_arn : str):
+    def cloud_lambda_function(self, the_function : Callable, role_arn : str):
         """
         Creates a lambda for an entirely self contained function the_function
         Necessary imports must be stated within the function body not in the header of the module
@@ -42,7 +43,7 @@ class LambdaAWS:
 
 
     @staticmethod
-    def get_zip(the_function : callable):
+    def get_zip(the_function : Callable):
         python_src = inspect.getsource(the_function)
 
         with tempfile.TemporaryDirectory() as tmp_dir:

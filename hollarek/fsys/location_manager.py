@@ -22,8 +22,6 @@ class LocationManager(Singleton):
         self.setup_dirs()
 
 
-
-
     def add_dir(self, relative_path : str) -> str:
         new_dir_path = os.path.join(self.root_path, relative_path)
         os.makedirs(new_dir_path, exist_ok=True)
