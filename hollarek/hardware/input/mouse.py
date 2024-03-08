@@ -6,10 +6,8 @@ from hollarek.hardware.display import Grid
 from typing import Optional
 
 class Mouse:
-    def __init__(self):
-        pass
-
-    def click(self, pixel_x : int, pixel_y : int, on_primary_display: bool = True):
+    @classmethod
+    def click(cls, pixel_x : int, pixel_y : int, on_primary_display: bool = True):
         point = LatticePoint(pixel_x, pixel_y)
         display = Display.get_primary() if on_primary_display else Display.get_secondary()
         if not display.in_bounds(point):
