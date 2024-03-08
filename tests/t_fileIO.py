@@ -1,6 +1,7 @@
-from hollarek.fileIO import BinaryIO, TextIO, ImageIO, Image, ImageFormat
+from hollarek.fileIO import BinaryIO, TextIO, ImageIO, ImageConverter, ImageFormat
 from hollarek.devtools import Spoofer, Unittest
 from hollarek.fsys import FsysNode
+from PIL.Image import Image
 from unittest.mock import patch
 import io
 # ---------------------------------------------------------
@@ -67,15 +68,15 @@ class TestImage(Unittest):
     def test_png_to_jpeg(self):
         image_io = ImageIO(fpath=self.png_file)
         image = image_io.read()
-        image.convert(target_format=ImageFormat.JPG)
-        self.assertTrue(image.get_format() == 'JPEG')
+        new = ImageConverter.convert(image=image, target_format=ImageFormat.JPEG)
+        self.assertTrue(new.format == 'JPEG')
 
 
     def test_jpg_to_png(self):
         image_io = ImageIO(fpath=self.jpg_file)
         image = image_io.read()
-        image.convert(target_format=ImageFormat.PNG)
-        self.assertTrue(image.get_format() == 'PNG')
+        new = ImageConverter.convert(image=image, target_format=ImageFormat.PNG)
+        self.assertTrue(new.format == 'PNG')
 
 
 if __name__ == '__main__':

@@ -1,6 +1,5 @@
-from PIL.Image import open as load_img
-from PIL.Image import new as create_img
-from PIL.Image import Image as PilImage
+from PIL.Image import Image
+import PIL.Image as ImgHandler
 import base64
 from .file_io import IO
 from enum import Enum
@@ -21,56 +20,46 @@ class ImageFormat(Enum):
         return [member.value for member in cls]
 
 
-
-class Image:
-    def __init__(self, path : str):
-        self.content : PilImage = load_img(path)
-
-    def save(self, *args, **kwargs):
-        self.content.save(*args, **kwargs)
-
-    def show(self):
-        self.content.show()
-
-    def as_bytes(self) -> bytes:
+class ImageConverter:
+    @staticmethod
+    def as_bytes(image : Image) -> bytes:
         buffer = io.BytesIO()
-        self.content.save(buffer, format=self.get_format())
+        image.save(buffer, format=image.format)
         img_bytes = buffer.getvalue()
         return img_bytes
 
 
-    def get_format(self) -> str:
-        return self.content.format
-
-
-    def as_base64_str(self) -> str:
-        byte_content = self.as_bytes()
+    @staticmethod
+    def as_base64_str(image : Image):
+        byte_content = ImageConverter.as_bytes(image=image)
         base64_content = base64.b64encode(byte_content).decode('utf-8')
         return base64_content
 
 
-    def convert(self, target_format: ImageFormat):
+    @staticmethod
+    def convert(image: Image, target_format: ImageFormat):
         new_format = target_format.value.upper()
         if new_format == 'JPG':
             new_format = 'JPEG'
-        if self.content.format.upper() == new_format:
-            return
+        if image.format.upper() == new_format:
+            return image
 
-        content = self.content
-        if self.content.mode in ('LA', 'RGBA') and new_format in ['JPG', 'JPEG']:
-            new = create_img('RGB', content.size, (255, 255, 255))
+        content = image
+        if image.mode in ('LA', 'RGBA') and new_format in ['JPG', 'JPEG']:
+            new = ImgHandler.new('RGB', content.size, (255, 255, 255))
             rgb_content = content.convert('RGB') if content.mode == 'RGBA' else content.convert('L').convert('RGB')
             new.paste(rgb_content, mask=content.split()[-1])
-        elif self.content.mode != 'RGBA' and new_format == 'PNG':
+        elif image.mode != 'RGBA' and new_format == 'PNG':
             new = content.convert('RGBA')
         else:
-            new = self.content
+            new = image
 
         buffer = io.BytesIO()
         new.save(buffer, format=new_format)
         buffer.seek(0)
-        self.content = load_img(buffer)
-        return self
+        new_image = ImgHandler.open(buffer)
+        return new_image
+
 
 
 class ImageIO(IO):
@@ -79,9 +68,9 @@ class ImageIO(IO):
         suffix = self.get_suffix()
         if not suffix in supported_formats:
             raise ValueError(f'Unsupported image format: {suffix}')
-        return Image(path=self.fpath)
+        return ImgHandler.open(self.fpath)
 
-    def write(self, image: Image) -> None:
+    def write(self, image: Image):
         image.save(self.fpath)
 
     def view(self):
