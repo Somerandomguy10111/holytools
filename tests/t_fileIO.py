@@ -14,10 +14,10 @@ class TestIO(Unittest):
         pass
 
     def setUp(self):
-        spoofer = Spoofer()
-        self.text_fpath = spoofer.lend_txt()
-        self.jpg_fpath = spoofer.lend_jpg()
-        self.png_fpath = spoofer.lend_png()
+        self.text_fpath = Spoofer.lend_txt().fpath
+        self.jpg_fpath = Spoofer.lend_jpg().fpath
+        self.png_fpath = Spoofer.lend_png().fpath
+
 
     def test_binary_read_write(self):
         bio = BinaryIO(self.text_fpath)
@@ -66,9 +66,8 @@ class TestIO(Unittest):
 class TestImage(Unittest):
     def setUp(self):
         spoofer = Spoofer()
-        self.text_file = spoofer.lend_txt()
-        self.jpg_file = spoofer.lend_jpg()
-        self.png_file = spoofer.lend_png()
+        self.jpg_file = spoofer.lend_jpg().fpath
+        self.png_file = spoofer.lend_png().fpath
 
     def test_png_to_jpeg(self):
         image_io = ImageIO(fpath=self.png_file)

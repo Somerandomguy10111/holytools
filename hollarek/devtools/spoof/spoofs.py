@@ -1,9 +1,22 @@
 import os
 import shutil
 import tempfile
+from dataclasses import dataclass
 
 
-def create_temp_copy(filename: str) -> str:
+@dataclass
+class File:
+    fpath : str
+
+    def __post_init__(self):
+        if not (os.path.isdir(self.fpath) or os.path.isfile(self.fpath)):
+            raise FileNotFoundError(f'File not found: {self.fpath}')
+
+    def get_data(self) -> bytes:
+        with open(self.fpath, 'rb') as file:
+            return file.read()
+
+def create_temp_copy(filename: str) -> File:
     module_dir = os.path.dirname(__file__)
     original_file_path = os.path.join(module_dir, filename)
 
@@ -11,34 +24,30 @@ def create_temp_copy(filename: str) -> str:
     os.close(temp_fd)
     shutil.copy2(original_file_path, temp_filepath)
 
-    return temp_filepath
-
+    return File(fpath=temp_filepath)
 
 class Spoofer:
-    def __init__(self):
-        self.tempfile_paths = []
+    @staticmethod
+    def lend_png() -> File:
+        file_obj = create_temp_copy('spoof.png')
+        return file_obj
 
-    def lend_png(self) -> str:
-        path = create_temp_copy('spoof.png')
-        self.tempfile_paths.append(path)
-        return path
+    @staticmethod
+    def lend_jpg() -> File:
+        file_obj = create_temp_copy('spoof.jpg')
+        return file_obj
 
-    def lend_jpg(self) -> str:
-        path = create_temp_copy('spoof.jpg')
-        self.tempfile_paths.append(path)
-        return path
+    @staticmethod
+    def lend_pdf() -> File:
+        file_obj = create_temp_copy('spoof.pdf')
+        return file_obj
 
-    def lend_pdf(self) -> str:
-        path = create_temp_copy('spoof.pdf')
-        self.tempfile_paths.append(path)
-        return path
+    @staticmethod
+    def lend_txt() -> File:
+        file_obj = create_temp_copy('spoof.txt')
+        return file_obj
 
-    def lend_txt(self) -> str:
-        path = create_temp_copy('spoof.txt')
-        self.tempfile_paths.append(path)
-        return path
-
-    def lend_csv(self) -> str:
-        path = create_temp_copy('spoof.csv')
-        self.tempfile_paths.append(path)
-        return path
+    @staticmethod
+    def lend_csv() -> File:
+        file_obj = create_temp_copy('spoof.csv')
+        return file_obj
