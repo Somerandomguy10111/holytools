@@ -1,7 +1,7 @@
 import time
 
 import pyautogui
-from hollarek.hardware.display import Display, LatticePoint
+from hollarek.hardware.display import Display, LatticePoint, Vector
 from hollarek.hardware.display import Grid
 from typing import Optional
 
@@ -31,14 +31,16 @@ class TextMouse:
         return display.get_screenshot(grid=self.input_grid)
 
     def click(self, cell_num : int, on_primary_display : bool = True):
-        pt = self.input_grid.get_pt(num=cell_num)
+        left_corner = self.input_grid.get_pt(num=cell_num).to_vector()
+        center = left_corner + Vector(0.5,0.5)
+
         display = self.primary if on_primary_display else self.secondary
         if not display:
             raise ValueError("There is no secondary display")
-        mapper = display.get_mapper(grid=self.input_grid)
-        px = mapper.map_pt(point=pt)
-        self.mouse.click(pixel_x=px.x, pixel_y=px.y, on_primary_display=on_primary_display)
 
+        mapper = display.get_mapper(grid=self.input_grid)
+        center = mapper.map_vector(center).to_lattice()
+        self.mouse.click(center.x, center.y, on_primary_display=on_primary_display)
 
 
 if __name__ == "__main__":
