@@ -71,6 +71,13 @@ class ImageIO(IO):
         return ImgHandler.open(self.fpath)
 
     def write(self, image: Image):
+        supported_formats = ImageFormat.as_list()
+        if not self.get_suffix() in supported_formats:
+            if self.get_suffix():
+                raise TypeError(f'Path \"{self.fpath}\" indicates unsupported image format: \"{self.get_suffix()}\"')
+            else:
+                raise TypeError(f'Path \"{self.fpath}\" must end in image suffix: {supported_formats}')
+
         image.save(self.fpath)
 
     def view(self):

@@ -2,6 +2,7 @@ from hollarek.fileIO import BinaryIO, TextIO, ImageIO, ImageConverter, ImageForm
 from hollarek.devtools import Spoofer, Unittest
 from hollarek.fsys import FsysNode
 from PIL.Image import Image
+import PIL.Image as ImgHandler
 from unittest.mock import patch
 import io
 # ---------------------------------------------------------
@@ -13,47 +14,51 @@ class TestIO(Unittest):
         pass
 
     def setUp(self):
-        # Set up for all tests; get files from spoofer
         spoofer = Spoofer()
-        self.text_file = spoofer.lend_txt()
-        self.jpg_file = spoofer.lend_jpg()
-        self.png_file = spoofer.lend_png()
+        self.text_fpath = spoofer.lend_txt()
+        self.jpg_fpath = spoofer.lend_jpg()
+        self.png_fpath = spoofer.lend_png()
 
     def test_binary_read_write(self):
-        bio = BinaryIO(self.text_file)
+        bio = BinaryIO(self.text_fpath)
         bytes_count_mb = len(bio.read())/10**6
-        fsize= FsysNode(path=self.png_file).get_size_in_MB()
+        fsize= FsysNode(path=self.png_fpath).get_size_in_MB()
         lower = int(fsize)
         upper = int(fsize+1)
         self.assertTrue(lower <= bytes_count_mb <= upper)
 
     def test_binary_view(self):
-        bio = BinaryIO(self.text_file)
+        bio = BinaryIO(self.text_fpath)
         with patch('sys.stdout', new=io.StringIO()) as fake_out:
             bio.view()
             self.assertIn("4f 6e", fake_out.getvalue())
 
     def test_image_view(self):
-        image_io = ImageIO(fpath=self.png_file)
+        image_io = ImageIO(fpath=self.png_fpath)
         image_io.view()
 
     def test_valid_image_read(self):
-        image_io = ImageIO(fpath=self.png_file)
+        image_io = ImageIO(fpath=self.png_fpath)
         result = image_io.read()
         self.assertIsInstance(obj=result, cls=Image)
 
     def test_invalid_image_read(self):
-        image_io = ImageIO(fpath=self.text_file)
+        image_io = ImageIO(fpath=self.text_fpath)
         with self.assertRaises(ValueError):
             image_io.read()
 
+    def test_invalid_image_write(self):
+        image_io = ImageIO(fpath=f'test')
+        with self.assertRaises(TypeError):
+            image_io.write(image=ImgHandler.open(self.text_fpath))
+
     def test_text_read(self):
-        tio = TextIO(fpath=self.text_file)
+        tio = TextIO(fpath=self.text_fpath)
         content = tio.read()
         self.assertIn(member=f'mankind', container=content)
 
     def test_text_view(self):
-        tio = TextIO(fpath=self.text_file)
+        tio = TextIO(fpath=self.text_fpath)
         tio.view()
 
 
