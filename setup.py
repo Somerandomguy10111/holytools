@@ -15,5 +15,6 @@ setup(
     url='https://github.com/Somerandomguy10111/hollarek',
     packages=find_packages(),
     python_requires='>=3.8',
+    include_package_data=True,
     install_requires=requirements
 )
