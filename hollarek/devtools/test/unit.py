@@ -1,3 +1,4 @@
+import time
 import unittest
 from hollarek.logging import get_logger, LogSettings, Logger
 from .runner import Runner

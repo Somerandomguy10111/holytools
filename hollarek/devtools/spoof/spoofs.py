@@ -7,15 +7,12 @@ def create_temp_copy(filename: str) -> str:
     module_dir = os.path.dirname(__file__)
     original_file_path = os.path.join(module_dir, filename)
 
-    try:
-        temp_fd, temp_filepath = tempfile.mkstemp(suffix=os.path.splitext(filename)[1], dir='/tmp')
-        os.close(temp_fd)
-        shutil.copy2(original_file_path, temp_filepath)
+    temp_fd, temp_filepath = tempfile.mkstemp(suffix=os.path.splitext(filename)[1], dir='/tmp')
+    os.close(temp_fd)
+    shutil.copy2(original_file_path, temp_filepath)
 
-        return temp_filepath
-    except FileNotFoundError:
-        print(f"File {filename} not found.")
-        return ''
+    return temp_filepath
+
 
 class Spoofer:
     def __init__(self):
