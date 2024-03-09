@@ -3,11 +3,10 @@ import inspect
 from dataclasses import dataclass
 from typing import Callable
 
-
 @dataclass
 class Argument:
     name: str
-    dtype: type
+    dtype: type  = Any
 
     def set_default_val(self, val: object):
         setattr(self, 'default_val', val)
@@ -41,11 +40,10 @@ class ModuleInspector:
         defaults_mapping = dict(zip(spec.args[::-1], defaults[::-1]))
 
         def create_arg(name : str):
-            dtype = spec.annotations.get(name, Any)
+            dtype = type(spec.annotations.get(name))
             argument = Argument(name=name, dtype=dtype)
             if name in defaults_mapping:
                 argument.set_default_val(defaults_mapping[name])
             return argument
-
 
         return [create_arg(name=name) for name in relevant_arg_names]

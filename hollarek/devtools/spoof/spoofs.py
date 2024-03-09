@@ -2,7 +2,7 @@ import os
 import shutil
 import tempfile
 from dataclasses import dataclass
-
+# ---------------------------------------------------------
 
 @dataclass
 class File:
@@ -25,6 +25,7 @@ def create_temp_copy(filename: str) -> File:
     shutil.copy2(original_file_path, temp_filepath)
 
     return File(fpath=temp_filepath)
+
 
 class FileSpoofer:
     @staticmethod
