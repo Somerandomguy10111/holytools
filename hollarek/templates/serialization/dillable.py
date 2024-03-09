@@ -1,8 +1,7 @@
 import dill
-from abc import ABC
+from .serializable import Serializable
 
-
-class Dillable(ABC):
+class Dillable(Serializable):
     def to_str(self) -> str:
         return dill.dumps(self).hex()
 

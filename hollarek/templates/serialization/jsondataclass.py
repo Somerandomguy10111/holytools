@@ -10,10 +10,11 @@ from typing import get_type_hints
 
 from hollarek.devtools import TypeInspector
 from enum import Enum
+from .serializable import Serializable
 # -------------------------------------------
 
 
-class JsonDataclass:
+class JsonDataclass(Serializable):
     def __init__(self):
         if not dataclasses.is_dataclass(self):
             raise TypeError(f'{self.__class__} must be a dataclass to be Jsonifyable')
