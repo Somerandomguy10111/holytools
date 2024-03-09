@@ -1,1 +1,1 @@
-from .spoofs import Spoofer
+from .spoofs import Spoofer, File
