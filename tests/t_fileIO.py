@@ -1,5 +1,5 @@
 from hollarek.fileIO import BinaryIO, TextIO, ImageIO, ImageConverter, ImageFormat
-from hollarek.devtools import Spoofer, Unittest
+from hollarek.devtools import FileSpoofer, Unittest
 from hollarek.fsys import FsysNode
 from PIL.Image import Image
 import PIL.Image as ImgHandler
@@ -14,9 +14,9 @@ class TestIO(Unittest):
         pass
 
     def setUp(self):
-        self.text_fpath = Spoofer.lend_txt().fpath
-        self.jpg_fpath = Spoofer.lend_jpg().fpath
-        self.png_fpath = Spoofer.lend_png().fpath
+        self.text_fpath = FileSpoofer.lend_txt().fpath
+        self.jpg_fpath = FileSpoofer.lend_jpg().fpath
+        self.png_fpath = FileSpoofer.lend_png().fpath
 
 
     def test_binary_read_write(self):
@@ -65,7 +65,7 @@ class TestIO(Unittest):
 
 class TestImage(Unittest):
     def setUp(self):
-        spoofer = Spoofer()
+        spoofer = FileSpoofer()
         self.jpg_file = spoofer.lend_jpg().fpath
         self.png_file = spoofer.lend_png().fpath
 
