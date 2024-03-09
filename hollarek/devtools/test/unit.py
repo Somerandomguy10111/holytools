@@ -1,11 +1,13 @@
 import unittest
-from hollarek.logging import get_logger, LogSettings, Logger
+from hollarek.logging import get_logger, LogSettings, Logger, LogLevel
 from .runner import Runner
 from .settings import TestSettings
 from typing import Optional
 # ---------------------------------------------------------
 
 class Unittest(unittest.TestCase):
+    _logger : Logger = None
+
     @classmethod
     def execute_all(cls, settings : TestSettings = TestSettings()):
         suite = unittest.TestLoader().loadTestsFromTestCase(cls)
@@ -15,7 +17,12 @@ class Unittest(unittest.TestCase):
 
     @classmethod
     def get_logger(cls) -> Logger:
-        return get_logger(settings=LogSettings(call_location=False, timestamp=False), name=cls.__name__)
+        if not cls._logger:
+            cls._logger = get_logger(settings=LogSettings(call_location=False, timestamp=False), name=cls.__name__)
+        return cls._logger
+
+    def log(self, msg : str, level : LogLevel = LogLevel.INFO):
+        self.get_logger().log(msg, level=level)
 
     # ---------------------------------------------------------
     # assertions
