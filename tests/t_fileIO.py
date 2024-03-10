@@ -27,18 +27,6 @@ class TestFile(Unittest):
         upper = int(fsize+1)
         self.assertTrue(lower <= bytes_count_mb <= upper)
 
-    def test_binary_view(self):
-        bio = BinaryFile(self.text_fpath)
-        with patch('sys.stdout', new=io.StringIO()) as fake_out:
-            bio.view()
-            self.assertIn("4f 6e", fake_out.getvalue())
-
-    def test_image_view(self, manual : bool = False):
-        if manual:
-            image_io = ImageFile(fpath=self.png_fpath)
-            image_io.view()
-        self.skipTest(f'View can only be tested manually')
-
     def test_valid_image_read(self):
         image_io = ImageFile(fpath=self.png_fpath)
         result = image_io.read()
@@ -58,10 +46,25 @@ class TestFile(Unittest):
         content = tio.read()
         self.assertIn(member=f'mankind', container=content)
 
-    def test_text_view(self):
+    def test_text_view(self, manual : bool = False):
+        if not manual:
+            self.skipTest(f'View can only be tested manually')
         tio = TextFile(fpath=self.text_fpath)
         tio.view()
 
+    def test_binary_view(self, manual : bool= False):
+        if not manual:
+            self.skipTest(f'View can only be tested manually')
+        bio = BinaryFile(self.text_fpath)
+        with patch('sys.stdout', new=io.StringIO()) as fake_out:
+            bio.view()
+            self.assertIn("4f 6e", fake_out.getvalue())
+
+    def test_image_view(self, manual : bool = False):
+        if not manual:
+            self.skipTest(f'View can only be tested manually')
+        image_io = ImageFile(fpath=self.png_fpath)
+        image_io.view()
 
 
 class TestImageConverter(Unittest):
