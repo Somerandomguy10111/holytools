@@ -63,21 +63,19 @@ class ImageConverter:
 
 
 class ImageFile(File):
-    def read(self) -> Image:
-        supported_formats = ImageFormat.as_list()
-        suffix = self.get_suffix()
-        if not suffix in supported_formats:
-            raise ValueError(f'Unsupported image format: {suffix}')
-        return ImgHandler.open(self.fpath)
-
-    def write(self, image: Image):
+    def check_format_ok(self) -> bool:
         supported_formats = ImageFormat.as_list()
         if not self.get_suffix() in supported_formats:
             if self.get_suffix():
                 raise TypeError(f'Path \"{self.fpath}\" indicates unsupported image format: \"{self.get_suffix()}\"')
             else:
                 raise TypeError(f'Path \"{self.fpath}\" must end in image suffix: {supported_formats}')
+        return True
 
+    def read(self) -> Image:
+        return ImgHandler.open(self.fpath)
+
+    def write(self, image: Image):
         image.save(self.fpath)
 
     def view(self):

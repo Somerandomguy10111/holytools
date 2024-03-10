@@ -23,6 +23,7 @@ class File:
         if missing_permissions:
             raise PermissionError(f'File {fpath} does not have required permissions: {missing_permissions}')
 
+        self.check_format_ok()
 
     def has_permission(self, access : Access) -> bool:
         if os.path.isdir(self.fpath):
@@ -33,6 +34,8 @@ class File:
             parent_directory = os.path.dirname(self.fpath)
             return os.access(parent_directory, access.value) if parent_directory else False
 
+    def check_format_ok(self):
+        pass
 
     @abstractmethod
     def read(self):
