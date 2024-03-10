@@ -41,10 +41,11 @@ class Countdown:
 
     def finish(self):
         self.one_time_lock.wait()
+        return self.on_expiration()
+
 
     def _release(self):
         self.one_time_lock.unlock()
-        self.on_expiration()
 
 class Lock:
     def __init__(self):
