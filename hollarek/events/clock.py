@@ -24,7 +24,7 @@ class Countdown:
         self.job: Optional[Job] = None
         self.on_expiration : Callable = on_expiration
 
-        self.one_time_lock = Event()
+        self.one_time_lock = Lock()
         self.scheduler.start()
 
     def restart(self):
@@ -36,7 +36,6 @@ class Countdown:
         self.start()
 
     def start(self):
-        self.one_time_lock.clear()
         run_time = datetime.now() + timedelta(seconds=self.duration)
         self.job = self.scheduler.add_job(func=self._release, trigger='date', next_run_time=run_time)
 
@@ -44,8 +43,19 @@ class Countdown:
         self.one_time_lock.wait()
 
     def _release(self):
-        self.one_time_lock.set()
+        self.one_time_lock.unlock()
         self.on_expiration()
+
+class Lock:
+    def __init__(self):
+        self._event = Event()
+        self._event.clear()
+
+    def wait(self):
+        self._event.wait()
+
+    def unlock(self):
+        self._event.set()
 
 
 # Usage examples
