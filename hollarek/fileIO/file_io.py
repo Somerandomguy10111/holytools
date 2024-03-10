@@ -7,14 +7,16 @@ from enum import Enum
 class Access(Enum):
     READABLE = os.R_OK
     WRITABLE = os.W_OK
-
+    EXECUTABLE = os.X_OK
 
 class File:
-    def __init__(self, fpath : str, view_only : bool = True):
+    def __init__(self, fpath : str, allow_view_only : bool = True, require_executable : bool = False):
         self.fpath : str = fpath
         required_permissions : set[Access] = {Access.READABLE}
-        if not view_only:
+        if not allow_view_only:
             required_permissions.add(Access.WRITABLE)
+        if require_executable:
+            required_permissions.add(Access.EXECUTABLE)
 
         actual_permissions = {access for access in required_permissions if self.has_permission(access=access)}
         missing_permissions = required_permissions - actual_permissions
