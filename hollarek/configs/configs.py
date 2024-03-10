@@ -6,6 +6,7 @@ from hollarek.crypt import AES
 from hollarek.cloud import AWSRegion
 from hollarek.logging import LogLevel
 from .abstr import StrMap, Configs
+from botocore.auth import NoCredentialsError
 # ---------------------------------------------------------
 
 class AWSConfigs(Configs):
@@ -18,6 +19,34 @@ class AWSConfigs(Configs):
         session = boto3.session.Session()
         self.client = session.client(service_name='secretsmanager', region_name=region.value)
         self.log(f'Initialized {self.__class__.__name__} with region \"{region.value}\"')
+
+        err = self.check_errors()
+        if err == NoCredentialsError:
+            self.set_credentials()
+            err = self.check_errors()
+        if err:
+            raise ConnectionError
+
+
+    def check_errors(self) -> Optional[Exception]:
+        err = None
+        try:
+            self.client.get_secret_value(SecretId=self.secret_name)
+        except NoCredentialsError:
+            self.log('No AWS credentials found', LogLevel.CRITICAL)
+            err = NoCredentialsError
+        except Exception as e:
+            self.log(f'An error occurred while trying to connect to AWS: {e}', LogLevel.CRITICAL)
+            err = e
+        return err
+
+
+    @staticmethod
+    def set_credentials():
+        raise NotImplementedError
+        # print("Please provide AWS credentials.")
+        # os.environ['AWS_ACCESS_KEY_ID'] = input('Enter your AWS Access Key ID: ')
+        # os.environ['AWS_SECRET_ACCESS_KEY'] = input('Enter your AWS Secret Access Key: ')
 
 
     def set(self, key : str, value : str):
