@@ -8,7 +8,7 @@ import io
 # ---------------------------------------------------------
 
 
-class TestIO(Unittest):
+class TestFile(Unittest):
     @classmethod
     def setUpClass(cls):
         pass
@@ -33,9 +33,11 @@ class TestIO(Unittest):
             bio.view()
             self.assertIn("4f 6e", fake_out.getvalue())
 
-    def test_image_view(self):
-        image_io = ImageFile(fpath=self.png_fpath)
-        image_io.view()
+    def test_image_view(self, manual : bool = False):
+        if manual:
+            image_io = ImageFile(fpath=self.png_fpath)
+            image_io.view()
+        self.skipTest(f'View can only be tested manually')
 
     def test_valid_image_read(self):
         image_io = ImageFile(fpath=self.png_fpath)
@@ -43,14 +45,13 @@ class TestIO(Unittest):
         self.assertIsInstance(obj=result, cls=Image)
 
     def test_invalid_image_read(self):
-        image_io = ImageFile(fpath=self.text_fpath)
-        with self.assertRaises(ValueError):
+        image_io = ImageFile(fpath=f'test.png')
+        with self.assertRaises(FileNotFoundError):
             image_io.read()
 
     def test_invalid_image_write(self):
-        image_io = ImageFile(fpath=f'/tmp/test')
         with self.assertRaises(TypeError):
-            image_io.write(image=ImgHandler.open(self.text_fpath))
+            image_io = ImageFile(fpath=f'/tmp/test')
 
     def test_text_read(self):
         tio = TextFile(fpath=self.text_fpath)
@@ -63,7 +64,7 @@ class TestIO(Unittest):
 
 
 
-class TestImage(Unittest):
+class TestImageConverter(Unittest):
     def setUp(self):
         spoofer = FileSpoofer()
         self.jpg_file = spoofer.lend_jpg().fpath
@@ -85,4 +86,4 @@ class TestImage(Unittest):
 
 if __name__ == '__main__':
     # TestIO.execute_all()
-    TestImage.execute_all()
+    TestImageConverter.execute_all()

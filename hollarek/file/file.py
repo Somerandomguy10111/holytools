@@ -2,7 +2,7 @@ from abc import abstractmethod
 from typing import Optional
 import os
 from enum import Enum
-
+from pathlib import Path
 
 class Access(Enum):
     READABLE = os.R_OK
@@ -11,7 +11,7 @@ class Access(Enum):
 
 class File:
     def __init__(self, fpath : str, require_writable : bool = True, require_executable : bool = False):
-        self.fpath : str = fpath
+        self.fpath : str = str(Path(fpath).absolute())
         required_permissions : set[Access] = {Access.READABLE}
         if require_writable:
             required_permissions.add(Access.WRITABLE)
