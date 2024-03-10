@@ -21,13 +21,15 @@ class KeyboardListener:
         self.press_waiters : list[InputWaiter] = []
         self.release_waiters : list[InputWaiter] = []
 
-    def wait_on_hold(self, key : Key, duration : float):
+    def wait_on_hold(self, key : Key, duration : float, verbose : bool = True):
         def check_key_pressed():
             return key in self.pressed_buttons
 
         while True:
             press_waiter = self._register_press_waiter(target_value=key)
             press_waiter.get()
+            if verbose:
+                print(f'Press of key \"{key}\" registered. Hold for {duration} to finsh')
             countdown = Countdown(duration=duration, on_expiration=check_key_pressed)
             countdown.start()
             still_held = countdown.finish()

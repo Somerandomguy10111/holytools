@@ -1,2 +1,2 @@
 from .mouse import Mouse, TextMouse
-from .keyboard import Keyboard
+from .keyboard import Keyboard, KeyboardListener
