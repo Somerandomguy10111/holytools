@@ -2,15 +2,18 @@ from typing import Any
 from queue import Queue
 
 
+class MatchesAny:
+    def __eq__(self, other):
+        return True
 
 
 class InputWaiter:
-    _undefined = object()
+    _any = MatchesAny()
 
-    def __init__(self, target_value : Any = _undefined):
+    def __init__(self, target_value : Any = _any):
         self.q = Queue()
         self.target_value : Any = target_value
-        self.input_found : bool = False
+        self.is_done : bool = False
 
     def clear(self):
         self.q = Queue()
@@ -18,15 +21,12 @@ class InputWaiter:
     def write(self, value):
         self.q.put(value)
 
-    def read(self) -> Any:
-        value = self.q.get()
-        if not self.target_value == InputWaiter._undefined:
-            if value == self.target_value:
-                self.input_found = True
-        else:
-            self.input_found = True
-        return value
-
+    def get(self) -> Any:
+        while True:
+            value = self.q.get()
+            if self.target_value == value:
+                self.is_done = True
+                return value
 
 if __name__ == "__main__":
     waiter = InputWaiter(target_value=None)
