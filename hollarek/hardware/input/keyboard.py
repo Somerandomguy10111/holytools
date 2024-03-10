@@ -1,3 +1,5 @@
+import time
+
 import pyautogui
 from hollarek.events import InputWaiter, Countdown
 from pynput.keyboard import Key as PynputKey
@@ -14,21 +16,23 @@ Key = Union[PynputKey, KeyCode]
 
 
 class KeyboardListener:
-    def __init__(self):
+    def __init__(self, verbose : bool = False):
+        self.verbose = verbose
+
         self.listener = keyboard.Listener(on_press=self._on_press, on_release=self._on_release)
         self.listener.start()
         self.pressed_buttons : set[Key] = set()
         self.press_waiters : list[InputWaiter] = []
         self.release_waiters : list[InputWaiter] = []
 
-    def wait_on_hold(self, key : Key, duration : float, verbose : bool = True):
+    def wait_on_hold(self, key : Key, duration : float):
         def check_key_pressed():
             return key in self.pressed_buttons
 
         while True:
             press_waiter = self._register_press_waiter(target_value=key)
             press_waiter.get()
-            if verbose:
+            if self.verbose:
                 print(f'Press of key \"{key}\" registered. Hold for {duration} to finsh')
             countdown = Countdown(duration=duration, on_expiration=check_key_pressed)
             countdown.start()
@@ -48,13 +52,17 @@ class KeyboardListener:
     # ---------------------------------------------------------
 
     def _on_press(self, key: Key):
-        # print(f'key press registered {key}')
+        if self.verbose:
+            print(f'key press registered {key}')
         for waiter in self.press_waiters:
             waiter.write(key)
         self._remove_finished_waiters()
         self.pressed_buttons.add(key)
 
+
     def _on_release(self, key : Key):
+        if self.verbose:
+            print(f'key release registered {key}')
         if key in self.pressed_buttons:
             self.pressed_buttons.remove(key)
         for waiter in self.release_waiters:
@@ -77,5 +85,13 @@ class KeyboardListener:
 
 
 if __name__ == "__main__":
-    listener = KeyboardListener()
-    listener.wait_on_hold(key=KeyCode(char='a'),duration=2)
+    listener = KeyboardListener(verbose=True)
+
+    def press_a():
+        Keyboard.type(msg='a')
+
+    Countdown = Countdown(duration=3, on_expiration=press_a)
+    Countdown.start()
+
+    time.sleep(10)
+    # listener.wait_on_hold(key=KeyCode(char='a'),duration=2)

@@ -1,13 +1,13 @@
 from datetime import datetime, timedelta
 from threading import Event
-from typing import Callable, Optional
+from typing import Callable, Optional, Any
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.job import Job
 import inspect
 
 from hollarek.logging import Loggable
 from devtools import Timer as DevtoolsTimer
-
+from .input_waiter import InputWaiter
 
 class InvalidCallableException(Exception):
     """Exception raised when a callable with arguments is passed where none are expected."""
@@ -23,6 +23,7 @@ class Countdown:
         self.scheduler : BackgroundScheduler = BackgroundScheduler()
         self.job: Optional[Job] = None
         self.on_expiration : Callable = on_expiration
+        self.output_waiter : InputWaiter = InputWaiter()
 
         self.one_time_lock = Lock()
         self.scheduler.start()
@@ -31,21 +32,26 @@ class Countdown:
         try:
             self.job.remove()
         except:
-            pass  # Ideally, log this exception
-
+            pass
         self.start()
 
     def start(self):
         run_time = datetime.now() + timedelta(seconds=self.duration)
         self.job = self.scheduler.add_job(func=self._release, trigger='date', next_run_time=run_time)
 
-    def finish(self):
+    def finish(self) -> Any:
         self.one_time_lock.wait()
-        return self.on_expiration()
 
+    def get_output(self):
+        if not self.on_expiration:
+            raise ValueError("on_expiration must be set to use this method")
+        return self.output_waiter.get()
 
     def _release(self):
         self.one_time_lock.unlock()
+        out = self.on_expiration()
+        self.output_waiter.write(out)
+
 
 class Lock:
     def __init__(self):
