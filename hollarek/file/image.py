@@ -1,7 +1,7 @@
 from PIL.Image import Image
 import PIL.Image as ImgHandler
 import base64
-from .file_io import File
+from .file import File
 from enum import Enum
 import io
 # ---------------------------------------------------------
@@ -37,7 +37,7 @@ class ImageConverter:
 
 
     @staticmethod
-    def convert(image: Image, target_format: ImageFormat):
+    def convert(image: Image, target_format: ImageFormat) -> Image:
         new_format = target_format.value.upper()
         if new_format == 'JPG':
             new_format = 'JPEG'
@@ -62,7 +62,7 @@ class ImageConverter:
 
 
 
-class ImageIO(File):
+class ImageFile(File):
     def read(self) -> Image:
         supported_formats = ImageFormat.as_list()
         suffix = self.get_suffix()

@@ -10,10 +10,10 @@ class Access(Enum):
     EXECUTABLE = os.X_OK
 
 class File:
-    def __init__(self, fpath : str, allow_view_only : bool = True, require_executable : bool = False):
+    def __init__(self, fpath : str, require_writable : bool = True, require_executable : bool = False):
         self.fpath : str = fpath
         required_permissions : set[Access] = {Access.READABLE}
-        if not allow_view_only:
+        if require_writable:
             required_permissions.add(Access.WRITABLE)
         if require_executable:
             required_permissions.add(Access.EXECUTABLE)
@@ -52,4 +52,3 @@ class File:
         parts = self.fpath.split('.')
         suffix = parts[-1] if len(parts) > 1 else None
         return suffix
-
