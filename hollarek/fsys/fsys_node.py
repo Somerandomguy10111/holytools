@@ -90,7 +90,7 @@ class FsysNode(TreeNode):
     # resource info
 
     def get_path(self) -> str:
-        return str(self._path_wrapper)
+        return str(self._path_wrapper.absolute())
 
     def get_suffix(self) -> Optional[str]:
         try:
