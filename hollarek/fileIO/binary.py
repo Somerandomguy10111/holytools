@@ -1,6 +1,6 @@
-from .file_io import IO
+from .file_io import File
 
-class BinaryIO(IO):
+class BinaryIO(File):
     def read(self) -> bytes:
         with open(self.fpath, 'rb') as file:
             content = file.read()

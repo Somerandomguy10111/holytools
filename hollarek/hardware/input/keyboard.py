@@ -62,7 +62,7 @@ class KeyboardListener:
 
     def _on_release(self, key : Key):
         if self.verbose:
-            print(f'key release registered {key}')
+            print(f'key release registe2red {key}')
         if key in self.pressed_buttons:
             self.pressed_buttons.remove(key)
         for waiter in self.release_waiters:

@@ -1,8 +1,8 @@
 from docx import Document
 import textract
-from .file_io import IO
+from .file_io import File
 
-class TextIO(IO):
+class TextIO(File):
     def read(self) -> str:
         text = textract.process(self.fpath)
         return text.decode('utf-8')

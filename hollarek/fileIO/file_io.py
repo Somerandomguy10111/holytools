@@ -1,7 +1,7 @@
 from abc import abstractmethod
 from typing import Optional
 
-class IO:
+class File:
     def __init__(self, fpath : str):
         self.fpath : str = fpath
 

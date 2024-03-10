@@ -1,7 +1,7 @@
 from PIL.Image import Image
 import PIL.Image as ImgHandler
 import base64
-from .file_io import IO
+from .file_io import File
 from enum import Enum
 import io
 # ---------------------------------------------------------
@@ -62,7 +62,7 @@ class ImageConverter:
 
 
 
-class ImageIO(IO):
+class ImageIO(File):
     def read(self) -> Image:
         supported_formats = ImageFormat.as_list()
         suffix = self.get_suffix()
