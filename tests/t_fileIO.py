@@ -19,7 +19,7 @@ class TestIO(Unittest):
         self.png_fpath = FileSpoofer.lend_png().fpath
 
 
-    def test_binary_read_write(self):
+    def test_binary_size(self):
         bio = BinaryFile(self.text_fpath)
         bytes_count_mb = len(bio.read())/10**6
         fsize= FsysNode(path=self.png_fpath).get_size_in_MB()
@@ -48,7 +48,7 @@ class TestIO(Unittest):
             image_io.read()
 
     def test_invalid_image_write(self):
-        image_io = ImageFile(fpath=f'test')
+        image_io = ImageFile(fpath=f'/tmp/test')
         with self.assertRaises(TypeError):
             image_io.write(image=ImgHandler.open(self.text_fpath))
 
