@@ -29,17 +29,18 @@ class TestFile(Unittest):
 
     def test_valid_image_read(self):
         image_io = ImageFile(fpath=self.png_fpath)
-        result = image_io.read()
-        self.assertIsInstance(obj=result, cls=Image)
+        with image_io.read() as result:
+            self.assertIsInstance(obj=result, cls=Image)
 
     def test_invalid_image_read(self):
         image_io = ImageFile(fpath=f'test.png')
         with self.assertRaises(FileNotFoundError):
-            image_io.read()
+            with image_io.read() as _:
+                pass
 
     def test_invalid_image_write(self):
         with self.assertRaises(TypeError):
-            image_io = ImageFile(fpath=f'/tmp/test')
+            ImageFile(fpath=f'/tmp/test')
 
     def test_text_read(self):
         tio = TextFile(fpath=self.text_fpath)

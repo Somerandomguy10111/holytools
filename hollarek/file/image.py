@@ -79,5 +79,5 @@ class ImageFile(File):
         image.save(self.fpath)
 
     def view(self):
-        image = self.read()
-        image.show()
+        with self.read() as image:
+            image.show()
