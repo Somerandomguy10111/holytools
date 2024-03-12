@@ -1,21 +1,24 @@
 import time
 
-import pyautogui
+from pynput.mouse import Button
+from pynput.mouse import Controller as MouseController
 from hollarek.hardware.display import Display, LatticePoint, Vector
 from hollarek.hardware.display import Grid
 from typing import Optional
 
 class Mouse:
-    @classmethod
-    def click(cls, pixel_x : int, pixel_y : int, on_primary_display: bool = True):
+    def __init__(self):
+        self._mouse : MouseController = MouseController()
+
+    def click(self, pixel_x : int, pixel_y : int, on_primary_display: bool = True):
         point = LatticePoint(pixel_x, pixel_y)
         display = Display.get_primary() if on_primary_display else Display.get_secondary()
         if not display.in_bounds(point):
             raise ValueError(f"Point {point} is outside of the display bounds")
         rel_to_primary = display.to_virtual_display(pixel=point)
 
-        pyautogui.click(rel_to_primary.x, rel_to_primary.y)
-
+        self._mouse.position = (rel_to_primary.x, rel_to_primary.y)
+        self._mouse.click(Button.left, 1)
 
 class TextMouse:
     def __init__(self, input_grid: Grid = Grid(x_size=25, y_size=25)):
@@ -49,3 +52,5 @@ if __name__ == "__main__":
         num = int(input(f'Click on cell:'))
         text_mouse.click(num)
         time.sleep(1)
+        
+        

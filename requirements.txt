@@ -18,6 +18,5 @@ python-docx
 orjson
 devtools
 mss
-pyautogui
 screeninfo
 pynput

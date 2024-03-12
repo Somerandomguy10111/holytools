@@ -1,16 +1,24 @@
 import time
 
-import pyautogui
 from hollarek.events import InputWaiter, Countdown
 from pynput.keyboard import Key as PynputKey
 from pynput.keyboard import KeyCode
+from pynput.keyboard import Controller as KeyboardController
 from pynput import keyboard
 from typing import Union
+from pynput.keyboard import Controller
+
 
 class Keyboard:
-    @staticmethod
-    def type(msg: str):
-        pyautogui.write(msg, interval=0.02)
+    def __init__(self):
+        self._keyboard = KeyboardController()
+
+    def type(self, msg: str):
+        for char in msg:
+            self._keyboard.type(char)  # Type the character
+            time.sleep(0.02)  # Interval between keys
+
+
 
 Key = Union[PynputKey, KeyCode]
 
