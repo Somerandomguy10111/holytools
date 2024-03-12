@@ -6,18 +6,20 @@ from pynput.keyboard import KeyCode
 from pynput.keyboard import Controller as KeyboardController
 from pynput import keyboard
 from typing import Union
-from pynput.keyboard import Controller
-
+import atexit
 
 class Keyboard:
     def __init__(self):
         self._keyboard = KeyboardController()
 
+        def del_keyboard():
+            del self._keyboard
+        atexit.register(del_keyboard)
+
     def type(self, msg: str):
         for char in msg:
             self._keyboard.type(char)  # Type the character
             time.sleep(0.02)  # Interval between keys
-
 
 
 Key = Union[PynputKey, KeyCode]
@@ -93,13 +95,8 @@ class KeyboardListener:
 
 
 if __name__ == "__main__":
-    listener = KeyboardListener(verbose=True)
+    # listener = KeyboardListener(verbose=True)
+    test_keyboard = Keyboard()
 
-    def press_a():
-        Keyboard.type(msg='a')
-
-    Countdown = Countdown(duration=3, on_expiration=press_a)
-    Countdown.start()
-
-    time.sleep(10)
+    time.sleep(0.1)
     # listener.wait_on_hold(key=KeyCode(char='a'),duration=2)
