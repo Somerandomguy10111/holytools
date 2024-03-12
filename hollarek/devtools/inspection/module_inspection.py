@@ -2,6 +2,7 @@ from typing import Any
 import inspect
 from dataclasses import dataclass
 from typing import Callable
+from typing import get_type_hints
 
 @dataclass
 class Argument:
@@ -34,13 +35,16 @@ class ModuleInspector:
     @staticmethod
     def get_args(func: Callable) -> list[Argument]:
         spec = inspect.getfullargspec(func)
+        type_hints = get_type_hints(func)
         start_index = 1 if spec.args and spec.args[0] in ['self', 'cls'] else 0
         relevant_arg_names = spec.args[start_index:]
         defaults = spec.defaults or ()
         defaults_mapping = dict(zip(spec.args[::-1], defaults[::-1]))
 
         def create_arg(name : str):
-            dtype = type(spec.annotations.get(name))
+            dtype = type_hints.get(name)
+            if not dtype:
+                raise ValueError(f"Type hint for argument '{name}' is missing.")
             argument = Argument(name=name, dtype=dtype)
             if name in defaults_mapping:
                 argument.set_default_val(defaults_mapping[name])
