@@ -5,23 +5,22 @@ import logging
 from typing import Union
 from logging import Logger as BaseLogger
 from .log_settings import LogSettings, LogLevel, LogTarget
+import traceback
 # ---------------------------------------------------------
 
 
 class Logger(BaseLogger):
-    def log(self, msg : str, level : Union[int, LogLevel] = LogLevel.INFO, leading_newline : bool = False, *args, **kwargs):
+    def log(self, msg : str, level : Union[int, LogLevel] = LogLevel.INFO, with_traceback : bool = False , *args, **kwargs):
         if isinstance(level, LogLevel):
             level = level.value
-        if leading_newline:
-            msg = '\n' + msg
-
         frame = inspect.currentframe()
         caller_frame = inspect.getouterframes(frame)[1]
-        file_name = os.path.basename(caller_frame.filename)
+
+        file_name = caller_frame.filename
         line_no = caller_frame.lineno
 
-        extra_info = {'custom_file_name': file_name, 'custom_line_no': line_no}
-        super().log(msg=msg, level=level, extra=extra_info, *args, **kwargs)
+        extra_info = {Formatter.custom_file_name: file_name, Formatter.custom_line_no: line_no}
+        super().log(msg=msg, level=level, extra=extra_info, exc_info = with_traceback, *args, **kwargs)
 
     def setLevel(self, level : Union[int, LogLevel]):
         if isinstance(level, LogLevel):
@@ -84,10 +83,10 @@ class Formatter(logging.Formatter):
             timestamp = f"[{custom_time}{conditional_millis}]"
             log_fmt = f"{timestamp}: {log_fmt}"
 
-        if self.log_settings.call_location:
+        if self.log_settings.include_call_location:
             filename = getattr(record, Formatter.custom_file_name, record.filename)
             lineno = getattr(record, Formatter.custom_line_no, record.lineno)
-            log_fmt += f" {filename}:{lineno}"
+            log_fmt += f" (\"{filename}:{lineno}\")"
 
         if self.log_target == LogTarget.CONSOLE:
             color_prefix = Formatter.colors.get(record.levelno, "")

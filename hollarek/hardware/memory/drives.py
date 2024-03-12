@@ -7,7 +7,7 @@ from hollarek.logging import get_logger, LogSettings
 # -------------------------------------------
 
 
-drive_logger = get_logger(settings=LogSettings(call_location=False))
+drive_logger = get_logger(settings=LogSettings(include_call_location=False))
 def log(msg : str, level : int = logging.INFO):
     drive_logger.log(msg=msg, level=level)
     print(drive_logger.name)

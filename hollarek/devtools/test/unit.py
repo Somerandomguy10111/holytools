@@ -18,7 +18,7 @@ class Unittest(unittest.TestCase):
     @classmethod
     def get_logger(cls) -> Logger:
         if not cls._logger:
-            cls._logger = get_logger(settings=LogSettings(call_location=False, timestamp=False), name=cls.__name__)
+            cls._logger = get_logger(settings=LogSettings(include_call_location=False, timestamp=False), name=cls.__name__)
         return cls._logger
 
     @classmethod
