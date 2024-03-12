@@ -41,8 +41,9 @@ class ImageConverter:
         new_format = target_format.value.upper()
         if new_format == 'JPG':
             new_format = 'JPEG'
-        if image.format.upper() == new_format:
-            return image
+        if image.format:
+            if image.format.upper() == new_format:
+                return image
 
         content = image
         if image.mode in ('LA', 'RGBA') and new_format in ['JPG', 'JPEG']:

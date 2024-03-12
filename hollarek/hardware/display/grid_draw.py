@@ -71,8 +71,6 @@ class EditableImage:
             color = (255, 255,255 , opacity)
         else:
             color = (0, 0, 0, opacity)
-        print(color)
-        print(centered_point)
         self.overlay_draw.text(centered_point.as_tuple(), text=text, fill=color, font=font)
 
 
