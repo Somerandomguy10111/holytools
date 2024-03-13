@@ -5,12 +5,13 @@ import base64
 from .file import File
 from enum import Enum
 import io
+from typing import Optional
 # ---------------------------------------------------------
 
 class ImageFormat(Enum):
-    PNG = 'png'
-    JPG = 'jpg'
-    JPEG = 'jpeg'
+    PNG = 'PNG'
+    JPG = 'JPG'
+    JPEG = 'JPEG'
     # GIF = 'gif'
     # BMP = 'bmp'
     # TIFF = 'tiff'
@@ -23,23 +24,31 @@ class ImageFormat(Enum):
 
     def __eq__(self, other):
         if isinstance(other,str):
-            return self.value == other
+            return self.value.upper() == other.upper()
         elif isinstance(other, ImageFormat):
             return self.value == other.value
         return False
 
+    def __str__(self):
+        return self.value
+
 class ImageConverter:  # Assuming these methods are part of a class named ImageConverter
 
     @classmethod
-    def as_bytes(cls, image: Image) -> bytes:
+    def as_bytes(cls, image: Image, img_format : Optional[ImageFormat] = None) -> bytes:
+        if not img_format:
+            img_format = image.format
+        if not img_format:
+            raise ValueError(f'No img_format provided and failed to extract format from image as fallback')
+
         buffer = io.BytesIO()
-        image.save(buffer, format=image.format)
+        image.save(buffer, format=str(img_format))
         img_bytes = buffer.getvalue()
         return img_bytes
 
     @classmethod
-    def as_base64_str(cls, image: Image):
-        byte_content = cls.as_bytes(image=image)  # Use cls instead of ImageConverter
+    def as_base64_str(cls, image: Image, img_format : Optional[ImageFormat] = None) -> str:
+        byte_content = cls.as_bytes(image=image, img_format=img_format)
         base64_content = base64.b64encode(byte_content).decode('utf-8')
         return base64_content
 
