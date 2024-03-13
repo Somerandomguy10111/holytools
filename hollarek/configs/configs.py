@@ -1,12 +1,15 @@
 import os.path
-import boto3
 from typing import Optional
+
+import boto3
+from boto3.session import Session
+from botocore.auth import NoCredentialsError
+from botocore.client import BaseClient
 
 from hollarek.crypt import AES
 from hollarek.cloud import AWSRegion
 from hollarek.logging import LogLevel
 from .abstr import StrMap, Configs
-from botocore.auth import NoCredentialsError
 # ---------------------------------------------------------
 
 class AWSConfigs(Configs):
@@ -16,19 +19,23 @@ class AWSConfigs(Configs):
 
         super().__init__()
         self.secret_name: str = secret_name
-        session = boto3.session.Session()
-        self.client = session.client(service_name='secretsmanager', region_name=region.value)
+        self.region : AWSRegion = region
+        self.session = self.create_session()
+        self.client = self.session.client(service_name='secretsmanager', region_name=region.value)
         self.log(f'Initialized {self.__class__.__name__} with region \"{region.value}\"')
 
-        err = self.check_errors()
+        err = self._check_errors()
         if err == NoCredentialsError:
-            self.set_credentials()
-            err = self.check_errors()
+            self._set_aws_credentials()
+            err = self._check_errors()
         if err:
             raise ConnectionError
 
+    def set(self, key : str, value : str):
+        self._map[key] = value
+        self.client.update_secret(SecretId=self.secret_name, SecretString=self._map.to_str())
 
-    def check_errors(self) -> Optional[Exception]:
+    def _check_errors(self) -> Optional[Exception]:
         err = None
         try:
             self.client.get_secret_value(SecretId=self.secret_name)
@@ -40,19 +47,18 @@ class AWSConfigs(Configs):
             err = e
         return err
 
+    def _set_aws_credentials(self):
+        os.environ['AWS_ACCESS_KEY_ID'] = input('Enter your AWS Access key ID: ')
+        os.environ['AWS_SECRET_ACCESS_KEY'] = input('Enter your AWS Secret Access Key: ')
 
-    @staticmethod
-    def set_credentials():
-        raise NotImplementedError
-        # print("Please provide AWS credentials.")
-        # os.environ['AWS_ACCESS_KEY_ID'] = input('Enter your AWS Access Key ID: ')
-        # os.environ['AWS_SECRET_ACCESS_KEY'] = input('Enter your AWS Secret Access Key: ')
+        self.log(f'Enter your AWS Access key ID: ')
+        key_id = input()
+        self.log(f'Enter your AWS Secret Access key: ')
+        access_key = input()
 
-
-    def set(self, key : str, value : str):
-        self._map[key] = value
-        self.client.update_secret(SecretId=self.secret_name, SecretString=self._map.to_str())
-
+        self.log(f'Credentials set successfully')
+        self.session = self.create_session(key_id=key_id, access_token=access_key)
+        self.client = self.create_client()
 
     def _retrieve_map(self):
         try:
@@ -64,6 +70,17 @@ class AWSConfigs(Configs):
 
         return settings
 
+    # -------------------------------------------
+    # create
+
+    @classmethod
+    def create_session(cls, key_id : Optional[str] = None, access_token : Optional[str] = None) -> Session:
+        if not key_id or not access_token:
+            return boto3.session.Session()
+        return boto3.session.Session(aws_access_key_id=key_id, aws_secret_access_key=access_token)
+
+    def create_client(self) -> BaseClient:
+        return self.session.client(service_name='secretsmanager', region_name=self.region.value)
 
 
 class LocalConfigs(Configs):
