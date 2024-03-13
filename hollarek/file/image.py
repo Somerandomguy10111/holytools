@@ -1,3 +1,4 @@
+from __future__ import annotations
 from PIL.Image import Image
 import PIL.Image as ImgHandler
 import base64
@@ -16,61 +17,101 @@ class ImageFormat(Enum):
     # WEBP = 'webp'
 
     @classmethod
-    def as_list(cls) -> list[str]:
-        return [member.value for member in cls]
+    def as_list(cls) -> list[ImageFormat]:
+        return [member for member in cls]
 
 
-class ImageConverter:
-    @staticmethod
-    def as_bytes(image : Image) -> bytes:
+    def __eq__(self, other):
+        if isinstance(other,str):
+            return self.value == other
+        elif isinstance(other, ImageFormat):
+            return self.value == other.value
+        return False
+
+class ImageConverter:  # Assuming these methods are part of a class named ImageConverter
+
+    @classmethod
+    def as_bytes(cls, image: Image) -> bytes:
         buffer = io.BytesIO()
         image.save(buffer, format=image.format)
         img_bytes = buffer.getvalue()
         return img_bytes
 
-
-    @staticmethod
-    def as_base64_str(image : Image):
-        byte_content = ImageConverter.as_bytes(image=image)
+    @classmethod
+    def as_base64_str(cls, image: Image):
+        byte_content = cls.as_bytes(image=image)  # Use cls instead of ImageConverter
         base64_content = base64.b64encode(byte_content).decode('utf-8')
         return base64_content
 
+    @classmethod
+    def convert(cls, image: Image, target_format : ImageFormat) -> Image:
+        if not image.format.lower() in cls.get_supported_formats():
+            raise TypeError(f'Given image {image} has unsupported format: {image.format}')
+        if not target_format in cls.get_supported_formats():
+            raise TypeError(f'Conversion to format {target_format} is not supported')
+        if not cls.is_valid_mode(image=image):
+            raise ValueError(f'Image mode {image.mode} is invalid for format {image.format}')
 
-    @staticmethod
-    def convert(image: Image, target_format: ImageFormat) -> Image:
         new_format = target_format.value.upper()
-        if new_format == 'JPG':
-            new_format = 'JPEG'
-        if image.format:
-            if image.format.upper() == new_format:
-                return image
-
-        content = image
         if image.mode in ('LA', 'RGBA') and new_format in ['JPG', 'JPEG']:
-            new = ImgHandler.new('RGB', content.size, (255, 255, 255))
-            rgb_content = content.convert('RGB') if content.mode == 'RGBA' else content.convert('L').convert('RGB')
-            new.paste(rgb_content, mask=content.split()[-1])
+            image = cls.to_rgb(image)
         elif image.mode != 'RGBA' and new_format == 'PNG':
-            new = content.convert('RGBA')
+            image = cls.to_rgba(image)
         else:
-            new = image
+            image = image
 
+        return cls.reload_as_fmt(image=image,target_format=target_format)
+
+    @classmethod
+    def reload_as_fmt(cls, image : Image, target_format : ImageFormat):
         buffer = io.BytesIO()
-        new.save(buffer, format=new_format)
+        image.save(buffer, format=target_format.value)
         buffer.seek(0)
-        new_image = ImgHandler.open(buffer)
-        return new_image
+        return ImgHandler.open(buffer)
 
+
+    @classmethod
+    def to_rgb(cls, image: Image) -> Image:
+        new_img = ImgHandler.new('RGB', image.size, (255, 255, 255))
+        rgb_content = image.convert('RGB')
+        new_img.paste(rgb_content, mask=image.split()[-1])
+        return new_img
+
+    @classmethod
+    def to_rgba(cls, image: Image) -> Image:
+        return image.convert('RGBA')
+
+    # ---------------------------------------------------------
+    # check formats
+
+    @classmethod
+    def is_valid_mode(cls, image: Image) -> bool:
+        if not cls.is_supported(image=image):
+            raise TypeError(f'Image format {image.format} is not supported')
+
+        if image.format.upper() == 'PNG':
+            return image.mode in ['L', 'LA', 'RGB', 'RGBA', 'P']
+        elif image.format.upper() in ['JPEG', 'JPG']:
+            return image.mode in ['L', 'RGB', 'CMYK']
+        return False
+
+
+    @classmethod
+    def is_supported(cls, image : Image) -> bool:
+        return image.format.lower() in cls.get_supported_formats()
+
+    @classmethod
+    def get_supported_formats(cls) -> list[ImageFormat]:
+        return ImageFormat.as_list()
 
 
 class ImageFile(File):
     def check_format_ok(self) -> bool:
-        supported_formats = ImageFormat.as_list()
-        if not self.get_suffix() in supported_formats:
+        if not self.get_suffix() in ImageFormat.as_list():
             if self.get_suffix():
                 raise TypeError(f'Path \"{self.fpath}\" indicates unsupported image format: \"{self.get_suffix()}\"')
             else:
-                raise TypeError(f'Path \"{self.fpath}\" must end in image suffix: {supported_formats}')
+                raise TypeError(f'Path \"{self.fpath}\" must end in image suffix: {supported_suffixes}')
         return True
 
     def read(self) -> Image:
