@@ -54,12 +54,14 @@ class ImageConverter:  # Assuming these methods are part of a class named ImageC
 
     @classmethod
     def convert(cls, image: Image, target_format : ImageFormat) -> Image:
+        if not image.format:
+            raise TypeError(f'Given image {image} has no format')
         if not image.format.lower() in cls.get_supported_formats():
             raise TypeError(f'Given image {image} has unsupported format: {image.format}')
         if not target_format in cls.get_supported_formats():
             raise TypeError(f'Conversion to format {target_format} is not supported')
         if not cls.is_valid_mode(image=image):
-            raise ValueError(f'Image mode {image.mode} is invalid for format {image.format}')
+            raise TypeError(f'Image mode {image.mode} is invalid for format {image.format}')
 
         new_format = target_format.value.upper()
         if image.mode in ('LA', 'RGBA') and new_format in ['JPG', 'JPEG']:
@@ -120,7 +122,7 @@ class ImageFile(File):
             if self.get_suffix():
                 raise TypeError(f'Path \"{self.fpath}\" indicates unsupported image format: \"{self.get_suffix()}\"')
             else:
-                raise TypeError(f'Path \"{self.fpath}\" must end in image suffix: {supported_suffixes}')
+                raise TypeError(f'Path \"{self.fpath}\" must end in image suffix: {ImageFormat.as_list()}')
         return True
 
     def read(self) -> Image:

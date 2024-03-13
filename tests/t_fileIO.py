@@ -2,7 +2,6 @@ from hollarek.file import BinaryFile, TextFile, ImageFile, ImageConverter, Image
 from hollarek.devtools import FileSpoofer, Unittest
 from hollarek.fsys import FsysNode
 from PIL.Image import Image
-import PIL.Image as ImgHandler
 from unittest.mock import patch
 import io
 # ---------------------------------------------------------
@@ -80,12 +79,26 @@ class TestImageConverter(Unittest):
         new = ImageConverter.convert(image=image, target_format=ImageFormat.JPEG)
         self.assertTrue(new.format == 'JPEG')
 
-
     def test_jpg_to_png(self):
         image_io = ImageFile(fpath=self.jpg_file)
         image = image_io.read()
         new = ImageConverter.convert(image=image, target_format=ImageFormat.PNG)
         self.assertTrue(new.format == 'PNG')
+
+    def test_no_format_attempt(self):
+        image_io = ImageFile(fpath=self.jpg_file)
+        image = image_io.read()
+        no_format_img = ImageConverter.to_rgb(image=image)
+        with self.assertRaises(TypeError):
+            ImageConverter.convert(image=no_format_img, target_format=ImageFormat.JPEG)
+
+    # noinspection PyClassVar
+    def test_invalid_format_attempt(self):
+        image_io = ImageFile(fpath=self.jpg_file)
+        image = image_io.read()
+        image.format = 'xyz'
+        with self.assertRaises(TypeError):
+            ImageConverter.convert(image=image, target_format=ImageFormat.PNG)
 
 
 if __name__ == '__main__':

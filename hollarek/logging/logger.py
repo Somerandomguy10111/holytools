@@ -1,11 +1,9 @@
 from __future__ import annotations
-import os
 import inspect
 import logging
 from typing import Union
 from logging import Logger as BaseLogger
 from .log_settings import LogSettings, LogLevel, LogTarget
-import traceback
 # ---------------------------------------------------------
 
 

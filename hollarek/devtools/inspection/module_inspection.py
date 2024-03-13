@@ -21,6 +21,7 @@ class Argument:
         return getattr(self, 'default_val')
 
 
+
 class ModuleInspector:
     @staticmethod
     def get_methods(cls: type, public_only=False) -> list[Callable]:
