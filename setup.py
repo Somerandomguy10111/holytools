@@ -8,7 +8,7 @@ with open('requirements.txt','r') as file:
 
 setup(
     name='hollarek',
-    version='0.8.1',
+    version='0.9',
     author='Daniel Hollarek',
     author_email='daniel.hollarek@googlemail.com',
     description='Collection of general python utilities for future projects',
