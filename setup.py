@@ -14,6 +14,7 @@ setup(
     description='Collection of general python utilities for future projects',
     url='https://github.com/Somerandomguy10111/hollarek',
     packages=find_packages(),
+    package_data={'hollarek.devtools.spoof': ['*']},
     python_requires='>=3.8',
     include_package_data=True,
     install_requires=requirements
