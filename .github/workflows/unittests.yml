@@ -18,6 +18,4 @@ jobs:
         pip install .
     - name: Run tests
       run: |
-        mkdir empty_dir
-        cd empty_dir
-        python -m unittest discover ../tests -p 't_*.py' -v
+        cd tests && python -m unittest discover -p "t_*.py" $1
