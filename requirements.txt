@@ -1,5 +1,4 @@
 apscheduler
-pypdf
 json-repair
 requests
 func-timeout
@@ -14,7 +13,6 @@ trafilatura
 PyYAML
 boto3
 textract
-python-docx
 orjson
 devtools
 mss
