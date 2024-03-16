@@ -1,6 +1,7 @@
 from __future__ import annotations
 import inspect
 import logging
+import sys
 from typing import Union
 from logging import Logger as BaseLogger
 from .log_settings import LogSettings, LogLevel, LogTarget
@@ -41,17 +42,37 @@ class LoggerFactory:
         logger.propagate = False
         logger.setLevel(settings.threshold)
 
-        console_handler = logging.StreamHandler()
-        console_handler.setFormatter(Formatter(settings=settings, log_target=LogTarget.CONSOLE))
-        logger.addHandler(console_handler)
+        stdout_handler = logging.StreamHandler(sys.stdout)
+        stdout_handler.addFilter(filter=BelowFilter(level=LogLevel.ERROR))
+        stdout_handler.setFormatter(Formatter(settings=settings, log_target=LogTarget.CONSOLE))
+        logger.addHandler(stdout_handler)
+        
+        stderr_handler = logging.StreamHandler(sys.stderr)
+        stderr_handler.addFilter(filter=AboveFilter(level=LogLevel.INFO))
+        stderr_handler.setFormatter(Formatter(settings=settings, log_target=LogTarget.CONSOLE))
+        logger.addHandler(stderr_handler)
 
         if settings.log_fpath:
             file_handler = logging.FileHandler(settings.log_fpath)
             file_handler.setFormatter(Formatter(settings=settings, log_target=LogTarget.FILE))
             logger.addHandler(file_handler)
-
-
         return logger
+
+
+class LevelFilter(logging.Filter):
+    def __init__(self, level : Union[int, LogLevel]):
+        super().__init__()
+        if isinstance(level, LogLevel):
+            level = level.value
+        self.level : int = level
+
+class AboveFilter(LevelFilter):
+    def filter(self, record):
+        return record.levelno > self.level
+
+class BelowFilter(LevelFilter):
+    def filter(self, record):
+        return record.levelno < self.level
 
 
 class Formatter(logging.Formatter):

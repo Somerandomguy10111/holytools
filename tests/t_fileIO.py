@@ -97,6 +97,7 @@ class TestImageConverter(Unittest):
         image_io = ImageFile(fpath=self.jpg_file)
         image = image_io.read()
         image.format = 'xyz'
+        self.log(f'just a test')
         with self.assertRaises(TypeError):
             ImageConverter.convert(image=image, target_format=ImageFormat.PNG)
 
