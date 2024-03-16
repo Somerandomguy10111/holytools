@@ -5,6 +5,7 @@ import base64
 from .file import File
 from enum import Enum
 import io
+from io import BytesIO
 from typing import Optional
 # ---------------------------------------------------------
 
@@ -45,6 +46,14 @@ class ImageConverter:  # Assuming these methods are part of a class named ImageC
         image.save(buffer, format=str(img_format))
         img_bytes = buffer.getvalue()
         return img_bytes
+
+    @classmethod
+    def from_base64_str(cls, base64_str : str) -> Image:
+        if "base64," in base64_str:
+            base64_str = base64_str.split("base64,")[-1]
+        image_data = base64.b64decode(base64_str)
+        image = ImgHandler.open(BytesIO(image_data))
+        return image
 
     @classmethod
     def as_base64_str(cls, image: Image, img_format : Optional[ImageFormat] = None) -> str:
