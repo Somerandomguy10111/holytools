@@ -21,6 +21,7 @@ class Logger(BaseLogger):
         extra_info = {Formatter.custom_file_name: file_name, Formatter.custom_line_no: line_no}
         super().log(msg=msg, level=level, extra=extra_info, exc_info = with_traceback, *args, **kwargs)
 
+
     def setLevel(self, level : Union[int, LogLevel]):
         if isinstance(level, LogLevel):
             level = level.value
@@ -43,36 +44,14 @@ class LoggerFactory:
         logger.setLevel(settings.threshold)
 
         stdout_handler = logging.StreamHandler(sys.stdout)
-        stdout_handler.addFilter(filter=BelowFilter(level=LogLevel.ERROR))
         stdout_handler.setFormatter(Formatter(settings=settings, log_target=LogTarget.CONSOLE))
         logger.addHandler(stdout_handler)
-        
-        stderr_handler = logging.StreamHandler(sys.stderr)
-        stderr_handler.addFilter(filter=AboveFilter(level=LogLevel.INFO))
-        stderr_handler.setFormatter(Formatter(settings=settings, log_target=LogTarget.CONSOLE))
-        logger.addHandler(stderr_handler)
 
         if settings.log_fpath:
             file_handler = logging.FileHandler(settings.log_fpath)
             file_handler.setFormatter(Formatter(settings=settings, log_target=LogTarget.FILE))
             logger.addHandler(file_handler)
         return logger
-
-
-class LevelFilter(logging.Filter):
-    def __init__(self, level : Union[int, LogLevel]):
-        super().__init__()
-        if isinstance(level, LogLevel):
-            level = level.value
-        self.level : int = level
-
-class AboveFilter(LevelFilter):
-    def filter(self, record):
-        return record.levelno > self.level
-
-class BelowFilter(LevelFilter):
-    def filter(self, record):
-        return record.levelno < self.level
 
 
 class Formatter(logging.Formatter):

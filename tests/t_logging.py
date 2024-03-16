@@ -1,22 +1,12 @@
-# from hollarek.logging import add_color, Color
-# 
-# abc = add_color(msg='hi', color=Color.RED)
-# d = ' there'
-# e =  add_color(msg=' my dude', color=Color.GREEN)
-# print(abc+d+e)
-from hollarek.logging import Loggable, LogSettings, get_logger
+from hollarek.logging import Loggable, LogSettings, get_logger, LogLevel
+from hollarek.devtools import Unittest
 
-class NewClass(Loggable):
-    def __init__(self):
-        super().__init__(settings=LogSettings(include_call_location=True))
-
-    def say_hi(self):
-        self.log(msg='hi there')
+class TestLoggin(Unittest):
+    def test_info_error(self):
+        self.log(f'Info text', level=LogLevel.INFO)
+        self.log(f'Error text', level=LogLevel.ERROR)
 
 
-if __name__ == "__main__":
-    a = NewClass()
-    a.say_hi()
 
-    new_logger = get_logger(LogSettings(include_call_location=True))
-    new_logger.log(f'new')
+if __name__ == '__main__':
+    TestLoggin.execute_all()
