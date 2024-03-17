@@ -1,10 +1,8 @@
 from typing import Optional
-import inspect
-import devtools as externalDevtools
 from enum import Enum
-from .logger import Logger
-from .log_settings import LogSettings
-from .logger import LoggerFactory
+import inspect
+from .log_settings import LogSettings, LogLevel
+from .logger import Logger, LoggerFactory
 # ---------------------------------------------------------
 
 class Loggable:
@@ -13,6 +11,22 @@ class Loggable:
     def __init__(self, settings : LogSettings = LogSettings()):
         self.logger = get_logger(settings, name = self.__class__.__name__)
         self.log = self.logger.log
+
+    def warning(self, msg : str, *args, **kwargs):
+        kwargs['level'] = LogLevel.WARNING
+        self.logger.log(msg=msg, *args, **kwargs)
+
+    def error(self, msg : str, *args, **kwargs):
+        kwargs['level'] = LogLevel.ERROR
+        self.logger.log(msg=msg, *args, **kwargs)
+
+    def critical(self, msg : str, *args, **kwargs):
+        kwargs['level'] = LogLevel.CRITICAL
+        self.logger.log(msg=msg, *args, **kwargs)
+
+    def info(self, msg : str, *args, **kwargs):
+        kwargs['level'] = LogLevel.INFO
+        self.logger.log(msg=msg, *args, **kwargs)
 
 
 def get_logger(settings: LogSettings = LogSettings(), name : Optional[str] = None) -> Logger:
@@ -29,10 +43,6 @@ def get_logger(settings: LogSettings = LogSettings(), name : Optional[str] = Non
 
 def update_defaults(settings : LogSettings):
     LoggerFactory.set_defaults(settings=settings)
-
-
-def debug(obj):
-    externalDevtools.debug(obj)
 
 
 class Color(Enum):

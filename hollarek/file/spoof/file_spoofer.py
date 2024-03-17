@@ -1,7 +1,7 @@
 import os
 import shutil
 import tempfile
-from hollarek.file import BinaryFile, ImageFile, TextFile
+from ..types import TextFile, ImageFile, BinaryFile
 
 # ---------------------------------------------------------
 

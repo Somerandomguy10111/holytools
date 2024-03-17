@@ -1,8 +1,8 @@
 import unittest
-from hollarek.logging import get_logger, LogSettings, Logger, LogLevel
 from .runner import Runner
 from .settings import TestSettings
 from typing import Optional
+from hollarek.logging import get_logger, LogSettings, Logger, LogLevel
 # ---------------------------------------------------------
 
 class Unittest(unittest.TestCase):

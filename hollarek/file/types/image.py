@@ -2,11 +2,12 @@ from __future__ import annotations
 from PIL.Image import Image
 import PIL.Image as ImgHandler
 import base64
-from .file import File
+
 from enum import Enum
 import io
 from io import BytesIO
 from typing import Optional
+from .file import File
 # ---------------------------------------------------------
 
 class ImageFormat(Enum):

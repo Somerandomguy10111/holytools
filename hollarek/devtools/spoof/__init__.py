@@ -1,1 +1,0 @@
-from .filespoofer import FileSpoofer

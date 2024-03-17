@@ -6,7 +6,6 @@ from apscheduler.job import Job
 import inspect
 
 from hollarek.logging import Loggable
-from devtools import Timer as DevtoolsTimer
 from .input_waiter import InputWaiter
 
 class InvalidCallableException(Exception):
@@ -68,23 +67,21 @@ class Lock:
 
 
 # Usage examples
-class Timer(DevtoolsTimer):
-    pass
+class Timer:
+    def __init__(self):
+        self.start_time : Optional[datetime] = None
+
+    def start(self):
+        self.start_time = datetime.now()
+
+    def capture(self, verbose : bool = True) -> float:
+        now = datetime.now()
+        delta = now-self.start_time
+        delta_sec = delta.total_seconds()
+        if verbose:
+            print(f'Time has been running for {delta_sec} seconds')
+        return delta_sec
+
 
 class Clock(Loggable):
     pass
-
-
-# def say_hi():  # This function has no parameters
-#     print(f'sup mah man')
-#
-# def transmit(msg : str):
-#     print(msg)
-
-# # This will work as expected
-# countdown = Countdown(duration=3, on_expiration=say_hi)
-# # new = Countdown(duration=3, on_expiration=transmit)
-# countdown.start()
-#
-# # This will wait for 4 seconds to allow for the countdown to expire
-# time.sleep(4)

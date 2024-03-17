@@ -1,8 +1,7 @@
 from __future__ import annotations
-
 from dataclasses import dataclass
-from hollarek.templates import Dillable
 from typing import Union
+
 
 @dataclass
 class Grid:
@@ -84,9 +83,18 @@ class LatticePoint:
             raise TypeError("Can only subtract LatticePoint from another LatticePoint")
 
 @dataclass
-class Click(Dillable):
+class Click:
     point : LatticePoint
     display_index : int
+
+    def to_str(self):
+        return f'{self.point.x},{self.point.y},{self.display_index}'
+
+    @classmethod
+    def from_str(cls, s : str) -> Click:
+        x, y, display_index = s.split(',')
+        return cls(point=LatticePoint(x=int(x), y=int(y)), display_index=int(display_index))
+
 
 if __name__ == "__main__":
     point1 = LatticePoint(3, 5)

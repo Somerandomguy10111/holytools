@@ -68,15 +68,3 @@ if __name__ == "__main__":
     print(f"CPU usage: {process_stats.get_cpu_usage()} %")
     print(process_stats.get_subprocesses())
     print(process_stats.get_subprocess_mem_usage())
-
-
-    # FunctionStatistics usage example
-    # def sample_function():
-    #     func_stats = FunctionStatistics()
-    #     a = [i for i in range(1)]
-    #     increase = func_stats.get_mem_usage()
-    #     print(f"Memory usage of function: {increase} bytes")
-    #
-    #     print(func_stats.get_variable_mem_usage())
-    #
-    # sample_function()

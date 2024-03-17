@@ -5,24 +5,18 @@ import boto3
 from boto3.session import Session
 from botocore.auth import NoCredentialsError
 from botocore.client import BaseClient
-
 from hollarek.crypt import AES
-from hollarek.cloud import AWSRegion
-from hollarek.logging import LogLevel
 from .abstr import StrMap, Configs
 # ---------------------------------------------------------
 
 class AWSConfigs(Configs):
-    def __init__(self, secret_name : str, region : AWSRegion = AWSRegion.EU_NORTH_1):
-        if self.get_is_initialized():
-            return
-
+    def __init__(self, secret_name : str, region : str):
         super().__init__()
         self.secret_name: str = secret_name
-        self.region : AWSRegion = region
+        self.region : str = region
         self.session = self.create_session()
-        self.client = self.session.client(service_name='secretsmanager', region_name=region.value)
-        self.log(f'Initialized {self.__class__.__name__} with region \"{region.value}\"')
+        self.client = self.session.client(service_name='secretsmanager', region_name=region)
+        self.log(f'Initialized {self.__class__.__name__} with region \"{region}\"')
 
         err = self._check_errors()
         if err == NoCredentialsError:
@@ -40,10 +34,10 @@ class AWSConfigs(Configs):
         try:
             self.client.get_secret_value(SecretId=self.secret_name)
         except NoCredentialsError:
-            self.log('No AWS credentials found', LogLevel.CRITICAL)
+            self.critical('No AWS credentials found')
             err = NoCredentialsError
         except Exception as e:
-            self.log(f'An error occurred while trying to connect to AWS: {e}', LogLevel.CRITICAL)
+            self.critical(f'An error occurred while trying to connect to AWS: {e}')
             err = e
         return err
 
@@ -65,7 +59,7 @@ class AWSConfigs(Configs):
             secret_value = self.client.get_secret_value(SecretId=self.secret_name)
             settings = StrMap.from_str(secret_value['SecretString'])
         except Exception as e:
-            self.log(f'An error occurred while trying to read value from AWS: {e}', LogLevel.ERROR)
+            self.error(f'An error occurred while trying to read value from AWS: {e}')
             settings = StrMap()
 
         return settings
@@ -80,15 +74,12 @@ class AWSConfigs(Configs):
         return boto3.session.Session(aws_access_key_id=key_id, aws_secret_access_key=access_token)
 
     def create_client(self) -> BaseClient:
-        return self.session.client(service_name='secretsmanager', region_name=self.region.value)
+        return self.session.client(service_name='secretsmanager', region_name=self.region)
 
 
 class LocalConfigs(Configs):
     def __init__(self, config_fpath : str = os.path.expanduser('~/.pyconfig'),
                        encryption_key : Optional[str] = None):
-        if self.get_is_initialized():
-            return
-
         super().__init__()
         self._config_fpath : str = config_fpath
         self._aes : AES = AES()
@@ -112,7 +103,7 @@ class LocalConfigs(Configs):
             settings = StrMap.from_str(json_str=file_content)
         except FileNotFoundError:
             settings = StrMap()
-            self.log(msg=f'Config file \"{self._config_fpath}\" does not exist', level=LogLevel.WARNING)
+            self.warning(msg=f'Config file \"{self._config_fpath}\" does not exist')
         return settings
 
     # -------------------------------------------

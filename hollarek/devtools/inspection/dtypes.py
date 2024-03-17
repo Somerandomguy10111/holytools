@@ -13,6 +13,7 @@ class TypeInspector:
         else:
             return [dtype]
 
+    # noinspection DuplicatedCode
     @staticmethod
     def get_core_type(dtype : type) -> type:
         """

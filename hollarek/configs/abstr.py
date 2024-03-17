@@ -2,8 +2,7 @@ from __future__ import annotations
 
 from abc import abstractmethod
 import json
-from hollarek.templates import Singleton
-from hollarek.logging import LogLevel, get_logger
+from hollarek.logging import Loggable, LogLevel
 
 
 class StrMap(dict[str,str]):
@@ -18,12 +17,11 @@ class StrMap(dict[str,str]):
         return len(self) == 0
 
 
-class Configs(Singleton):
+class Configs(Loggable):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._map: StrMap = StrMap()
         self.is_setup: bool = False
-        self.log = get_logger(name=self.__class__.__name__).log
 
     def get(self, key : str) -> str:
         if not self.is_setup:

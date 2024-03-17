@@ -1,4 +1,2 @@
-from .text import TextFile
-from .binary import BinaryFile, BytesConverter
-from .image import ImageFile, ImageConverter, ImageFormat
-from .file import File
+from .spoof.file_spoofer import FileSpoofer
+from .types import *

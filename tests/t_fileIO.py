@@ -1,5 +1,5 @@
-from hollarek.file import BinaryFile, TextFile, ImageFile, ImageConverter, ImageFormat
-from hollarek.devtools import FileSpoofer, Unittest
+from hollarek.file import BinaryFile, TextFile, ImageFile, ImageConverter, ImageFormat, FileSpoofer
+from hollarek.devtools import Unittest
 from hollarek.fsys import FsysNode
 from PIL.Image import Image
 from unittest.mock import patch

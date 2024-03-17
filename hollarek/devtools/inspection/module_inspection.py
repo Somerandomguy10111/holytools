@@ -1,8 +1,6 @@
-from typing import Any
+from typing import Any, Callable, get_type_hints
 import inspect
 from dataclasses import dataclass
-from typing import Callable
-from typing import get_type_hints
 
 @dataclass
 class Argument:

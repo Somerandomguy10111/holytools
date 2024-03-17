@@ -3,12 +3,9 @@ from __future__ import annotations
 import orjson
 import dataclasses
 from datetime import datetime, date, time
-from decimal import Decimal
-from uuid import UUID
-from pathlib import Path
-from typing import get_type_hints
+from typing import get_type_hints, get_origin, get_args, Union
+from types import NoneType
 
-from hollarek.devtools import TypeInspector
 from enum import Enum
 from .serializable import Serializable
 # -------------------------------------------
@@ -54,7 +51,7 @@ def from_json(cls : type, json_dict: dict):
             init_dict[key] = value
             continue
 
-        core_type = TypeInspector.get_core_type(dtype=type_hints.get(key))
+        core_type = get_core_type(dtype=type_hints.get(key))
         if not isinstance(value, dict):
             init_dict[key] = make_elementary(cls=core_type,value=value)
         elif issubclass(core_type, Enum):
@@ -65,25 +62,29 @@ def from_json(cls : type, json_dict: dict):
     return cls(**init_dict)
 
 
-def make_elementary(cls, value : object):
-    identity = lambda x: x
+def make_elementary(cls, value : str):
     conversion_map = {
-        str: identity,
-        int: identity,
-        float: identity,
-        bool: identity,
         datetime: datetime.fromisoformat,
         date: date.fromisoformat,
         time: time.fromisoformat,
-        Decimal: Decimal,
-        UUID: UUID,
-        Path: Path,
     }
 
-    if issubclass(cls, Enum):
-        return cls(value)
-
+    typecast_classes = ['Decimal', 'UUID', 'Path', 'str', 'int', 'float', 'bool']
     if cls in conversion_map:
         return conversion_map[cls](value)
+    elif cls.__name__ in typecast_classes or issubclass(cls, Enum):
+        return cls(value)
     else:
         raise TypeError(f'Unsupported type {cls}')
+
+# noinspection DuplicatedCode
+def get_core_type(dtype : type) -> type:
+    if get_origin(dtype) is Union:
+        types = get_args(dtype)
+        core_types = [t for t in types if not t is NoneType]
+        if len(core_types) == 1:
+            return core_types[0]
+        else:
+            raise ValueError(f'Union dtype {dtype} has more than one core dtype')
+    else:
+        return dtype
