@@ -2,7 +2,7 @@ from __future__ import annotations
 import os
 from abc import abstractmethod
 from typing import Optional
-from hollarek.templates import Singleton
+from hollarek.abstract import Singleton
 # -------------------------------------------
 
 class LocationManager(Singleton):

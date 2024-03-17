@@ -1,4 +1,4 @@
-from hollarek.templates import Singleton, AlreadyInitialized
+from hollarek.abstract import Singleton, AlreadyInitialized
 from hollarek.devtools import Unittest
 
 class SingletonTest(Unittest):

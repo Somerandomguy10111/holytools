@@ -3,7 +3,7 @@ from typing import Optional
 from pathlib import Path as PathWrapper
 import os
 import tempfile, shutil
-from hollarek.templates import TreeNode
+from hollarek.abstract import TreeNode
 # -------------------------------------------
 
 class FsysNode(TreeNode):
