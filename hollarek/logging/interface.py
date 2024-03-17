@@ -1,10 +1,10 @@
 from typing import Optional
 import inspect
+import devtools as externalDevtools
+from enum import Enum
 from .logger import Logger
 from .log_settings import LogSettings
 from .logger import LoggerFactory
-import devtools as externalDevtools
-from enum import *
 # ---------------------------------------------------------
 
 class Loggable:
