@@ -10,6 +10,7 @@ class Dillable(Serializable):
         return dill.loads(bytes.fromhex(dill_str))
 
 
+
 # Example usage:
 if __name__ == "__main__":
     class Example(Dillable):

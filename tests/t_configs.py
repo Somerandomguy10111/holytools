@@ -1,4 +1,4 @@
-from hollarek.configs import LocalConfigs, AWSConfigs
+from hollarek.configs import AWSConfigs
 
 if __name__ == "__main__":
     # another_configs = LocalConfigs(config_fpath='abcd')

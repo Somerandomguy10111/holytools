@@ -1,4 +1,5 @@
 from .file import File
+from enum import Enum
 
 class BinaryFile(File):
     def read(self) -> bytes:
