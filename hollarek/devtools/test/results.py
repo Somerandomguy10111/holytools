@@ -5,15 +5,13 @@ import unittest
 import linecache
 from dataclasses import dataclass
 from typing import Optional
-from unittest import TestCase, TestResult
+from unittest import TestCase
 
 from hollarek.core.logging import LogLevel, Logger
-from .status import CaseStatus, CaseResult, get_case_name
-from .configurable import ConfigurableTest
-
+from .configurable_unit import ConfigurableTest
+from .case_reports import ReportableResult, CaseReport, CaseStatus
 
 # ---------------------------------------------------------
-
 
 @dataclass
 class DisplayOptions:
@@ -21,18 +19,12 @@ class DisplayOptions:
     show_details : bool = True
 
 
-class Result(TestResult):
-    test_spaces = 50
-    status_spaces = 10
-    runtime_space = 10
-
+class Results(ReportableResult):
     def __init__(self, logger : Logger, settings : DisplayOptions,is_manual : bool = False,  *args, **kwargs):
+        kwargs['logger'] = logger
         super().__init__(*args, **kwargs)
         self.test_settings : DisplayOptions = settings
-
-        self.log = logger.log
         self.start_times : dict[str, float] = {}
-        self.case_results : list[CaseResult] = []
         self.is_manual : bool = is_manual
         self.print_header(f'  Test suite for \"{self.__class__.__name__}\"  ')
 
@@ -44,35 +36,19 @@ class Result(TestResult):
         if self.is_manual:
             test.set_manual()
         super().startTest(test)
-        self.log(msg = f'------> {get_case_name(test=test)[:self.test_spaces]} ', level=LogLevel.INFO)
         self.start_times[test.id()] = time.time()
-
-    def addSuccess(self, test):
-        super().addSuccess(test)
-        self.report(test, CaseStatus.SUCCESS)
-
-    def addError(self, test, err):
-        super().addError(test, err)
-        self.report(test, CaseStatus.ERROR, err)
-
-    def addFailure(self, test, err):
-        super().addFailure(test, err)
-        self.report(test, CaseStatus.FAIL, err)
-
-    def addSkip(self, test, reason):
-        super().addSkip(test, reason)
-        self.report(test, CaseStatus.SKIPPED)
 
     # ---------------------------------------------------------
     # case logging
 
     def report(self, test : TestCase, status: CaseStatus, err : Optional[tuple] = None):
-        case_result = CaseResult(test=test, status=status, runtime=self.get_runtime(test=test))
+        case_result = CaseReport(test=test, status=status, runtime=self.get_runtime(test=test))
         self.case_results.append(case_result)
 
         conditional_err_msg = f'\n{self.get_err_details(err)}' if err and self.test_settings.show_details else ''
         finish_log_msg = f'Status: {status.value}{conditional_err_msg}\n'
         self.log(msg=finish_log_msg, level=status.get_log_level())
+
 
     @staticmethod
     def get_err_details(err) -> str:
@@ -89,6 +65,7 @@ class Result(TestResult):
             result += f'{err_class.__name__}: {err_instance}\n{tb_str}'
         return result
 
+
     def get_runtime(self, test : TestCase) -> Optional[float]:
         test_id = test.id()
         if test_id in self.start_times:
@@ -104,8 +81,6 @@ class Result(TestResult):
         self.print_header(msg=' Summary ', seperator='-')
         for case in self.case_results:
             level = case.status.get_log_level()
-
-            # Inline the functionality of get_name_msg, get_status_msg, and get_runtime_msg
             name_msg = f'{case.name[:self.test_spaces - 4]:<{self.test_spaces}}'
             status_msg = f'{case.status.value:<{self.status_spaces}}'
             runtime_str = f'{case.runtime_sec}s'
@@ -115,12 +90,14 @@ class Result(TestResult):
         self.log(self.get_final_status())
         self.print_header(msg='')
 
+
     def print_header(self, msg: str, seperator : str = '='):
         total_len = self.test_spaces + self.status_spaces
         total_len += self.runtime_space if self.test_settings.show_runtimes else 0
         line_len = max(total_len- len(msg), 0)
         lines = seperator * int(line_len / 2.)
         self.log(f'{lines}{msg}{lines}')
+
 
     def get_final_status(self) -> str:
         num_total = self.testsRun

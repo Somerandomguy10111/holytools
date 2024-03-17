@@ -1,2 +1,2 @@
 from .unit import Unittest
-from .result import DisplayOptions
+from .results import DisplayOptions

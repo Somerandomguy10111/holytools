@@ -2,8 +2,8 @@ import unittest
 
 from typing import Optional
 from hollarek.core.logging import get_logger, LogSettings, Logger, LogLevel
-from .result import Result, DisplayOptions
-from .configurable import  ConfigurableTest
+from .configurable_unit import  ConfigurableTest
+from .results import Results, DisplayOptions
 
 # ---------------------------------------------------------
 
@@ -15,12 +15,12 @@ class Runner(unittest.TextTestRunner):
         self.display_options : DisplayOptions = settings
         self.is_manual : bool = is_manual
 
-    def run(self, test) -> Result:
-        result = Result(logger=self.logger,
-                        stream=self.stream,
-                        settings=self.display_options,
-                        descriptions=self.descriptions,
-                        verbosity=2)
+    def run(self, test) -> Results:
+        result = Results(logger=self.logger,
+                         stream=self.stream,
+                         settings=self.display_options,
+                         descriptions=self.descriptions,
+                         verbosity=2)
         test(result)
         result.printErrors()
 
