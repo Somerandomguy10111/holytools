@@ -1,9 +1,35 @@
 import unittest
-from .runner import Runner
-from .settings import TestSettings
+from dataclasses import dataclass
+
 from typing import Optional
 from hollarek.logging import get_logger, LogSettings, Logger, LogLevel
+from .result import Result
 # ---------------------------------------------------------
+
+
+@dataclass
+class TestSettings:
+    show_runtimes : bool =True
+    show_details : bool = True
+
+
+class Runner(unittest.TextTestRunner):
+    def __init__(self, logger : Logger, settings : TestSettings):
+        super().__init__(resultclass=None)
+        self.logger : Logger = logger
+        self.test_settings : TestSettings = settings
+
+    def run(self, test) -> Result:
+        result = Result(logger=self.logger,
+                        stream=self.stream,
+                        settings=self.test_settings,
+                        descriptions=self.descriptions,
+                        verbosity=2)
+        test(result)
+        result.printErrors()
+
+        return result
+
 
 class Unittest(unittest.TestCase):
     _logger : Logger = None
@@ -60,3 +86,5 @@ class Unittest(unittest.TestCase):
             if msg is None:
                 msg = f'Tested expression should be true'
             raise AssertionError(msg)
+
+

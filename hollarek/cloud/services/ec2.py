@@ -1,6 +1,5 @@
 import boto3, logging
 from botocore.exceptions import ClientError
-from typing import List
 
 from ..entities.EC2Template import InstanceTemplate
 from ..entities.enums import AWSRegion, InstanceState
@@ -71,7 +70,7 @@ class EC2AWS:
             return 0
 
 
-    def get_all_instance_ids(self) -> List[str]:
+    def get_all_instance_ids(self) -> list[str]:
         try:
             response = self.ec2_client.describe_instances()
             instances = [instance['InstanceId'] for reservation in response['Reservations'] for instance in
@@ -84,7 +83,7 @@ class EC2AWS:
     # ----------------------------------------------
     # Other
 
-    def wait(self, instance_ids: List[str], instance_state: InstanceState) -> None:
+    def wait(self, instance_ids: list[str], instance_state: InstanceState) -> None:
         instance_state_val = instance_state.value
         if not instance_ids:
             logging.info("No instance IDs provided.")

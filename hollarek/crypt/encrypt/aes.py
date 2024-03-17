@@ -4,12 +4,10 @@ from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.backends import default_backend
 from typing import Optional, Union
 
-from hollarek.logging import get_logger, LogLevel
 from ..hash import SHA
 from .algo import CryptoAlgo
 # -------------------------------------------
 
-log = get_logger().log
 
 class AES(CryptoAlgo):
     def __init__(self):
@@ -35,7 +33,7 @@ class AES(CryptoAlgo):
         try:
             decoded = decrypted_content.decode()
         except UnicodeDecodeError:
-            log(f'Error decoding bytes to UTF-8. Most likely the decryption key is not correct', level=LogLevel.WARNING)
+            print(f'Error decoding bytes to UTF-8. Most likely the decryption key is not correct')
             decoded = None
 
         return decoded

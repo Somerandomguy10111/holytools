@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 from typing import Optional
-from .enums import ImageID, EC2Type
 from dataclasses import dataclass
+from .enums import ImageID, EC2Type
 
 @dataclass
 class InstanceTemplate:

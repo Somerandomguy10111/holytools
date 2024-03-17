@@ -2,17 +2,18 @@ import os
 import time
 import traceback
 import unittest
-from typing import Optional
-from unittest import TestCase
 import linecache
+from typing import Optional
+from unittest import TestCase, TestResult
 
 from hollarek.logging import LogLevel, Logger
+from .. import TestSettings
 from .case import CaseStatus, CaseResult, get_case_name
-from .settings import TestSettings
+
+
 # ---------------------------------------------------------
 
-
-class Result(unittest.TestResult):
+class Result(TestResult):
     test_spaces = 50
     status_spaces = 10
     runtime_space = 10
@@ -53,7 +54,7 @@ class Result(unittest.TestResult):
         self.report(test, CaseStatus.SKIPPED)
 
     # ---------------------------------------------------------
-    # logging
+    # case logging
 
     def report(self, test : TestCase, status: CaseStatus, err : Optional[tuple] = None):
         case_result = CaseResult(test=test, status=status, runtime=self.get_runtime(test=test))
@@ -62,42 +63,6 @@ class Result(unittest.TestResult):
         conditional_err_msg = f'\n{self.get_err_details(err)}' if err and self.test_settings.show_details else ''
         finish_log_msg = f'Status: {status.value}{conditional_err_msg}\n'
         self.log(msg=finish_log_msg, level=status.get_log_level())
-
-
-    def get_runtime(self, test : TestCase) -> Optional[float]:
-        test_id = test.id()
-        if test_id in self.start_times:
-            time_in_sec =  time.time() - self.start_times[test_id]
-            return round(time_in_sec, 3)
-        else:
-            self.log(f'Couldnt find start time of test {test_id}. Current start_times : {self.start_times}', level=LogLevel.ERROR)
-
-
-    def print_summary(self):
-        self.print_header(msg=f' Summary ', seperator='-')
-        for case in self.case_results:
-            level = case.status.get_log_level()
-            self.log(f'{self.get_name_msg(case)}{self.get_status_msg(case)}{self.get_runtime_msg(case)}', level=level)
-        self.log(self.get_final_status())
-        self.print_header(msg=f'')
-
-    def get_name_msg(self, result : CaseResult) -> str:
-        return f'{result.name[:self.test_spaces-4]:<{self.test_spaces}}'
-
-    def get_status_msg(self, result : CaseResult) -> str:
-        return f'{result.status.value:<{self.status_spaces}}'
-
-    def get_runtime_msg(self, result : CaseResult)-> str:
-        runtime_str = f'{result.runtime_sec}s'
-        return f'{runtime_str:^{self.runtime_space}}' if self.test_settings.show_runtimes else ''
-
-    def print_header(self, msg: str, seperator : str = '='):
-        total_len = self.test_spaces + self.status_spaces
-        total_len += self.runtime_space if self.test_settings.show_runtimes else 0
-        line_len = max(total_len- len(msg), 0)
-        lines = seperator * int(line_len / 2.)
-        self.log(f'{lines}{msg}{lines}')
-
 
     @staticmethod
     def get_err_details(err) -> str:
@@ -114,6 +79,38 @@ class Result(unittest.TestResult):
             result += f'{err_class.__name__}: {err_instance}\n{tb_str}'
         return result
 
+    def get_runtime(self, test : TestCase) -> Optional[float]:
+        test_id = test.id()
+        if test_id in self.start_times:
+            time_in_sec =  time.time() - self.start_times[test_id]
+            return round(time_in_sec, 3)
+        else:
+            self.log(f'Couldnt find start time of test {test_id}. Current start_times : {self.start_times}', level=LogLevel.ERROR)
+
+    # ---------------------------------------------------------
+    # summary logging
+
+    def print_summary(self):
+        self.print_header(msg=' Summary ', seperator='-')
+        for case in self.case_results:
+            level = case.status.get_log_level()
+
+            # Inline the functionality of get_name_msg, get_status_msg, and get_runtime_msg
+            name_msg = f'{case.name[:self.test_spaces - 4]:<{self.test_spaces}}'
+            status_msg = f'{case.status.value:<{self.status_spaces}}'
+            runtime_str = f'{case.runtime_sec}s'
+            runtime_msg = f'{runtime_str:^{self.runtime_space}}' if self.test_settings.show_runtimes else ''
+
+            self.log(f'{name_msg}{status_msg}{runtime_msg}', level=level)
+        self.log(self.get_final_status())
+        self.print_header(msg='')
+
+    def print_header(self, msg: str, seperator : str = '='):
+        total_len = self.test_spaces + self.status_spaces
+        total_len += self.runtime_space if self.test_settings.show_runtimes else 0
+        line_len = max(total_len- len(msg), 0)
+        lines = seperator * int(line_len / 2.)
+        self.log(f'{lines}{msg}{lines}')
 
     def get_final_status(self) -> str:
         num_total = self.testsRun

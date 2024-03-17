@@ -1,5 +1,5 @@
-from typing import Any, Callable, get_type_hints
 import inspect
+from typing import Any, Callable, get_type_hints
 from dataclasses import dataclass
 
 @dataclass

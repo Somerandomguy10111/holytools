@@ -1,5 +1,6 @@
 from enum import Enum
 from unittest import TestCase
+
 from hollarek.logging import LogLevel
 
 
@@ -24,7 +25,6 @@ class CaseResult:
         self.runtime_sec : float = runtime
         self.name : str = get_case_name(test)
         self.status : CaseStatus = status
-
 
 
 def get_case_name(test : TestCase) -> str:
