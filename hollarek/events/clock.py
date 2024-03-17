@@ -16,9 +16,11 @@ class InvalidCallableException(Exception):
 
 class Countdown:
     def __init__(self, duration: float, on_expiration: Callable = lambda *args, **kwargs: None):
-        if inspect.signature(on_expiration).parameters:
-            raise InvalidCallableException("on_expiration should not take any arguments")
-
+        parameters = inspect.signature(on_expiration).parameters.values()
+        for param in parameters:
+            # Check if the parameter is mandatory (i.e., has no default value and is not a *args or **kwargs kind)
+            if (param.default is param.empty) and (param.kind not in [param.VAR_POSITIONAL, param.VAR_KEYWORD]):
+                raise InvalidCallableException("on_expiration should not take any mandatory arguments")
         self.duration : float = duration
         self.scheduler : BackgroundScheduler = BackgroundScheduler()
         self.job: Optional[Job] = None
