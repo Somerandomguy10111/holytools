@@ -1,10 +1,10 @@
 import time
 import threading
-from concurrent.futures import ThreadPoolExecutor
 from queue import Queue
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
-from hollarek.logging import get_logger
 from typing import Callable
+from hollarek.logging import get_logger
 
 # ---------------------------------------------------------
 

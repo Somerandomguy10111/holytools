@@ -1,10 +1,9 @@
 import logging
 from apscheduler.schedulers.background import BackgroundScheduler
-from hollarek.templates import Singleton
 from typing import Optional
 from typing import Callable
 
-class ScheduleHandler(Singleton):
+class ScheduleHandler:
     scheduler : Optional[BackgroundScheduler]= None
     logging.getLogger('apscheduler').setLevel(logging.ERROR)
 

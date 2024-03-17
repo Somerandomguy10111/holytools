@@ -4,7 +4,6 @@ import PIL.Image as ImgHandler
 import base64
 
 from enum import Enum
-import io
 from io import BytesIO
 from typing import Optional
 from .file import File
@@ -54,7 +53,7 @@ class ImageConverter:
 
     @classmethod
     def _reload_as_fmt(cls, image : Image, target_format : ImageFormat):
-        buffer = io.BytesIO()
+        buffer = BytesIO()
         image.save(buffer, format=target_format.value)
         buffer.seek(0)
         return ImgHandler.open(buffer)
@@ -99,7 +98,7 @@ class ImageSerializer:
         if not img_format:
             raise ValueError(f'No img_format provided and failed to extract format from image as fallback')
 
-        buffer = io.BytesIO()
+        buffer = BytesIO()
         image.save(buffer, format=str(img_format))
         img_bytes = buffer.getvalue()
         return img_bytes
