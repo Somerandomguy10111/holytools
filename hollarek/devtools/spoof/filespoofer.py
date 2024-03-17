@@ -43,6 +43,14 @@ class FileSpoofer:
         return TextFile(fpath=fpath)
 
     @staticmethod
-    def lend_bin():
+    def lend_bin() -> BinaryFile:
         fpath = create_temp_copy('spoof.bin')
         return BinaryFile(fpath=fpath)
+
+    @staticmethod
+    def lend_wav() -> BinaryFile:
+        fpath = create_temp_copy('spoof.wav')
+        return BinaryFile(fpath=fpath)
+
+if __name__ == "__main__":
+    print(os.path.abspath(__file__))
