@@ -1,7 +1,7 @@
 from enum import Enum
 from unittest import TestCase
 
-from hollarek.logging import LogLevel
+from hollarek.core.logging import LogLevel
 
 
 class CaseStatus(Enum):

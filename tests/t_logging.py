@@ -1,4 +1,4 @@
-from hollarek.logging import LogLevel
+from hollarek.core.logging import LogLevel
 from hollarek.devtools import Unittest
 
 class TestLoggin(Unittest):

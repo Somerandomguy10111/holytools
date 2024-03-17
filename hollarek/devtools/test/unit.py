@@ -1,28 +1,23 @@
 import unittest
-from dataclasses import dataclass
 
 from typing import Optional
-from hollarek.logging import get_logger, LogSettings, Logger, LogLevel
-from .result import Result
+from hollarek.core.logging import get_logger, LogSettings, Logger, LogLevel
+from .result import Result, DisplayOptions
+
+
 # ---------------------------------------------------------
 
 
-@dataclass
-class TestSettings:
-    show_runtimes : bool =True
-    show_details : bool = True
-
-
 class Runner(unittest.TextTestRunner):
-    def __init__(self, logger : Logger, settings : TestSettings):
+    def __init__(self, logger : Logger, settings : DisplayOptions):
         super().__init__(resultclass=None)
         self.logger : Logger = logger
-        self.test_settings : TestSettings = settings
+        self.display_options : DisplayOptions = settings
 
     def run(self, test) -> Result:
         result = Result(logger=self.logger,
                         stream=self.stream,
-                        settings=self.test_settings,
+                        settings=self.display_options,
                         descriptions=self.descriptions,
                         verbosity=2)
         test(result)
@@ -35,7 +30,7 @@ class Unittest(unittest.TestCase):
     _logger : Logger = None
 
     @classmethod
-    def execute_all(cls, settings : TestSettings = TestSettings()):
+    def execute_all(cls, settings : DisplayOptions = DisplayOptions()):
         suite = unittest.TestLoader().loadTestsFromTestCase(cls)
         runner = Runner(logger=cls.get_logger(),settings=settings)
         results =  runner.run(suite)

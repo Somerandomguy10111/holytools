@@ -4,7 +4,6 @@ from queue import Queue
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
 from typing import Callable
-from hollarek.logging import get_logger
 
 # ---------------------------------------------------------
 
@@ -45,12 +44,11 @@ class RateLimitedPool:
 if __name__ == "__main__":
     def func(n):
         print(f"Executing task {n}")
-        logger.log(f'Current time is {time.time()}')
+        print(f'Current time is {time.time()}')
         return n * 2
 
     pool = RateLimitedPool(tasks_per_second=5)
     pool.start()
-    logger = get_logger()
 
     # Submit tasks
     for i in range(10):

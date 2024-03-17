@@ -1,6 +1,6 @@
 import time
 
-from hollarek.events import InputWaiter, Countdown
+from hollarek.core.events import InputWaiter, Countdown
 from pynput.keyboard import Key as PynputKey
 from pynput.keyboard import KeyCode
 from pynput.keyboard import Controller as KeyboardController

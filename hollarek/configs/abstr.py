@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from abc import abstractmethod
 import json
-from hollarek.logging import Loggable, LogLevel
+from hollarek.core.logging import Loggable, LogLevel
 
 
 class StrMap(dict[str,str]):

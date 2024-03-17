@@ -3,7 +3,7 @@ import logging
 import os
 import psutil
 
-from hollarek.logging import get_logger, LogSettings
+from hollarek.core.logging import get_logger, LogSettings
 # -------------------------------------------
 
 

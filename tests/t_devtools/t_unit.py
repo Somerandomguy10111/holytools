@@ -1,6 +1,6 @@
 import json
 from json_repair import repair_json
-from hollarek.devtools import Unittest, TestSettings
+from hollarek.devtools import Unittest, DisplayOptions
 
 
 class TestJsonRepair(Unittest):
@@ -35,4 +35,4 @@ class TestJsonRepair(Unittest):
             self.assertEqual(parsed_json['keyy'], "new\nline and\ttab")
 
 if __name__ == "__main__":
-    TestJsonRepair.execute_all(settings=TestSettings(show_details=True, show_runtimes=True))
+    TestJsonRepair.execute_all(settings=DisplayOptions(show_details=True, show_runtimes=True))

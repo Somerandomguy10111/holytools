@@ -5,7 +5,7 @@ import boto3
 from boto3.session import Session
 from botocore.auth import NoCredentialsError
 from botocore.client import BaseClient
-from hollarek.crypt import AES
+from hollarek.core.crypt import AES
 from .abstr import StrMap, Configs
 # ---------------------------------------------------------
 

@@ -1,2 +1,2 @@
-from .unit import *
-from .settings import *
+from .unit import Unittest
+from .result import DisplayOptions

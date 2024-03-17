@@ -1,4 +1,4 @@
-from hollarek.crypt import AES
+from hollarek.core.crypt import AES
 import os
 #
 # if __name__ == "__main__":

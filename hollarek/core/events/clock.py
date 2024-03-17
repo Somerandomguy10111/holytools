@@ -5,7 +5,6 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.job import Job
 import inspect
 
-from hollarek.logging import Loggable
 from .input_waiter import InputWaiter
 
 class InvalidCallableException(Exception):
@@ -82,6 +81,3 @@ class Timer:
             print(f'Time has been running for {delta_sec} seconds')
         return delta_sec
 
-
-class Clock(Loggable):
-    pass

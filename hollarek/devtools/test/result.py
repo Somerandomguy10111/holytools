@@ -3,24 +3,31 @@ import time
 import traceback
 import unittest
 import linecache
+from dataclasses import dataclass
 from typing import Optional
 from unittest import TestCase, TestResult
 
-from hollarek.logging import LogLevel, Logger
-from .. import TestSettings
+from hollarek.core.logging import LogLevel, Logger
 from .case import CaseStatus, CaseResult, get_case_name
 
 
 # ---------------------------------------------------------
+
+
+@dataclass
+class DisplayOptions:
+    show_runtimes : bool =True
+    show_details : bool = True
+
 
 class Result(TestResult):
     test_spaces = 50
     status_spaces = 10
     runtime_space = 10
 
-    def __init__(self, logger : Logger, settings : TestSettings, *args, **kwargs):
+    def __init__(self, logger : Logger, settings : DisplayOptions, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.test_settings : TestSettings = settings
+        self.test_settings : DisplayOptions = settings
 
         self.log = logger.log
         self.start_times : dict[str, float] = {}
@@ -128,3 +135,4 @@ class Result(TestResult):
             final_status = f"{RED}\n{CROSS} {num_unsuccessful}/{num_total} tests had errors or failures!{RESET}"
 
         return final_status
+

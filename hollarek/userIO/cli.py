@@ -1,6 +1,6 @@
 from typing import Callable
 import inspect
-from hollarek.logging import Loggable, LogSettings, LogLevel
+from hollarek.core.logging import Loggable, LogSettings, LogLevel
 # ---------------------------------------------------------
 
 
