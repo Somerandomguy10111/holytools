@@ -3,16 +3,17 @@ import unittest
 from typing import Optional
 from hollarek.core.logging import get_logger, LogSettings, Logger, LogLevel
 from .result import Result, DisplayOptions
-
+from .configurable import  ConfigurableTest
 
 # ---------------------------------------------------------
 
 
 class Runner(unittest.TextTestRunner):
-    def __init__(self, logger : Logger, settings : DisplayOptions):
+    def __init__(self, logger : Logger, settings : DisplayOptions, is_manual : bool = False):
         super().__init__(resultclass=None)
         self.logger : Logger = logger
         self.display_options : DisplayOptions = settings
+        self.is_manual : bool = is_manual
 
     def run(self, test) -> Result:
         result = Result(logger=self.logger,
@@ -26,13 +27,13 @@ class Runner(unittest.TextTestRunner):
         return result
 
 
-class Unittest(unittest.TestCase):
+class Unittest(ConfigurableTest):
     _logger : Logger = None
 
     @classmethod
-    def execute_all(cls, settings : DisplayOptions = DisplayOptions()):
+    def execute_all(cls, is_manual : bool = True, settings : DisplayOptions = DisplayOptions()):
         suite = unittest.TestLoader().loadTestsFromTestCase(cls)
-        runner = Runner(logger=cls.get_logger(),settings=settings)
+        runner = Runner(logger=cls.get_logger(),settings=settings, is_manual=is_manual)
         results =  runner.run(suite)
         results.print_summary()
 

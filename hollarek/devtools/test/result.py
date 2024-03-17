@@ -8,7 +8,8 @@ from typing import Optional
 from unittest import TestCase, TestResult
 
 from hollarek.core.logging import LogLevel, Logger
-from .case import CaseStatus, CaseResult, get_case_name
+from .status import CaseStatus, CaseResult, get_case_name
+from .configurable import ConfigurableTest
 
 
 # ---------------------------------------------------------
@@ -25,21 +26,23 @@ class Result(TestResult):
     status_spaces = 10
     runtime_space = 10
 
-    def __init__(self, logger : Logger, settings : DisplayOptions, *args, **kwargs):
+    def __init__(self, logger : Logger, settings : DisplayOptions,is_manual : bool = False,  *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.test_settings : DisplayOptions = settings
 
         self.log = logger.log
         self.start_times : dict[str, float] = {}
         self.case_results : list[CaseResult] = []
-
+        self.is_manual : bool = is_manual
         self.print_header(f'  Test suite for \"{self.__class__.__name__}\"  ')
 
     def stopTestRun(self):
         super().stopTestRun()
         self.print_summary()
 
-    def startTest(self, test):
+    def startTest(self, test : ConfigurableTest):
+        if self.is_manual:
+            test.set_manual()
         super().startTest(test)
         self.log(msg = f'------> {get_case_name(test=test)[:self.test_spaces]} ', level=LogLevel.INFO)
         self.start_times[test.id()] = time.time()

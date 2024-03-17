@@ -46,22 +46,22 @@ class TestFile(Unittest):
         content = tio.read()
         self.assertIn(member=f'mankind', container=content)
 
-    def test_text_view(self, manual : bool = False):
-        if not manual:
+    def test_text_view(self):
+        if not self.is_manual_mode:
             self.skipTest(f'View can only be tested manually')
         tio = TextFile(fpath=self.text_fpath)
         tio.view()
 
-    def test_binary_view(self, manual : bool= False):
-        if not manual:
+    def test_binary_view(self):
+        if not self.is_manual_mode:
             self.skipTest(f'View can only be tested manually')
         bio = BinaryFile(self.text_fpath)
         with patch('sys.stdout', new=io.StringIO()) as fake_out:
             bio.view()
             self.assertIn("4f 6e", fake_out.getvalue())
 
-    def test_image_view(self, manual : bool = False):
-        if not manual:
+    def test_image_view(self):
+        if not self.is_manual_mode:
             self.skipTest(f'View can only be tested manually')
         image_io = ImageFile(fpath=self.png_fpath)
         image_io.view()
@@ -109,12 +109,16 @@ class TestImageSerializer(Unittest):
         self.png_file = spoofer.lend_jpg()
 
     def test_base64_roundtrip(self):
+        if not self.is_manual_mode:
+            self.skipTest(f'manual only')
         base64_str = ImageSerializer.as_base64_str(image=self.jpg_file.read())
         image = ImageSerializer.from_base64_str(base64_str=base64_str)
         image.show()
         image.close()
 
     def test_binary_roundtrip(self):
+        if not self.is_manual_mode:
+            self.skipTest(f'manual only')
         bio = ImageSerializer.as_bytes(image=self.jpg_file.read())
         image = ImageSerializer.from_bytes(img_bytes=bio)
         image.show()
@@ -125,4 +129,5 @@ class TestImageSerializer(Unittest):
 if __name__ == '__main__':
     # TestIO.execute_all()
     # TestImageConverter.execute_all()
-    TestImageSerializer.execute_all()
+    # TestImageConverter.execute_all()
+    TestImageSerializer.execute_all(is_manual=False)
