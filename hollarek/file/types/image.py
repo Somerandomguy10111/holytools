@@ -103,6 +103,12 @@ class ImageSerializer:
         img_bytes = buffer.getvalue()
         return img_bytes
 
+    @staticmethod
+    def from_bytes(img_bytes : bytes) -> Image:
+        buffer = BytesIO(img_bytes)
+        image = ImgHandler.open(buffer)
+        return image
+
     @classmethod
     def from_base64_str(cls, base64_str : str) -> Image:
         if "base64," in base64_str:

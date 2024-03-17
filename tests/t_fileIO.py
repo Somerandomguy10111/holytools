@@ -1,4 +1,4 @@
-from hollarek.file import BinaryFile, TextFile, ImageFile, ImageConverter, ImageFormat, FileSpoofer
+from hollarek.file import BinaryFile, TextFile, ImageFile, ImageConverter, ImageFormat, FileSpoofer, ImageSerializer
 from hollarek.devtools import Unittest
 from hollarek.fsys import FsysNode
 from PIL.Image import Image
@@ -102,6 +102,27 @@ class TestImageConverter(Unittest):
             ImageConverter.convert(image=image, target_format=ImageFormat.PNG)
 
 
+class TestImageSerializer(Unittest):
+    def setUp(self):
+        spoofer = FileSpoofer()
+        self.jpg_file = spoofer.lend_jpg()
+        self.png_file = spoofer.lend_jpg()
+
+    def test_base64_roundtrip(self):
+        base64_str = ImageSerializer.as_base64_str(image=self.jpg_file.read())
+        image = ImageSerializer.from_base64_str(base64_str=base64_str)
+        image.show()
+        image.close()
+
+    def test_binary_roundtrip(self):
+        bio = ImageSerializer.as_bytes(image=self.jpg_file.read())
+        image = ImageSerializer.from_bytes(img_bytes=bio)
+        image.show()
+        image.close()
+
+
+
 if __name__ == '__main__':
     # TestIO.execute_all()
-    TestImageConverter.execute_all()
+    # TestImageConverter.execute_all()
+    TestImageSerializer.execute_all()

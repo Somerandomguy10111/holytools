@@ -3,10 +3,7 @@ import base64
 
 class BinaryFile(File):
     def read(self) -> bytes:
-        with open(self.fpath, 'rb') as file:
-            content = file.read()
-        return content
-
+        return self.as_bytes()
 
     def write(self,content: bytes):
         with open(self.fpath, 'wb') as file:

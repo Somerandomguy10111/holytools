@@ -3,6 +3,7 @@ from typing import Optional
 import os
 from enum import Enum
 from pathlib import Path
+from base64 import b64encode
 
 class Access(Enum):
     READABLE = os.R_OK
@@ -54,3 +55,12 @@ class File:
         parts = self.fpath.split('.')
         suffix = parts[-1] if len(parts) > 1 else None
         return suffix
+
+    def as_bytes(self):
+        with open(self.fpath, 'rb') as file:
+            content = file.read()
+        return content
+
+    def as_base64(self) -> str:
+        data = self.as_bytes()
+        return b64encode(data).decode(encoding='utf-8')
