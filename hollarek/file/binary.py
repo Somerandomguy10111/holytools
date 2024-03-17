@@ -27,7 +27,7 @@ class BinaryFile(File):
 class BytesConverter:
     @staticmethod
     def to_base64(data : bytes) -> str:
-        return base64.b64encode(data).decode()
+        return base64.b64encode(data).decode(encoding='utf-8')
 
     @staticmethod
     def from_base64(data : str) -> bytes:
