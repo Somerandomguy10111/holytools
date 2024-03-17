@@ -36,6 +36,7 @@ class Unittest(ConfigurableTest):
         runner = Runner(logger=cls.get_logger(),settings=settings, is_manual=is_manual)
         results =  runner.run(suite)
         results.print_summary()
+        return results
 
     @classmethod
     def get_logger(cls) -> Logger:

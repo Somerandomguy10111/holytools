@@ -34,5 +34,11 @@ class TestJsonRepair(Unittest):
         with self.assertRaises(KeyError):
             self.assertEqual(parsed_json['keyy'], "new\nline and\ttab")
 
+
+class TestMeta(Unittest):
+    def test_summary(self):
+        results = TestJsonRepair.execute_all()
+        self.assertIn(f'4/4 tests ran successfully!',results.get_final_status())
+
 if __name__ == "__main__":
-    TestJsonRepair.execute_all(settings=DisplayOptions(show_details=True, show_runtimes=True))
+    TestMeta.execute_all()

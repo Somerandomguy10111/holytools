@@ -40,8 +40,6 @@ class ReportableResult(TestResult):
         self.case_results : list[CaseReport] = []
         self.log = logger.log
 
-    def startTest(self, test):
-        self.log(msg = f'------> {get_case_name(test=test)[:self.test_spaces]} ', level=LogLevel.INFO)
 
     def addSuccess(self, test):
         super().addSuccess(test)

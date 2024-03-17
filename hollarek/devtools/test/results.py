@@ -9,7 +9,7 @@ from unittest import TestCase
 
 from hollarek.core.logging import LogLevel, Logger
 from .configurable_unit import ConfigurableTest
-from .case_reports import ReportableResult, CaseReport, CaseStatus
+from .case_reports import ReportableResult, CaseReport, CaseStatus, get_case_name
 
 # ---------------------------------------------------------
 
@@ -35,8 +35,9 @@ class Results(ReportableResult):
     def startTest(self, test : ConfigurableTest):
         if self.is_manual:
             test.set_manual()
-        super().startTest(test)
+        self.log(msg=f'------> {get_case_name(test=test)[:self.test_spaces]} ', level=LogLevel.INFO)
         self.start_times[test.id()] = time.time()
+        super().startTest(test)
 
     # ---------------------------------------------------------
     # case logging
