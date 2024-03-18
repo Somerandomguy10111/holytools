@@ -35,4 +35,4 @@ class Endpoint:
 
     def get_url(self, protocol : str = 'https') -> str:
         socket_addr = self.socket.as_addr(protocol=protocol)
-        return f'{socket_addr}/{self.path}'
+        return f'{socket_addr}{self.path}'
