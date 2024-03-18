@@ -8,7 +8,7 @@ from typing import Callable
 # ---------------------------------------------------------
 
 @dataclass
-class Task:
+class FunctionTask:
     function: Callable
     args: tuple = field(default_factory=tuple)
     kwargs: dict = field(default_factory=dict)
@@ -19,7 +19,7 @@ class RateLimitedPool:
         super().__init__()
         self.max_rate = tasks_per_second
         self.executor = ThreadPoolExecutor(max_workers=max_workers)
-        self.task_queue : Queue[Task] = Queue()
+        self.task_queue : Queue[FunctionTask] = Queue()
         self.is_running = False
 
     def start(self):
@@ -52,7 +52,7 @@ if __name__ == "__main__":
 
     # Submit tasks
     for i in range(10):
-        pool.submit(Task(function=func,kwargs={'n' : i}))
+        pool.submit(FunctionTask(function=func, kwargs={'n' : i}))
 
     time.sleep(10)
     pool.stop()
