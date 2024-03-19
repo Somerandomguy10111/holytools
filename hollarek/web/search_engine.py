@@ -24,7 +24,7 @@ class SearchEngine:
             logging.warning(f'An error occured during search: {response.status_code} {response.reason}')
             return []
 
-        response_content = response.json()
+        response_content = response.model_dump_json()
         search_results = response_content.get('items')
         if search_results is None:
             logging.warning(f'Unable to obtain search results')
