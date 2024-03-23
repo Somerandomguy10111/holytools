@@ -1,2 +1,2 @@
-from .dtypes import TypeInspector
-from .modules import ModuleInspector, Argument
+from .type_inspect import TypeInspector
+from .module_inspect import ModuleInspector, Argument
