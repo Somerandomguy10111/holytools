@@ -26,6 +26,10 @@ def invalid(arg1, arg2=42):
     _, __ = arg1, arg2
 
 
+class InheritedClass(SampleClass):
+    pass
+
+
 
 class TestArgument(Unittest):
     def test_set_default(self):
@@ -73,6 +77,12 @@ class TestGetArgs(Unittest):
         args = ModuleInspector.get_args(sc.method_with_args, exclude_self=False)
         self.assertEqual(args[0].name, 'self')
 
+    def test_inheritance(self):
+        methods = ModuleInspector.get_methods(InheritedClass)
+        self.assertIn(InheritedClass.method_with_args, methods)
+        self.assertIn(InheritedClass._private_method, methods)
+        self.assertNotIn(InheritedClass.__magic_method__, methods, "Magic methods should not be included by default")
+
 
 class TestGetMethods(Unittest):
     def test_default(self):
@@ -94,5 +104,5 @@ class TestGetMethods(Unittest):
 
 if __name__ == '__main__':
     # TestGetMethods.execute_all()
-    # TestGetArgs.execute_all()
-    TestArgument.execute_all()
+    TestGetArgs.execute_all()
+    # TestArgument.execute_all()

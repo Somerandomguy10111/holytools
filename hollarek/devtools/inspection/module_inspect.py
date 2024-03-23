@@ -37,7 +37,7 @@ class ModuleInspector:
             attr_value = getattr(obj, attr_name)
             is_callable = callable(attr_value)
             return is_ok and is_callable
-        methods = [value for name, value in obj.__dict__.items() if attr_filter(name)]
+        methods = [getattr(obj, name) for name in dir(obj) if attr_filter(name)]
         return methods
 
 
