@@ -27,7 +27,7 @@ class Argument:
 
 class ModuleInspector:
     @staticmethod
-    def get_methods(obj : Union[object, type], public_only= False, include_operators : bool = False) -> list[Callable]:
+    def get_methods(obj : Union[object, type], public_only= False, include_operators : bool = False, include_inherited : bool = True) -> list[Callable]:
         def attr_filter(attr_name : str) -> bool:
             is_ok = True
             if public_only and attr_name.startswith('_'):
@@ -37,7 +37,8 @@ class ModuleInspector:
             attr_value = getattr(obj, attr_name)
             is_callable = callable(attr_value)
             return is_ok and is_callable
-        methods = [getattr(obj, name) for name in dir(obj) if attr_filter(name)]
+        attrs = dir(obj) if include_inherited else list(obj.__dict__.keys())
+        methods = [getattr(obj, name) for name in attrs if attr_filter(name)]
         return methods
 
 

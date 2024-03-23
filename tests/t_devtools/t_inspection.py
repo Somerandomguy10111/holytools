@@ -29,6 +29,8 @@ def invalid(arg1, arg2=42):
 class InheritedClass(SampleClass):
     pass
 
+    def new(self):
+        pass
 
 
 class TestArgument(Unittest):
@@ -77,11 +79,18 @@ class TestGetArgs(Unittest):
         args = ModuleInspector.get_args(sc.method_with_args, exclude_self=False)
         self.assertEqual(args[0].name, 'self')
 
-    def test_inheritance(self):
+    def test_with_inheritance(self):
         methods = ModuleInspector.get_methods(InheritedClass)
         self.assertIn(InheritedClass.method_with_args, methods)
         self.assertIn(InheritedClass._private_method, methods)
         self.assertNotIn(InheritedClass.__magic_method__, methods, "Magic methods should not be included by default")
+
+    def test_without_inhertiance(self):
+        methods = ModuleInspector.get_methods(InheritedClass, include_inherited=False)
+        self.assertNotIn(InheritedClass.method_with_args, methods)
+        self.assertNotIn(InheritedClass._private_method, methods)
+        self.assertNotIn(InheritedClass.__magic_method__, methods)
+        self.assertIn(InheritedClass.new, methods)
 
 
 class TestGetMethods(Unittest):
