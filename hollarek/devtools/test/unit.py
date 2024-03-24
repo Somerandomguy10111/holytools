@@ -84,4 +84,12 @@ class Unittest(ConfigurableTest):
                 msg = f'Tested expression should be true'
             raise AssertionError(msg)
 
+    def assertFalse(self, expr : bool, msg : Optional[str] = None):
+        if expr:
+            if msg is None:
+                msg = f'Tested expression should be false'
+            raise AssertionError(msg)
+
+
+
 
