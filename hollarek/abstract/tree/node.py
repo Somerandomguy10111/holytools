@@ -60,27 +60,38 @@ class TreeNode:
 
 
 class Tree:
-    def __init__(self, root_node : TreeNode, max_depth : int = IntegerInf(), max_size : int = IntegerInf()):
-        def get_subtree_dict(node: TreeNode, depth : int):
-            if depth>max_depth:
-                raise ValueError(f'Exceeded max depth of {max_depth}')
-            the_dict = {node.get_name(): {}}
-            child_nodes = node.get_child_nodes()
-            self.current_size += len(child_nodes)
-            if self.current_size > max_size:
-                raise ValueError(f'Exceeded max size of {max_size}')
-            for child in child_nodes:
-                the_dict[node.get_name()].update(get_subtree_dict(child,depth+1))
-            return the_dict
-
+    def __init__(self, root_node : TreeNode, max_depth : int = IntegerInf(), max_size : int = IntegerInf(), max_subtree_size = IntegerInf()):
+        self.max_subtree_size = max_subtree_size
+        self.max_depth = max_depth
+        self.max_size = max_size
         self.current_size = 0
-        self.recursive_dict = get_subtree_dict(node=root_node, depth=0)
+        self.recursive_dict = self.get_subtree_dict(node=root_node, depth=0)
 
     def as_str(self) -> str:
         return nested_dict_as_str(nested_dict=self.recursive_dict)
 
     def get_size(self) -> int:
         return get_total_elements(nested_dict=self.recursive_dict)
+
+    def get_subtree_dict(self, node: TreeNode, depth: int):
+        if depth > self.max_depth:
+            raise ValueError(f'Exceeded max depth of {self.max_depth}')
+        the_dict = {node.get_name(): {}}
+        child_nodes = node.get_child_nodes()
+        self.current_size += len(child_nodes)
+        if self.current_size > self.max_size:
+            raise ValueError(f'Exceeded max size of {self.max_size}')
+
+        for child in child_nodes:
+            try:
+                subtree = Tree(root_node=child, max_depth=self.max_depth - 1, max_size=self.max_subtree_size)
+                subtree_dict = subtree.recursive_dict
+                the_dict[node.get_name()].update(subtree_dict)
+            except:
+                name_with_warning = f'{child.get_name()} [WARNING: Subtree too large to display]'
+                the_dict[name_with_warning] = {}
+        return the_dict
+
 
 def nested_dict_as_str(nested_dict: dict, prefix='') -> str:
     output = ''
