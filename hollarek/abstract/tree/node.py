@@ -31,18 +31,6 @@ class TreeNode:
     def get_child_nodes(self) -> list[TreeNode]:
         return self._children
 
-    def get_tree(self, max_child_size : int = 100) -> Tree:
-        return Tree(root_node=self)
-        # sub_dict = self.get_dict()[self._name]
-        # for key, value in [(key,value) for (key, value) in sub_dict.items() if isinstance(value, dict)]:
-        #     elem_count = get_total_elements(recursive_dict=value)
-        #     if elem_count > max_child_size:
-        #         sub_dict[key] = f': {key} exceeds limit of {max_child_size} elements contains {elem_count} files/folders'
-        #
-        # tree = get_pretty_tree(the_dict={self._name : sub_dict})
-        # tree = tree.replace('{}', '')
-        # return tree
-
     # -------------------------------------------
     # ancestors
 
@@ -65,25 +53,40 @@ class TreeNode:
 
 
 class Tree:
-    def __init__(self, root_node : TreeNode):
-        def get_subtree_dict(node : TreeNode):
-            the_dict = {node.get_name() : {}}
-            for child in node.get_child_nodes():
-                the_dict[node.get_name()].update(get_subtree_dict(child))
+    def __init__(self, root_node : TreeNode, max_depth : int, max_size : int):
+        def get_subtree_dict(node: TreeNode, depth : int):
+            if depth>max_depth:
+                raise ValueError(f'Exceeded max depth of {max_depth}')
+            the_dict = {node.get_name(): {}}
+            child_nodes = node.get_child_nodes()
+            self.current_size += len(child_nodes)
+            if self.current_size > max_size:
+                raise ValueError(f'Exceeded max size of {max_size}')
+            for child in child_nodes:
+                the_dict[node.get_name()].update(get_subtree_dict(child,depth+1))
             return the_dict
 
-        self.recursive_dict = get_subtree_dict(node=root_node)
+        self.current_size = 0
+        self.recursive_dict = get_subtree_dict(node=root_node, depth=0)
 
     def as_str(self) -> str:
-        return nested_dict_as_str(the_dict=self.recursive_dict)
+        return nested_dict_as_str(nested_dict=self.recursive_dict)
 
 
-def nested_dict_as_str(the_dict: dict, prefix=''):
+def nested_dict_as_str(nested_dict: dict, prefix='') -> str:
     output = ''
-    for index, (key, value) in enumerate(the_dict.items()):
-        is_last = index == len(the_dict) - 1
+    for index, (key, value) in enumerate(nested_dict.items()):
+        is_last = index == len(nested_dict) - 1
         new_prefix = prefix + ('    ' if is_last else '│   ')
         connector = '└── ' if is_last else '├── '
         output += f'{prefix}{connector}{key}\n'
-        output += nested_dict_as_str(the_dict=value, prefix = new_prefix)
+        output += nested_dict_as_str(nested_dict=value, prefix = new_prefix)
     return output
+
+def get_total_elements(nested_dict : dict) -> int:
+    count = 0
+    for key, value in nested_dict.items():
+        count += 1
+        if isinstance(value, dict):
+            count += get_total_elements(value)
+    return count
