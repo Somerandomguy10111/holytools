@@ -47,10 +47,14 @@ class Countdown:
             raise ValueError("on_expiration must be set to use this method")
         return self.output_waiter.get()
 
+    def is_active(self):
+        return not self.job is None
+
     def _release(self):
         self.one_time_lock.unlock()
         out = self.on_expiration()
         self.output_waiter.write(out)
+        self.job = None
 
 
 class Lock:

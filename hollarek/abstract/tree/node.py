@@ -33,13 +33,17 @@ class TreeNode:
     def get_child_nodes(self) -> list[TreeNodeType]:
         return self._children
 
-    def get_tree(self, pretty : bool = True) -> str:
-        if pretty:
-            tree = get_pretty_tree(the_dict=self.get_dict())
-            to_replace = f'{{}}'
-        else:
-            tree = yaml.dump(data=self.get_dict(), indent=4)
-            to_replace = f': {{}}'
+    def get_tree(self, max_child_size : int = 100) -> str:
+        sub_dict = self.get_dict()[self._name]
+        for key, value in sub_dict.items():
+            if isinstance(value, dict):
+                elem_count = get_total_elements(recursive_dict=value)
+                if elem_count > max_child_size:
+                    sub_dict[key] = (f': {key} exceeds limit of {max_child_size} elements'
+                                     f', contains {elem_count} files/folders')
+
+        tree = get_pretty_tree(the_dict={self._name : sub_dict})
+        to_replace = f'{{}}'
         tree = tree.replace(f'{to_replace}', '')
         return tree
 
@@ -85,3 +89,12 @@ def get_pretty_tree(the_dict, prefix='', is_last=True) -> str:
         else:
             output += f'{prefix}{connector}{key} {value}\n'
     return output
+
+
+def get_total_elements(recursive_dict: dict) -> int:
+    count = 0
+    for key, value in recursive_dict.items():
+        count += 1
+        if isinstance(value, dict):
+            count += get_total_elements(value)
+    return count

@@ -6,17 +6,18 @@ class TextFile(File):
         text = textract.process(self.fpath)
         return text.decode('utf-8')
 
+
     def write(self,content: str):
-        parts = self.fpath.split('.')
-        suffix = parts[-1] if len(parts) > 1 else None
-
-        if suffix == 'txt' or suffix is None:
-            with open(self.fpath, 'w', encoding='utf-8') as file:
-                file.write(content)
-        else:
-            raise ValueError(f'Unsupported file type: {suffix}')
-
+        if f'.{self.get_suffix()}' in self.get_viewable_formats():
+            raise ValueError(f'Cannot write to .{self.get_suffix()} files, only to plain text files')
+        with open(self.fpath, 'w', encoding='utf-8') as file:
+            file.write(content)
 
     def view(self):
         content = self.read()
         print(content)
+
+    @classmethod
+    def get_viewable_formats(cls) -> list[str]:
+        return [".csv", ".doc", ".docx", ".eml", ".epub", ".gif", ".jpg", ".jpeg", ".json", ".html", ".htm",
+                    ".msg", ".odt", ".ogg", ".pdf", ".png", ".pptx", ".ps", ".rtf", ".txt", ".xlsx", ".xls"]
