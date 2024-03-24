@@ -63,5 +63,10 @@ class TestFsysNode(Unittest):
 if __name__ == '__main__':
     dir_path = '/home/daniel/lotus/engine'
     node = FsysNode(path=dir_path)
-    tree = node.get_tree()
+    tree = node.get_tree(max_depth=4)
+    newtree = node.get_tree(max_size=100)
+
+    print(f'tree size is {tree.get_size()}')
+    print(f'subnodes count is {len(node.get_subnodes())}')
+
     print(tree.as_str())

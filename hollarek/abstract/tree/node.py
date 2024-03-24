@@ -2,6 +2,27 @@ from __future__ import annotations
 from typing import Optional
 # -------------------------------------------
 
+
+class IntegerInf(int):
+    def __eq__(self, other):
+        return False
+
+    def __ne__(self, other):
+        return True
+
+    def __lt__(self, other):
+        return False
+
+    def __le__(self, other):
+        return False
+
+    def __gt__(self, other):
+        return True
+
+    def __ge__(self, other):
+        return True
+
+
 class TreeNode:
     def __init__(self, name : str, parent : Optional[TreeNode] = None):
         self._name : str = name
@@ -17,6 +38,9 @@ class TreeNode:
 
     def get_name(self) -> str:
         return self._name
+
+    def get_tree(self, max_depth : int = IntegerInf(), max_size : int = IntegerInf()) -> Tree:
+        return Tree(root_node=self, max_depth=max_depth, max_size=max_size)
 
     # -------------------------------------------
     # descendants
@@ -53,7 +77,7 @@ class TreeNode:
 
 
 class Tree:
-    def __init__(self, root_node : TreeNode, max_depth : int, max_size : int):
+    def __init__(self, root_node : TreeNode, max_depth : int = IntegerInf(), max_size : int = IntegerInf()):
         def get_subtree_dict(node: TreeNode, depth : int):
             if depth>max_depth:
                 raise ValueError(f'Exceeded max depth of {max_depth}')
@@ -72,6 +96,8 @@ class Tree:
     def as_str(self) -> str:
         return nested_dict_as_str(nested_dict=self.recursive_dict)
 
+    def get_size(self) -> int:
+        return get_total_elements(nested_dict=self.recursive_dict)
 
 def nested_dict_as_str(nested_dict: dict, prefix='') -> str:
     output = ''
