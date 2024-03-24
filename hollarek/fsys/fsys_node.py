@@ -39,11 +39,10 @@ class FsysNode(TreeNode):
         if not self._children is None:
             return self._children
 
-        if self._children is None:
-            self._children = []
-            if not self.is_file():
-                child_paths = [os.path.join(self.get_path(), name) for name in os.listdir(path=self.get_path())]
-                self._children = [FsysNode(path=path, parent=self) for path in child_paths]
+        self._children = []
+        if self.is_dir():
+            child_paths = [os.path.join(self.get_path(), name) for name in os.listdir(path=self.get_path())]
+            self._children = [FsysNode(path=path, parent=self) for path in child_paths]
 
         return self._children
 
