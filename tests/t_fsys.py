@@ -61,12 +61,7 @@ class TestFsysNode(Unittest):
 
 # This allows the test script to be run from the command line
 if __name__ == '__main__':
-    # TestFsysNode.execute_all(show_run_times=True)
-    dir_path = '/home/daniel/OneDrive/Downloads'
-    # download_node = FsysNode(path=os.path.join(dir_path, 'cute_doggo.png'))
-    download_node = FsysNode(path=dir_path)
-    download_bytes = download_node.get_zip()
-
-    zip_path = os.path.join(dir_path, 'test.zip')
-    with open(f'{zip_path}', 'wb') as file:
-        file.write(download_bytes)
+    dir_path = '/home/daniel/lotus/engine'
+    node = FsysNode(path=dir_path)
+    tree = node.get_tree()
+    print(tree.as_str())
