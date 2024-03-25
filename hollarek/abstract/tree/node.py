@@ -28,7 +28,7 @@ class TreeNode(ABC):
                 the_dict[node].update(subtree)
             return the_dict
 
-        root_size = 1
+        root_size = 0
         return Tree(get_subdict(node=self, depth=0))
 
     # -------------------------------------------
