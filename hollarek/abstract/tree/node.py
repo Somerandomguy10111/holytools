@@ -1,28 +1,20 @@
 from __future__ import annotations
 from typing import Optional
-
+from abc import abstractmethod, ABC
 from hollarek.abstract.integer_inf import IntegerInf
 
 # -------------------------------------------
 
 
-class TreeNode:
-    def __init__(self, name : str, parent : Optional[TreeNode] = None):
-        self._name : str = name
-        self._parent : TreeNode = parent
-        self._children : Optional[list] = None
-
-    def _add_child(self, node : TreeNode):
-        if node.get_parent() != self:
-            raise ValueError(f'Node already has parent')
-        if self._children is None:
-            self._children = []
-        self._children.append(node)
-
+class TreeNode(ABC):
+    @abstractmethod
     def get_name(self) -> str:
-        return self._name
+        pass
 
-    def get_tree(self, max_depth : int = IntegerInf(), max_size : int = IntegerInf()) -> Tree:
+    def get_tree(self, max_depth : int = IntegerInf(), max_size : int = IntegerInf()) -> dict:
+        
+
+
         return Tree(root_node=self, max_depth=max_depth, max_size=max_size)
 
     # -------------------------------------------
@@ -35,8 +27,9 @@ class TreeNode:
             subnodes += child.get_subnodes()
         return subnodes
 
+    @abstractmethod
     def get_child_nodes(self) -> list[TreeNode]:
-        return self._children
+        pass
 
     # -------------------------------------------
     # ancestors
@@ -44,13 +37,14 @@ class TreeNode:
     def get_ancestors(self) -> list[TreeNode]:
         current = self
         ancestors = []
-        while current._parent:
-            ancestors.append(current._parent)
-            current = current._parent
+        while current.get_parent():
+            ancestors.append(current.get_parent())
+            current = current.get_parent()
         return ancestors
 
+    @abstractmethod
     def get_parent(self) -> Optional[TreeNode]:
-        return self._parent
+        pass
 
     def get_root(self) -> TreeNode:
         current = self

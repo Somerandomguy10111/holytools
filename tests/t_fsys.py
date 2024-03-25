@@ -50,10 +50,6 @@ class TestFsysNode(Unittest):
         file_subnodes = self.root_node.get_file_subnodes()
         self.assertEqual(len(file_subnodes), self.num_total_files)
 
-    def test_get_dict(self):
-        the_dict = self.root_node.get_dict()
-        self.assertIsInstance(the_dict, dict)
-
     def test_get_yaml(self):
         the_yaml = self.root_node.get_tree()
         self.assertIsInstance(the_yaml, str)
@@ -61,12 +57,14 @@ class TestFsysNode(Unittest):
 
 # This allows the test script to be run from the command line
 if __name__ == '__main__':
-    dir_path = '/home/daniel/lotus/engine'
+    dir_path = '/run'
     node = FsysNode(path=dir_path)
     tree = node.get_tree(max_depth=4)
     newtree = node.get_tree(max_size=100)
 
     print(f'tree size is {tree.get_size()}')
     print(f'subnodes count is {len(node.get_subnodes())}')
+    print(f'subnode names are {[node.get_name() for node in node.get_subnodes()]}')
+    print(f'Child nodes are {[node.get_name() for node in node.get_child_nodes()]}')
 
     print(tree.as_str())

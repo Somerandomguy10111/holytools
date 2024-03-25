@@ -7,15 +7,24 @@ from hollarek.abstract import TreeNode
 # -------------------------------------------
 
 class FsysNode(TreeNode):
-    def __init__(self, path : str, parent : FsysNode = None):
-        newpath = os.path.normpath(path)
-        super().__init__(name=os.path.basename(newpath), parent=parent)
+    def __init__(self, path : str, parent : Optional[FsysNode] = None):
+        super().__init__()
         self._path_wrapper : PathWrapper = PathWrapper(path)
+        self._cached_children : Optional[list[FsysNode]] = []
+        self._cached_parent : Optional[FsysNode] = parent
         if not (self.is_dir() or self.is_file()):
             raise FileNotFoundError(f'Path {path} is not a file/folder')
 
     # -------------------------------------------
     # descendants
+
+    def add_child(self, path : str) -> FsysNode:
+        if self._cached_children is None:
+            self._cached_children = []
+        child = FsysNode(path=path, parent=self)
+        self._cached_children.append(child)
+        return child
+
 
     def get_file_subnodes(self, select_formats: Optional[list[str]] = None) -> list[FsysNode]:
         file_subnodes = [des for des in self.get_subnodes() if des.is_file()]
@@ -25,26 +34,40 @@ class FsysNode(TreeNode):
         return file_subnodes
 
 
-    def get_subnodes(self, follow_symlinks : bool = False) -> list[FsysNode]:
-        if follow_symlinks:
-            subnodes = super().get_subnodes()
-        else:
-            path_list = list(self._path_wrapper.rglob('*'))
-            subnodes = [FsysNode(str(path)) for path in path_list]
+    def get_subnodes(self, follow_symlinks: bool = True) -> list['FsysNode']:
+        path_to_node = {self.get_path(): self}
 
-        return subnodes
+        for root, dirs, files in os.walk(self.get_path(), followlinks=follow_symlinks):
+            parent_node = path_to_node.get(root)
+            for name in dirs+files:
+                path = os.path.join(root, name)
+                is_resource = os.path.isfile(path) or os.path.isdir(path)
+                if path in path_to_node or not is_resource:
+                    continue
+                try:
+                    path_to_node[path] = parent_node.add_child(path)
+                except FileNotFoundError:
+                    continue
+
+        return list(path_to_node.values())
 
 
     def get_child_nodes(self) -> list[FsysNode]:
-        if not self._children is None:
-            return self._children
+        if not self._cached_children is None:
+            return self._cached_children
 
-        self._children = []
-        if self.is_dir():
-            child_paths = [os.path.join(self.get_path(), name) for name in os.listdir(path=self.get_path())]
-            self._children = [FsysNode(path=path, parent=self) for path in child_paths]
+        self._cached_children = []
+        if not self.is_dir():
+            return self._cached_children
 
-        return self._children
+        child_paths = [os.path.join(self.get_path(), name) for name in os.listdir(path=self.get_path())]
+        for path in child_paths:
+            try:
+                self.add_child(path=path)
+            except:
+                continue
+
+        return self._cached_children
 
     # -------------------------------------------
     # ancestors
@@ -53,14 +76,12 @@ class FsysNode(TreeNode):
         if self.is_root():
             return None
 
-        if self._parent is None:
-            self._parent = FsysNode(path=str(self._path_wrapper.parent))
-        return self._parent
-
+        if self._cached_parent is None:
+            self._cached_parent = FsysNode(path=str(self._path_wrapper.parent))
+        return self._cached_parent
 
     def is_root(self):
         return self._path_wrapper.parent == self._path_wrapper
-
 
     # -------------------------------------------
     # get data
@@ -87,6 +108,8 @@ class FsysNode(TreeNode):
 
     # -------------------------------------------
     # resource info
+    def get_name(self) -> str:
+        return self._path_wrapper.name
 
     def get_path(self) -> str:
         return str(self._path_wrapper.absolute())
