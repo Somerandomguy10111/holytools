@@ -57,14 +57,19 @@ class TestFsysNode(Unittest):
 
 # This allows the test script to be run from the command line
 if __name__ == '__main__':
-    dir_path = '/run'
+    dir_path = '/home/daniel/lotus/engine'
+
+
     node = FsysNode(path=dir_path)
-    tree = node.get_tree(max_depth=4)
+
+    print(f'subnodes count is {len(node.get_subnodes())}')
+
+    tree = node.get_tree()
     newtree = node.get_tree(max_size=100)
 
-    print(f'tree size is {tree.get_size()}')
-    print(f'subnodes count is {len(node.get_subnodes())}')
-    print(f'subnode names are {[node.get_name() for node in node.get_subnodes()]}')
-    print(f'Child nodes are {[node.get_name() for node in node.get_child_nodes()]}')
+
+    # print(f'subnode names are {[node.get_name() for node in node.get_subnodes()]}')
+    # print(f'Child nodes are {[node.get_name() for node in node.get_child_nodes()]}')
+    # print(f'tree size is {tree.get_size()}')
 
     print(tree.as_str())

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 
-class IntegerInf(int):
+class IntInf(int):
     def __eq__(self, other):
         return False
 
@@ -20,20 +20,30 @@ class IntegerInf(int):
     def __ge__(self, other):
         return True
 
-    def __add__(self, other):
+    def __add__(self, other) -> IntInf:
+        if isinstance(other, IntInf):
+            raise ValueError("Cannot add IntegerInf to IntegerInf")
         return self
 
-    def __radd__(self, other):
+    def __radd__(self, other) -> IntInf:
+        if isinstance(other, IntInf):
+            raise ValueError("Cannot add IntegerInf to IntegerInf")
         return self
 
-    def __iadd__(self, other):
+    def __iadd__(self, other) -> IntInf:
+        if isinstance(other, IntInf):
+            raise ValueError("Cannot add IntegerInf to IntegerInf")
         return self
 
-    def __sub__(self, other):
+    def __sub__(self, other) -> IntInf:
+        if isinstance(other, IntInf):
+            raise ValueError("Cannot subtract IntegerInf from IntegerInf")
         return self
 
-    def __rsub__(self, *args, **kwargs):
-        raise NotImplementedError("Subtraction from infinity is not supported")
+    def __rsub__(self, other) -> IntInf:
+        if isinstance(other, IntInf):
+            raise ValueError("Cannot subtract IntegerInf from IntegerInf")
+        return self
 
     def __mul__(self, *args, **kwargs):
         raise NotImplementedError("Multiplication is not supported")

@@ -1,7 +1,7 @@
 from __future__ import annotations
 from typing import Optional
 from abc import abstractmethod, ABC
-from hollarek.abstract.integer_inf import IntegerInf
+from hollarek.abstract.integer_inf import IntInf
 
 # -------------------------------------------
 
@@ -11,11 +11,25 @@ class TreeNode(ABC):
     def get_name(self) -> str:
         pass
 
-    def get_tree(self, max_depth : int = IntegerInf(), max_size : int = IntegerInf()) -> dict:
-        
+    def get_tree(self, max_depth : int = IntInf(), max_size : int = IntInf()) -> Tree:
+        def get_subdict(node : TreeNode, depth : int) -> dict:
+            nonlocal root_size
+            the_dict = {node.get_name(): {}}
+            root_size += 1
 
+            if depth > max_depth:
+                raise ValueError(f'Exceeded max depth of {max_depth}')
+            if root_size > max_size:
+                raise ValueError(f'Exceeded max size of {max_size}')
 
-        return Tree(root_node=self, max_depth=max_depth, max_size=max_size)
+            child_nodes = node.get_child_nodes()
+            for child in child_nodes:
+                subtree = get_subdict(node=child, depth=depth+1)
+                the_dict[node.get_name()].update(subtree)
+            return the_dict
+
+        root_size = 1
+        return Tree(get_subdict(node=self, depth=0))
 
     # -------------------------------------------
     # descendants
@@ -53,38 +67,22 @@ class TreeNode(ABC):
         return current
 
 
-class Tree:
-    def __init__(self, root_node : TreeNode, max_depth : int = IntegerInf(), max_size : int = IntegerInf(), max_subtree_size = IntegerInf()):
-        self.max_subtree_size = max_subtree_size
-        self.max_depth = max_depth
-        self.max_size = max_size
-        self.current_size = 0
-        self.recursive_dict = self.get_subtree_dict(node=root_node, depth=0)
 
+class Tree(dict[TreeNode, dict]):
     def as_str(self) -> str:
-        return nested_dict_as_str(nested_dict=self.recursive_dict)
+        return nested_dict_as_str(nested_dict=self)
 
     def get_size(self) -> int:
-        return get_total_elements(nested_dict=self.recursive_dict)
+        return get_total_elements(nested_dict=self)
 
-    def get_subtree_dict(self, node: TreeNode, depth: int):
-        if depth > self.max_depth:
-            raise ValueError(f'Exceeded max depth of {self.max_depth}')
-        the_dict = {node.get_name(): {}}
-        child_nodes = node.get_child_nodes()
-        self.current_size += len(child_nodes)
-        if self.current_size > self.max_size:
-            raise ValueError(f'Exceeded max size of {self.max_size}')
 
-        for child in child_nodes:
-            try:
-                subtree = Tree(root_node=child, max_depth=self.max_depth - 1, max_size=self.max_subtree_size)
-                subtree_dict = subtree.recursive_dict
-                the_dict[node.get_name()].update(subtree_dict)
-            except:
-                name_with_warning = f'{child.get_name()} [WARNING: Subtree too large to display]'
-                the_dict[name_with_warning] = {}
-        return the_dict
+class SizeCounter:
+    def __init__(self):
+        self.size_counter: dict[TreeNode, int] = {}
+
+    def increment(self, node: TreeNode):
+        val = self.size_counter.get(node, 1)
+        self.size_counter[node] = val + 1
 
 
 def nested_dict_as_str(nested_dict: dict, prefix='') -> str:
