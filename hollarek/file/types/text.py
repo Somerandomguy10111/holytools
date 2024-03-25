@@ -3,8 +3,13 @@ from .file import File
 
 class TextFile(File):
     def read(self) -> str:
-        text = textract.process(self.fpath)
-        return text.decode('utf-8')
+        if f'.{self.get_suffix()}' in self.get_viewable_formats():
+            binary_data = textract.process(self.fpath)
+            text = binary_data.decode('utf-8')
+        else:
+            with open(self.fpath, 'r') as f:
+                text = f.read()
+        return text
 
 
     def write(self,content: str):

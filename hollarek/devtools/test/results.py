@@ -20,12 +20,12 @@ class DisplayOptions:
 
 
 class Results(ReportableResult):
-    def __init__(self, logger : Logger, settings : DisplayOptions,is_manual : bool = False,  *args, **kwargs):
+    def __init__(self, logger : Logger, settings : DisplayOptions, manual_mode : bool = False, *args, **kwargs):
         kwargs['logger'] = logger
         super().__init__(*args, **kwargs)
         self.test_settings : DisplayOptions = settings
         self.start_times : dict[str, float] = {}
-        self.is_manual : bool = is_manual
+        self.is_manual : bool = manual_mode
         self.print_header(f'  Test suite for \"{self.__class__.__name__}\"  ')
 
     def stopTestRun(self):

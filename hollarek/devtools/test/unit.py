@@ -13,14 +13,15 @@ class Runner(unittest.TextTestRunner):
         super().__init__(resultclass=None)
         self.logger : Logger = logger
         self.display_options : DisplayOptions = settings
-        self.is_manual : bool = is_manual
+        self.manual_mode : bool = is_manual
 
     def run(self, test) -> Results:
         result = Results(logger=self.logger,
                          stream=self.stream,
                          settings=self.display_options,
                          descriptions=self.descriptions,
-                         verbosity=2)
+                         verbosity=2,
+                         manual_mode=self.manual_mode)
         test(result)
         result.printErrors()
 
@@ -31,9 +32,9 @@ class Unittest(ConfigurableTest):
     _logger : Logger = None
 
     @classmethod
-    def execute_all(cls, is_manual : bool = True, settings : DisplayOptions = DisplayOptions()):
+    def execute_all(cls, manual_mode : bool = True, settings : DisplayOptions = DisplayOptions()):
         suite = unittest.TestLoader().loadTestsFromTestCase(cls)
-        runner = Runner(logger=cls.get_logger(),settings=settings, is_manual=is_manual)
+        runner = Runner(logger=cls.get_logger(), settings=settings, is_manual=manual_mode)
         results =  runner.run(suite)
         results.print_summary()
         return results

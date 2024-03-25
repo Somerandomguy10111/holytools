@@ -127,7 +127,7 @@ class TestImageSerializer(Unittest):
 
 
 if __name__ == '__main__':
-    # TestIO.execute_all()
+    TestFile.execute_all(manual_mode=True)
     # TestImageConverter.execute_all()
     # TestImageConverter.execute_all()
-    TestImageSerializer.execute_all(is_manual=False)
+    # TestImageSerializer.execute_all(is_manual=False)
