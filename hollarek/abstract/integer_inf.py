@@ -21,52 +21,79 @@ class IntegerInf(int):
         return True
 
     def __add__(self, other):
-        # IntegerInf plus anything remains IntegerInf
         return self
 
     def __radd__(self, other):
-        # Anything plus IntegerInf remains IntegerInf
         return self
 
     def __iadd__(self, other):
-        # In-place addition: IntegerInf += anything remains IntegerInf
         return self
 
     def __sub__(self, other):
-        # IntegerInf minus anything remains IntegerInf
         return self
 
-    def __rsub__(self, other):
-        # Anything minus IntegerInf is not defined, raise an error
+    def __rsub__(self, *args, **kwargs):
         raise NotImplementedError("Subtraction from infinity is not supported")
 
-    # Override other operators to raise NotImplementedError
-    def __mul__(self, other):
+    def __mul__(self, *args, **kwargs):
         raise NotImplementedError("Multiplication is not supported")
 
-    def __rmul__(self, other):
+    def __rmul__(self, *args, **kwargs):
         raise NotImplementedError("Multiplication is not supported")
 
-    def __truediv__(self, other):
+    def __truediv__(self, *args, **kwargs):
         raise NotImplementedError("Division is not supported")
 
-    def __rtruediv__(self, other):
+    def __rtruediv__(self, *args, **kwargs):
         raise NotImplementedError("Division is not supported")
 
-    def __floordiv__(self, other):
+    def __floordiv__(self, *args, **kwargs):
         raise NotImplementedError("Floor division is not supported")
 
-    def __rfloordiv__(self, other):
+    def __rfloordiv__(self, *args, **kwargs):
         raise NotImplementedError("Floor division is not supported")
 
-    def __mod__(self, other):
+    def __mod__(self, *args, **kwargs):
         raise NotImplementedError("Modulo is not supported")
 
-    def __rmod__(self, other):
+    def __rmod__(self, *args, **kwargs):
         raise NotImplementedError("Modulo is not supported")
 
-    def __pow__(self, other):
+    def __pow__(self, *args, **kwargs):
         raise NotImplementedError("Power is not supported")
 
-    def __rpow__(self, other):
+    def __rpow__(self, *args, **kwargs):
         raise NotImplementedError("Power is not supported")
+
+    def __and__(self, *args, **kwargs):
+        raise NotImplementedError("Bitwise and is not supported")
+
+    def __rand__(self, *args, **kwargs):
+        raise NotImplementedError("Bitwise and is not supported")
+
+    def __or__(self, *args, **kwargs):
+        raise NotImplementedError("Bitwise or is not supported")
+
+    def __ror__(self, *args, **kwargs):
+        raise NotImplementedError("Bitwise or is not supported")
+
+    def __xor__(self, *args, **kwargs):
+        raise NotImplementedError("Bitwise xor is not supported")
+
+    def __rxor__(self, *args, **kwargs):
+        raise NotImplementedError("Bitwise xor is not supported")
+
+    def __lshift__(self, *args, **kwargs):
+        raise NotImplementedError("Left shift is not supported")
+
+    def __rlshift__(self, *args, **kwargs):
+        raise NotImplementedError("Left shift is not supported")
+
+    def __rshift__(self, *args, **kwargs):
+        raise NotImplementedError("Right shift is not supported")
+
+    def __rrshift__(self, *args, **kwargs):
+        raise NotImplementedError("Right shift is not supported")
+
+    def __invert__(self, *args, **kwargs):
+        raise NotImplementedError("Bitwise inversion is not supported")
