@@ -1,16 +1,17 @@
 from __future__ import annotations
 from typing import Optional
 from pathlib import Path as PathWrapper
-import os
 import tempfile, shutil
-from hollarek.abstract import TreeNode
+import os
+from hollarek.abstract import TreeNode, Tree
+from hollarek.abstract.integer_inf import IntInf
 # -------------------------------------------
 
 class FsysNode(TreeNode):
     def __init__(self, path : str, parent : Optional[FsysNode] = None):
         super().__init__()
         self._path_wrapper : PathWrapper = PathWrapper(path)
-        self._cached_children : Optional[list[FsysNode]] = []
+        self._cached_children : Optional[list[FsysNode]] = None
         self._cached_parent : Optional[FsysNode] = parent
         if not (self.is_dir() or self.is_file()):
             raise FileNotFoundError(f'Path {path} is not a file/folder')
@@ -26,6 +27,10 @@ class FsysNode(TreeNode):
         return child
 
 
+    def get_tree(self, max_depth : int = IntInf(), max_size : int = IntInf(), exclude_hidden : bool = False) -> Tree:
+        return super().get_tree(max_depth=max_depth, max_size=max_size, exclude_hidden=exclude_hidden)
+
+
     def get_file_subnodes(self, select_formats: Optional[list[str]] = None) -> list[FsysNode]:
         file_subnodes = [des for des in self.get_subnodes() if des.is_file()]
         if select_formats is not None:
@@ -34,13 +39,14 @@ class FsysNode(TreeNode):
         return file_subnodes
 
 
-    def get_subnodes(self, follow_symlinks: bool = True) -> list['FsysNode']:
+    def get_subnodes(self, follow_symlinks: bool = True) -> list[FsysNode]:
         path_to_node = {self.get_path(): self}
 
         for root, dirs, files in os.walk(self.get_path(), followlinks=follow_symlinks):
             parent_node = path_to_node.get(root)
             for name in dirs+files:
                 path = os.path.join(root, name)
+
                 is_resource = os.path.isfile(path) or os.path.isdir(path)
                 if path in path_to_node or not is_resource:
                     continue
@@ -52,16 +58,18 @@ class FsysNode(TreeNode):
         return list(path_to_node.values())
 
 
-    def get_child_nodes(self) -> list[FsysNode]:
+    def get_child_nodes(self, exclude_hidden : bool = False) -> list[FsysNode]:
         if not self._cached_children is None:
             return self._cached_children
-
         self._cached_children = []
         if not self.is_dir():
             return self._cached_children
 
         child_paths = [os.path.join(self.get_path(), name) for name in os.listdir(path=self.get_path())]
         for path in child_paths:
+            # print(f'Filepath {path} is hidden: {is_hidden(path)}')
+            if exclude_hidden and is_hidden(path):
+                continue
             try:
                 self.add_child(path=path)
             except:
@@ -108,6 +116,10 @@ class FsysNode(TreeNode):
 
     # -------------------------------------------
     # resource info
+
+    def is_hidden(self) -> bool:
+        return is_hidden(self.get_path())
+
     def get_name(self) -> str:
         return self._path_wrapper.name
 
@@ -134,20 +146,11 @@ class FsysNode(TreeNode):
         return self._path_wrapper.is_dir()
 
 
-if __name__ == "__main__":
-    test_path = '/home/daniel/OneDrive/Pictures'
-    test_node = FsysNode(test_path)
-    print(test_node.get_name())
-    print(test_node.get_path())
-    # print('abc')
-    # print(test_path)
-
-    test_childpaths = [node.get_path() for node in test_node.get_child_nodes()]
-    test_sub_paths = [node.get_path() for node in test_node.get_subnodes()]
-    test_sub_paths2 = [node.get_path() for node in test_node.get_subnodes(follow_symlinks=True)]
-
-    print(f'test childpaths {len(test_childpaths)}')
-    print(f'test sub paths {len(test_sub_paths)}')
-    print(f'test sub paths {len(test_sub_paths2)}')
-
-
+def is_hidden(filepath: str) -> bool:
+    if os.name == 'posix':
+        return os.path.basename(filepath).startswith('.')
+    elif os.name == 'nt':
+        return bool(os.stat(filepath).st_file_attributes & os.stat.FILE_ATTRIBUTE_HIDDEN)
+    else:
+        raise NotImplementedError(f'Unsupported OS: {os.name}, {FsysNode.is_hidden.__name__} is only supported '
+                                  f'on Windows and Unix systems')

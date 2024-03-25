@@ -56,13 +56,22 @@ class TestFsysNode(Unittest):
 
 
 if __name__ == '__main__':
-    dir_path = '/home/daniel/lotus/engine/l1_agent/agent'
-    node = FsysNode(path=dir_path)
-    print(f'subnodes count is {len(node.get_subnodes())}')
-
-    tree = node.get_tree()
-    newtree = node.get_tree(max_size=100)
-    from hollarek.abstract import Tree
-    new_tree = Tree.join_trees(root=node, subtrees=[child.get_tree() for child in node.get_child_nodes()])
-    print(tree.as_str())
-    assert(tree.as_str() == new_tree.as_str())
+    dir_path = '/home/daniel/lotus'
+    # node = FsysNode(path=dir_path)
+    # children = node.get_child_nodes()
+    # # print(f'children nodes are {children}')
+    # # print(f'subnodes count is {len(node.get_subnodes())}')
+    #
+    # tree = node.get_tree(exclude_hidden=True)
+    # # newtree = node.get_tree(max_size=100)
+    # from hollarek.abstract import Tree
+    # new_tree = Tree.join_trees(root=node, subtrees=[child.get_tree() for child in node.get_child_nodes()])
+    # print(tree.as_str())
+    # # assert(tree.as_str() == new_tree.as_str())
+    #
+    new_node = FsysNode(path='/home/daniel/lotus')
+    children = new_node.get_child_nodes(exclude_hidden=False)
+    for child in children:
+        print(child)
+    new_tree = new_node.get_tree(exclude_hidden=False)
+    print(new_tree.as_str())

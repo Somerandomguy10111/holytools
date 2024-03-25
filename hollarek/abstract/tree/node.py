@@ -11,7 +11,7 @@ class TreeNode(ABC):
     def get_name(self) -> str:
         pass
 
-    def get_tree(self, max_depth : int = IntInf(), max_size : int = IntInf()) -> Tree:
+    def get_tree(self, max_depth : int = IntInf(), max_size : int = IntInf(), **kwargs) -> Tree:
         def get_subdict(node : TreeNode, depth : int) -> dict:
             nonlocal root_size
             the_dict = {node : {}}
@@ -22,7 +22,7 @@ class TreeNode(ABC):
             if root_size > max_size:
                 raise ValueError(f'Exceeded max size of {max_size}')
 
-            child_nodes = node.get_child_nodes()
+            child_nodes = node.get_child_nodes(**kwargs)
             for child in child_nodes:
                 subtree = get_subdict(node=child, depth=depth+1)
                 the_dict[node].update(subtree)
@@ -34,7 +34,7 @@ class TreeNode(ABC):
     # -------------------------------------------
     # descendants
 
-    def get_subnodes(self) -> list[TreeNode]:
+    def get_subnodes(self, *args, **kwargs) -> list[TreeNode]:
         subnodes = []
         for child in self.get_child_nodes():
             subnodes.append(child)
@@ -42,7 +42,7 @@ class TreeNode(ABC):
         return subnodes
 
     @abstractmethod
-    def get_child_nodes(self) -> list[TreeNode]:
+    def get_child_nodes(self, *args, **kwargs) -> list[TreeNode]:
         pass
 
     # -------------------------------------------
