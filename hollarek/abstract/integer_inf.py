@@ -2,10 +2,12 @@ from __future__ import annotations
 
 
 class IntInf(int):
-    def __init__(self, sign : str = '+'):
-        if not sign in ['+', '-']:
+    def __new__(cls, sign: str = '+'):
+        if sign not in ['+', '-']:
             raise ValueError('Sign must be either "+" or "-"')
-        self.sign = sign
+        instance = super().__new__(cls, 0)
+        instance.sign = sign
+        return instance
 
     def __eq__(self, other):
         return isinstance(other, IntInf) and other.sign == self.sign
@@ -17,16 +19,12 @@ class IntInf(int):
         return self.sign == '-'
 
     def __le__(self, other):
-        if isinstance(other, IntInf) and other.sign == self.sign:
-            return True
         return self.sign == '-'
 
     def __gt__(self, other):
         return self.sign == '+'
 
     def __ge__(self, other):
-        if isinstance(other, IntInf):
-            return self.__eq__(other)
         return self.sign == '+'
 
     def __add__(self, other) -> IntInf:
