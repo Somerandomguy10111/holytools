@@ -14,7 +14,7 @@ class TreeNode(ABC):
     def get_tree(self, max_depth : int = IntInf(), max_size : int = IntInf()) -> Tree:
         def get_subdict(node : TreeNode, depth : int) -> dict:
             nonlocal root_size
-            the_dict = {node.get_name(): {}}
+            the_dict = {node : {}}
             root_size += 1
 
             if depth > max_depth:
@@ -25,7 +25,7 @@ class TreeNode(ABC):
             child_nodes = node.get_child_nodes()
             for child in child_nodes:
                 subtree = get_subdict(node=child, depth=depth+1)
-                the_dict[node.get_name()].update(subtree)
+                the_dict[node].update(subtree)
             return the_dict
 
         root_size = 1
@@ -66,6 +66,9 @@ class TreeNode(ABC):
             current = current.get_parent()
         return current
 
+    def __str__(self):
+        return self.get_name()
+
 
 
 class Tree(dict[TreeNode, dict]):
@@ -75,14 +78,13 @@ class Tree(dict[TreeNode, dict]):
     def get_size(self) -> int:
         return get_total_elements(nested_dict=self)
 
-
-class SizeCounter:
-    def __init__(self):
-        self.size_counter: dict[TreeNode, int] = {}
-
-    def increment(self, node: TreeNode):
-        val = self.size_counter.get(node, 1)
-        self.size_counter[node] = val + 1
+    @classmethod
+    def join_trees(cls, root : TreeNode, subtrees : list[Tree]):
+        the_dict = { root : {}}
+        sub_dict = the_dict[root]
+        for subtree in subtrees:
+            sub_dict.update(subtree)
+        return Tree(the_dict)
 
 
 def nested_dict_as_str(nested_dict: dict, prefix='') -> str:

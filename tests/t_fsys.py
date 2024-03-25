@@ -55,21 +55,14 @@ class TestFsysNode(Unittest):
         self.assertIsInstance(the_yaml, str)
 
 
-# This allows the test script to be run from the command line
 if __name__ == '__main__':
-    dir_path = '/home/daniel/lotus/engine'
-
-
+    dir_path = '/home/daniel/lotus/engine/l1_agent/agent'
     node = FsysNode(path=dir_path)
-
     print(f'subnodes count is {len(node.get_subnodes())}')
 
     tree = node.get_tree()
     newtree = node.get_tree(max_size=100)
-
-
-    # print(f'subnode names are {[node.get_name() for node in node.get_subnodes()]}')
-    # print(f'Child nodes are {[node.get_name() for node in node.get_child_nodes()]}')
-    # print(f'tree size is {tree.get_size()}')
-
+    from hollarek.abstract import Tree
+    new_tree = Tree.join_trees(root=node, subtrees=[child.get_tree() for child in node.get_child_nodes()])
     print(tree.as_str())
+    assert(tree.as_str() == new_tree.as_str())

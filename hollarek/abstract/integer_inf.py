@@ -2,23 +2,32 @@ from __future__ import annotations
 
 
 class IntInf(int):
+    def __init__(self, sign : str = '+'):
+        if not sign in ['+', '-']:
+            raise ValueError('Sign must be either "+" or "-"')
+        self.sign = sign
+
     def __eq__(self, other):
-        return False
+        return isinstance(other, IntInf) and other.sign == self.sign
 
     def __ne__(self, other):
-        return True
+        return not self.__eq__(other)
 
     def __lt__(self, other):
-        return False
+        return self.sign == '-'
 
     def __le__(self, other):
-        return False
+        if isinstance(other, IntInf) and other.sign == self.sign:
+            return True
+        return self.sign == '-'
 
     def __gt__(self, other):
-        return True
+        return self.sign == '+'
 
     def __ge__(self, other):
-        return True
+        if isinstance(other, IntInf):
+            return self.__eq__(other)
+        return self.sign == '+'
 
     def __add__(self, other) -> IntInf:
         if isinstance(other, IntInf):
