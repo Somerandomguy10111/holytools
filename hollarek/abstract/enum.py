@@ -2,7 +2,7 @@ from enum import Enum
 
 class SelectableEnum(Enum):
     @classmethod
-    def from_manual(cls):
+    def from_manual_query(cls):
         options = [e.name for e in cls]
         while True:
             val = input(f"Creating {cls.__name__} manually, choose one of options {options}, type 'exit' to quit): ")
@@ -19,4 +19,4 @@ class NEW(SelectableEnum):
     DOWN = 'downn'
 
 if __name__ == "__main__":
-    a = NEW.from_manual()
+    a = NEW.from_manual_query()

@@ -47,7 +47,7 @@ class Unittest(ConfigurableTest):
 
     @classmethod
     def log(cls, msg : str, level : LogLevel = LogLevel.INFO):
-        cls.get_logger().log(msg, level=level)
+        cls.get_logger().log(f'--> {msg}', level=level)
 
     # ---------------------------------------------------------
     # assertions
