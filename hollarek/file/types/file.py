@@ -64,3 +64,6 @@ class File:
     def as_base64(self) -> str:
         data = self.as_bytes()
         return b64encode(data).decode(encoding='utf-8')
+
+    def exists_on_disk(self) -> bool:
+        return os.path.isfile(self.fpath)
