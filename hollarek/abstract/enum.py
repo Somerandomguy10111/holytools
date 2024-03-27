@@ -3,13 +3,13 @@ from enum import Enum
 class SelectableEnum(Enum):
     @classmethod
     def from_manual_query(cls):
-        options = [e.name for e in cls]
+        options = [e.value for e in cls]
         while True:
             val = input(f"Creating {cls.__name__} manually, choose one of options {options}, type 'exit' to quit): ")
             if val.lower() == 'exit':
-                return None
+                raise ValueError("User exited")
             try:
-                return cls[val]
+                return cls(val)
             except KeyError:
                 print("Invalid input. Please try again.")
 
