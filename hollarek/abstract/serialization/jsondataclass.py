@@ -8,6 +8,7 @@ from types import NoneType
 
 from enum import Enum
 from .serializable import Serializable
+import json
 # -------------------------------------------
 
 
@@ -22,6 +23,8 @@ class JsonDataclass(Serializable):
         return from_json(cls=cls, json_dict=json_str_dict)
 
     def to_str(self) -> str:
+        print(f'to_json dict is {self.to_json()}')
+
         return orjson.dumps(self.to_json()).decode("utf-8")
 
     def to_json(self) -> dict:
@@ -33,8 +36,12 @@ class JsonDataclass(Serializable):
 
 
 def get_json_entry(obj):
-    if hasattr(obj, '__dict__'):
+    if isinstance(obj, JsonDataclass):
+        entry = obj.to_json()
+    elif hasattr(obj, '__dict__'):
         entry = {attr: value for attr, value in obj.__dict__.items() if not callable(value)}
+    elif isinstance(obj, dict):
+        entry = json.dumps(obj)
     else:
         entry = obj
     return entry
