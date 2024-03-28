@@ -21,6 +21,11 @@ class ComplexDataclass(JsonDataclass):
     time_field: time
     enum_field: MyEnum  # Define MyEnum based on your needs
     simple_data: SimpleDataclass
+    dictionary_data : dict[str, str] = field(default_factory=dict)
+
+    def __post_init__(self):
+        self.dictionary_data = {'key1': 'value1', 'key2': 'value2'}
+
     # Add more fields as needed
 
 # Define MyEnum here
@@ -35,7 +40,7 @@ class TestJsonDataclass(Unittest):
     def setUpClass(cls):
         pass
 
-    def test_store_load(self):
+    def test_save_load_roundtrip(self):
         # Create an instance of ComplexDataclass
         original_data = ComplexDataclass(
             date_field=date.today(),
@@ -59,13 +64,13 @@ class TestJsonDataclass(Unittest):
     def test_invalid(self):
         with self.assertRaises(TypeError):
             @dataclass
-            class InvalidDataclass(JsonDataclass):
+            class UnsupportedType(JsonDataclass):
                 my_set: set = field(default_factory=set)
 
                 def __post_init__(self):
                     self.my_set = {1, 2, 3}
 
-            this = InvalidDataclass()
+            this = UnsupportedType()
             this.to_str()
 
         with self.assertRaises(TypeError):
@@ -73,6 +78,9 @@ class TestJsonDataclass(Unittest):
                 pass
             this =NonDataclass()
             this.to_json()
+
+
+
 
 if __name__ == '__main__':
     TestJsonDataclass.execute_all()
