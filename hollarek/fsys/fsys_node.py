@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import Optional
 from pathlib import Path as PathWrapper
 import tempfile, shutil
-import os
+import os, stat
 from hollarek.abstract import TreeNode, Tree
 from hollarek.abstract.integer_inf import IntInf
 # -------------------------------------------
@@ -150,7 +150,7 @@ def is_hidden(filepath: str) -> bool:
     if os.name == 'posix':
         return os.path.basename(filepath).startswith('.')
     elif os.name == 'nt':
-        return bool(os.stat(filepath).st_file_attributes & os.stat.FILE_ATTRIBUTE_HIDDEN)
+        return bool(os.stat(filepath).st_file_attributes & stat.FILE_ATTRIBUTE_HIDDEN)
     else:
         raise NotImplementedError(f'Unsupported OS: {os.name}, {FsysNode.is_hidden.__name__} is only supported '
                                   f'on Windows and Unix systems')
