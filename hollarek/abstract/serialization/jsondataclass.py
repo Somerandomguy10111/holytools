@@ -23,9 +23,8 @@ class JsonDataclass(Serializable):
         return from_json(cls=cls, json_dict=json_str_dict)
 
     def to_str(self) -> str:
-        print(f'to_json dict is {self.to_json()}')
-
-        return orjson.dumps(self.to_json()).decode("utf-8")
+        json_dict = self.to_json()
+        return orjson.dumps(json_dict).decode("utf-8")
 
     def to_json(self) -> dict:
         return {attr: get_json_entry(obj=value) for attr, value in self.__dict__.items()}
@@ -50,7 +49,6 @@ def get_json_entry(obj):
 def from_json(cls : type, json_dict: dict):
     if not dataclasses.is_dataclass(cls):
         raise TypeError(f'{cls} is not a dataclass. from_json can only be used with dataclasses')
-
     type_hints = get_type_hints(cls)
     init_dict = {}
     for key, value in json_dict.items():
@@ -58,40 +56,52 @@ def from_json(cls : type, json_dict: dict):
             init_dict[key] = value
             continue
 
-        core_type = get_core_type(dtype=type_hints.get(key))
-        if not isinstance(value, dict):
-            init_dict[key] = make_elementary(cls=core_type,value=value)
-        elif issubclass(core_type, Enum):
-            init_dict[key] = core_type(value['_value_'])
+        dtype = type_hints.get(key)
+        core_dtype = get_core_type(dtype=dtype)
+        if core_dtype.__name__ in elementary_type_names:
+            init_dict[key] = make_elementary(cls=core_dtype,value=value)
+        elif issubclass(core_dtype, Enum):
+            init_dict[key] = core_dtype(value['_value_'])
+        elif core_dtype == dict:
+            init_dict[key] = json.loads(value)
+        elif dataclasses.is_dataclass(obj=core_dtype):
+            init_dict[key] = from_json(cls=core_dtype, json_dict=value)
         else:
-            init_dict[key] = from_json(cls=core_type, json_dict=value)
+            raise TypeError(f'Unsupported type {core_dtype}')
 
     return cls(**init_dict)
 
 
 def make_elementary(cls, value : str):
-    conversion_map = {
-        datetime: datetime.fromisoformat,
-        date: date.fromisoformat,
-        time: time.fromisoformat,
-    }
-
-    typecast_classes = ['Decimal', 'UUID', 'Path', 'str', 'int', 'float', 'bool']
     if cls in conversion_map:
         return conversion_map[cls](value)
-    elif cls.__name__ in typecast_classes or issubclass(cls, Enum):
+    elif cls.__name__ in typecast_classes:
         return cls(value)
     else:
         raise TypeError(f'Unsupported type {cls}')
 
+
 # noinspection DuplicatedCode
 def get_core_type(dtype : type) -> type:
-    if get_origin(dtype) is Union:
+    origin = get_origin(dtype)
+    if origin is Union:
         types = get_args(dtype)
-        core_types = [t for t in types if not t is NoneType]
-        if len(core_types) == 1:
-            return core_types[0]
+        not_none_types = [t for t in types if not t is NoneType]
+        if len(not_none_types) == 1:
+            core_type = not_none_types[0]
         else:
             raise ValueError(f'Union dtype {dtype} has more than one core dtype')
+    elif origin:
+        core_type = origin
     else:
-        return dtype
+        core_type = dtype
+    return core_type
+
+
+typecast_classes = ['Decimal', 'UUID', 'Path', 'str', 'int', 'float', 'bool']
+conversion_map = {
+    datetime: datetime.fromisoformat,
+    date: date.fromisoformat,
+    time: time.fromisoformat,
+}
+elementary_type_names : list[str] = typecast_classes + [cls.__name__ for cls in conversion_map.keys()]
