@@ -5,10 +5,10 @@ import dataclasses
 from datetime import datetime, date, time
 from typing import get_type_hints, get_origin, get_args, Union
 from types import NoneType
-
 from enum import Enum
-from .serializable import Serializable
 import json
+
+from .serializable import Serializable
 # -------------------------------------------
 
 
@@ -63,13 +63,26 @@ def from_json(cls : type, json_dict: dict):
         elif issubclass(core_dtype, Enum):
             init_dict[key] = core_dtype(value['_value_'])
         elif core_dtype == dict:
-            init_dict[key] = json.loads(value)
+            init_dict[key] = make_dict(dtype=dtype, value=value)
         elif dataclasses.is_dataclass(obj=core_dtype):
             init_dict[key] = from_json(cls=core_dtype, json_dict=value)
         else:
             raise TypeError(f'Unsupported type {core_dtype}')
 
     return cls(**init_dict)
+
+
+def make_dict(dtype : type, value : str):
+    key_type, value_type = get_dict_item_types(dtype=dtype)
+    item_types = {key_type.__name__, value_type.__name__}
+    supported_types = set(elementary_type_names)
+    if any(item_type not in supported_types for item_type in item_types):
+        raise TypeError(f'Unsupported type in dict {item_types}')
+
+    str_dict = json.loads(value)
+    dict_value = {make_elementary(cls=key_type, value=k): make_elementary(cls=value_type, value=v) for k, v in
+                  str_dict.items()}
+    return dict_value
 
 
 def make_elementary(cls, value : str):
@@ -79,6 +92,16 @@ def make_elementary(cls, value : str):
         return cls(value)
     else:
         raise TypeError(f'Unsupported type {cls}')
+
+
+def get_dict_item_types(dtype : type) -> (type, type):
+    if not get_core_type(dtype) == dict:
+        raise TypeError(f'{dtype} is not a dict')
+    args = get_args(dtype)
+    if not len(args) == 2:
+        raise ValueError(f'{dtype} does not have key and value annotations')
+    key_type, value_type = args
+    return key_type, value_type
 
 
 # noinspection DuplicatedCode

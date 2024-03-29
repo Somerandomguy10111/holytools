@@ -57,7 +57,7 @@ def find_device_of_path(resource_path: str) -> Optional[str]:
 
     for partition in partitions:
         if absolute_path.startswith(partition.mountpoint):
-            return partition.device
+            return partition.get_device
 
     return None
 
@@ -65,7 +65,7 @@ def find_device_of_path(resource_path: str) -> Optional[str]:
 def get_device_mount_point(device_name : str) -> Optional[str]:
     partitions = psutil.disk_partitions()
     for part in partitions:
-        if part.device == device_name:
+        if part.get_device == device_name:
             return part.mountpoint
     return None
 
