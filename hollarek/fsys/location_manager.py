@@ -33,3 +33,12 @@ class LocationManager(Singleton):
     @abstractmethod
     def setup_dirs(self):
         pass
+
+
+def ensure_suffix(fpath: str, suffix : str) -> str:
+    parts = fpath.split('.')
+    if len(parts) < 2:
+        fpath = f'{fpath}.{suffix}'
+    elif parts[-1] != f'.{suffix}':
+        fpath = f'{parts[0]}.{suffix}'
+    return fpath
