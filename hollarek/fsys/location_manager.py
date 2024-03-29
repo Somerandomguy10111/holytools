@@ -42,3 +42,11 @@ def ensure_suffix(fpath: str, suffix : str) -> str:
     elif parts[-1] != f'.{suffix}':
         fpath = f'{parts[0]}.{suffix}'
     return fpath
+
+
+def get_suffix(fpath: str) -> Optional[str]:
+    parts = fpath.split('.')
+    if len(parts) > 1:
+        return parts[-1]
+    else:
+        return None
