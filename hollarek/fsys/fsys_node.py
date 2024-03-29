@@ -127,11 +127,12 @@ class FsysNode(TreeNode):
         return str(self._path_wrapper.absolute())
 
     def get_suffix(self) -> Optional[str]:
-        try:
-            suffix = self.get_name().split('.')[-1]
-        except:
-            suffix = None
-        return suffix
+        parts = self.get_name().split('.')
+        if len(parts) == 1:
+            return None
+        else:
+            return parts[-1]
+
 
     def get_epochtime_last_modified(self) -> float:
         return os.path.getmtime(self.get_path())
