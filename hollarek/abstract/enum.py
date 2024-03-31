@@ -1,8 +1,11 @@
 from enum import Enum
+from typing import TypeVar
+
+EnumType = TypeVar('EnumType', bound=Enum)
 
 class SelectableEnum(Enum):
     @classmethod
-    def from_manual_query(cls):
+    def from_manual_query(cls) -> EnumType:
         options = [e.name for e in cls]
         while True:
             val = input(f"Creating {cls.__name__} manually, choose one of options {options}, type 'exit' to quit): ")
