@@ -1,14 +1,15 @@
 from __future__ import annotations
 
-from bs4 import BeautifulSoup
-from func_timeout import func_timeout, FunctionTimedOut
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
-import trafilatura
-import logging
 from typing import Optional
-from .mail_addresses import get_mail_addresses_in_text
+import logging
 import requests
+
+import trafilatura
+from bs4 import BeautifulSoup
+from selenium import webdriver
+from func_timeout import func_timeout, FunctionTimedOut
+from selenium.webdriver.chrome.options import Options
+from .mail_addresses import get_mail_addresses_in_text
 # ---------------------------------------------------------
 
 class SiteVisitor:
@@ -37,7 +38,12 @@ class SiteVisitor:
         if use_driver:
             page_source = self.get_html(url=url)
             soup = BeautifulSoup(page_source, 'html.parser')
-            site_text = ' '.join(element for element in soup.stripped_strings)
+            for script in soup(["script", "style"]):
+                script.decompose()
+            site_text = soup.get_text()
+            lines = (line.strip() for line in site_text.splitlines())
+            chunks = (phrase.strip() for line in lines for phrase in line.split("  "))
+            site_text = '\n'.join(chunk for chunk in chunks if chunk)
         else:
             def get_website_text():
                 downloaded = trafilatura.fetch_url(url)
