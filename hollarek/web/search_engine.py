@@ -2,8 +2,21 @@ from __future__ import annotations
 import requests
 import logging
 
-
+from dataclasses import dataclass
 # ---------------------------------------------------------
+
+@dataclass
+class SearchResult:
+    name : str
+    url : str
+    desc : str
+
+    def as_str(self) -> str:
+        return f'[{self.name}]({self.url})\n{self.desc}\n'
+
+    def __str__(self):
+        return self.as_str()
+
 
 class SearchEngine:
     def __init__(self,google_key : str, searchengine_id : str):
@@ -12,6 +25,24 @@ class SearchEngine:
 
 
     def get_urls(self, search_term: str, num_results : int = 5) -> list[str]:
+        google_results = self.get_result_list(search_term=search_term, num_results=num_results)
+        search_result_urls = [result['link'] for result in google_results]
+        return search_result_urls
+
+
+    def get_results(self, search_term : str, num_results : int = 5) -> list[SearchResult]:
+        google_results = self.get_result_list(search_term=search_term, num_results=num_results)
+        results = []
+        for result in google_results:
+            name = result['title']
+            url = result['link']
+            desc = result['snippet']
+            search_result = SearchResult(name=name, url=url, desc=desc)
+            results.append(search_result)
+        return results
+
+
+    def get_result_list(self, search_term : str, num_results : int = 5) -> list[dict]:
         url = "https://www.googleapis.com/customsearch/v1"
         params = {
             'q': f'{search_term}',
@@ -24,12 +55,10 @@ class SearchEngine:
             logging.warning(f'An error occured during search: {response.status_code} {response.reason}')
             return []
 
-        response_content = response.json()
-        search_results = response_content.get('items')
-        if search_results is None:
+        response_json = response.json()
+        reponse_content = response_json.get('items')
+        if reponse_content is None:
             logging.warning(f'Unable to obtain search results')
-            return []
-        search_result_urls = [result['link'] for result in search_results]
+            reponse_content = []
 
-
-        return search_result_urls
+        return reponse_content
