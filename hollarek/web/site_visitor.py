@@ -7,15 +7,16 @@ import trafilatura
 import logging
 
 from .mail_addresses import get_mail_addresses_in_text
-
+import requests
 # ---------------------------------------------------------
 
 class SiteVisitor:
     max_site_loading_time = 10
 
-    def __init__(self):
+    def __init__(self, headless : bool = True):
         chrome_options = Options()
-        chrome_options.add_argument("--headless")
+        if headless:
+            chrome_options.add_argument("--headless")
         prefs = {
             "download.default_directory": "/dev/null",
             "plugins.always_open_pdf_externally": True,
@@ -65,3 +66,13 @@ class SiteVisitor:
 
         return result
 
+    @staticmethod
+    def site_exists(url : str, verbose : bool = False) -> bool:
+        try:
+            response = requests.get(url, timeout=10)
+            if response.status_code == 200:
+                return True
+        except requests.exceptions.RequestException as e:
+            if verbose:
+                print(f"Error: {e}")
+        return False

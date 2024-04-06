@@ -2,7 +2,6 @@ from hollarek.fsys import FsysNode, SaveManager
 from hollarek.abstract import Tree
 from hollarek.devtools import Unittest
 import shutil
-import unittest
 import os
 import tempfile
 
