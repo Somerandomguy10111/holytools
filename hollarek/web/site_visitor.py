@@ -60,9 +60,8 @@ class SiteVisitor:
     @staticmethod
     def site_exists(url : str, verbose : bool = False) -> bool:
         try:
-            response = requests.get(url, timeout=10)
-            if response.status_code == 200:
-                return True
+            requests.get(url, timeout=10)
+            return True
         except requests.exceptions.RequestException as e:
             if verbose:
                 print(f"Error: {e}")
