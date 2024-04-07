@@ -37,6 +37,8 @@ class SiteVisitor:
 
 
     def get_text(self, url: str, use_driver : bool = True, with_links : bool = False) -> str:
+        if with_links and not use_driver:
+            raise ValueError('Cannot extract links without using driver')
         if use_driver:
             page_html = self.get_html(url=url)
             site_text = self.extract_text(page_html=page_html, with_links=with_links)
@@ -79,7 +81,6 @@ class SiteVisitor:
         content = func_timeout(timeout=SiteVisitor.max_site_loading_time, func=get_website_html)
         self.last_url = url
         return content
-
 
     @staticmethod
     def extract_text(page_html : str, with_links : bool = False) -> str:
