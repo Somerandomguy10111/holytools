@@ -10,7 +10,9 @@ from selenium import webdriver
 from func_timeout import func_timeout, FunctionTimedOut
 from selenium.webdriver.chrome.options import Options
 from .mail_addresses import get_mail_addresses_in_text
+from .link_soup import LinkSoup
 # ---------------------------------------------------------
+
 
 class SiteVisitor:
     max_site_loading_time = 10
@@ -34,16 +36,10 @@ class SiteVisitor:
         return get_mail_addresses_in_text(text=self.get_html(url=url))
 
 
-    def get_text(self, url: str, use_driver : bool = True) -> str:
+    def get_text(self, url: str, use_driver : bool = True, with_links : bool = False) -> str:
         if use_driver:
-            page_source = self.get_html(url=url)
-            soup = BeautifulSoup(page_source, 'html.parser')
-            for script in soup(["script", "style"]):
-                script.decompose()
-            site_text = soup.get_text()
-            lines = (line.strip() for line in site_text.splitlines())
-            chunks = (phrase.strip() for line in lines for phrase in line.split("  "))
-            site_text = '\n'.join(chunk for chunk in chunks if chunk)
+            page_html = self.get_html(url=url)
+            site_text = self.extract_text(page_html=page_html, with_links=with_links)
         else:
             def get_website_text():
                 downloaded = trafilatura.fetch_url(url)
@@ -83,3 +79,15 @@ class SiteVisitor:
         content = func_timeout(timeout=SiteVisitor.max_site_loading_time, func=get_website_html)
         self.last_url = url
         return content
+
+
+    @staticmethod
+    def extract_text(page_html : str, with_links : bool = False) -> str:
+        SoupType = LinkSoup if with_links else BeautifulSoup
+        soup = SoupType(page_html, 'html.parser')
+        for script in soup(["script", "style"]):
+            script.decompose()
+        site_text = soup.get_text()
+        lines = (line.strip() for line in site_text.splitlines())
+        chunks = (phrase.strip() for line in lines for phrase in line.split("  "))
+        return '\n'.join(chunk for chunk in chunks if chunk)
