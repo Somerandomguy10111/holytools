@@ -20,10 +20,11 @@ class VisitorTester(Unittest):
     def beaver_test(self, use_driver : bool):
         text = self.visitor.get_text(url=self.beavers_url, use_driver=use_driver)
         self.assertTrue(self.contains_beavers(text=text))
-        print(f'Beaver text: {text}')
+        print(f'Beaver text: {text[:500]}')
 
     def test_link(self):
-        self.visitor.get_text(url=self.beavers_url, with_links=True)
+        link_text = self.visitor.get_text(url=self.beavers_url, with_links=True)
+        self.assertIn('http')
 
     @staticmethod
     def contains_beavers(text : str) -> bool:
