@@ -1,4 +1,4 @@
-from hollarek.file import BinaryFile, TextFile, ImageFile, ImageConverter, ImageFormat, FileSpoofer, ImageSerializer
+from hollarek.file import BinaryFile, PlaintextFile, ImageFile, ImageConverter, ImageFormat, FileSpoofer, ImageSerializer
 from hollarek.devtools import Unittest
 from hollarek.fsys import FsysNode
 from PIL.Image import Image
@@ -42,14 +42,14 @@ class TestFile(Unittest):
             ImageFile(fpath=f'/tmp/test')
 
     def test_text_read(self):
-        tio = TextFile(fpath=self.text_fpath)
+        tio = PlaintextFile(fpath=self.text_fpath)
         content = tio.read()
         self.assertIn(member=f'mankind', container=content)
 
     def test_text_view(self):
         if not self.is_manual_mode:
             self.skipTest(f'View can only be tested manually')
-        tio = TextFile(fpath=self.text_fpath)
+        tio = PlaintextFile(fpath=self.text_fpath)
         tio.view()
 
     def test_binary_view(self):

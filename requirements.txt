@@ -12,9 +12,7 @@ cryptography
 trafilatura
 PyYAML
 boto3
-textract
 orjson
-devtools
 mss
 screeninfo
 pynput

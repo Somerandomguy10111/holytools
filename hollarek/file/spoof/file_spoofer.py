@@ -1,7 +1,7 @@
 import os
 import shutil
 import tempfile
-from ..types import TextFile, ImageFile, BinaryFile
+from ..types import PlaintextFile, ImageFile, BinaryFile
 
 # ---------------------------------------------------------
 
@@ -28,19 +28,19 @@ class FileSpoofer:
         return ImageFile(fpath=fpath)
 
     @staticmethod
-    def lend_pdf() -> TextFile:
+    def lend_pdf() -> PlaintextFile:
         fpath = create_temp_copy('spoof.pdf')
-        return TextFile(fpath=fpath)
+        return PlaintextFile(fpath=fpath)
 
     @staticmethod
-    def lend_txt() -> TextFile:
+    def lend_txt() -> PlaintextFile:
         fpath = create_temp_copy('spoof.txt')
-        return TextFile(fpath=fpath)
+        return PlaintextFile(fpath=fpath)
 
     @staticmethod
-    def lend_csv() -> TextFile:
+    def lend_csv() -> PlaintextFile:
         fpath = create_temp_copy('spoof.csv')
-        return TextFile(fpath=fpath)
+        return PlaintextFile(fpath=fpath)
 
     @staticmethod
     def lend_bin() -> BinaryFile:

@@ -1,11 +1,9 @@
-import textract
 from .file import File
 
-class TextFile(File):
+class PlaintextFile(File):
     def read(self) -> str:
         if f'.{self.get_suffix()}' in self.get_non_plaintext_formats():
-            binary_data = textract.process(self.fpath)
-            text = binary_data.decode('utf-8')
+            raise NotImplementedError
         else:
             with open(self.fpath, 'r') as f:
                 text = f.read()
