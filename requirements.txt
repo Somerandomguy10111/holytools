@@ -1,7 +1,7 @@
 apscheduler
 json-repair
 requests
-func-timeout
+func_timeout
 selenium
 pathvalidate
 psutil
