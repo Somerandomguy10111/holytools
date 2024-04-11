@@ -6,7 +6,6 @@ import psutil
 from hollarek.core.logging import get_logger, LogSettings
 # -------------------------------------------
 
-
 drive_logger = get_logger(settings=LogSettings(include_call_location=False))
 def log(msg : str, level : int = logging.INFO):
     drive_logger.log(msg=msg, level=level)
@@ -20,7 +19,7 @@ class PartitionInfo:
         return cls(device_name=device_name)
 
     def __init__(self, device_name: str):
-        self.mount_point : str = get_device_mount_point(device_name=device_name)
+        self.mount_point : str = get_device_mount_path(device_name=device_name)
         if not self.mount_point:
             raise ResourceWarning(f'Could not find mount point for device {device_name}')
 
@@ -49,34 +48,46 @@ class PartitionInfo:
         stats = psutil.disk_usage(self.mount_point)
         return stats.total / (1024 ** 3)
 
-def find_device_of_path(resource_path: str) -> Optional[str]:
+def find_device_of_path(resource_path: str) -> str:
     absolute_path = os.path.abspath(resource_path)
 
     partitions = psutil.disk_partitions(all=True)
     partitions.sort(key=lambda x: len(x.mountpoint), reverse=True)
 
+    device_name = None
     for partition in partitions:
         if absolute_path.startswith(partition.mountpoint):
-            return partition.get_device
+            device_name = partition.device
 
-    return None
+    if not device_name:
+        raise FileNotFoundError(f'Could not find device for path {resource_path}')
+
+    return device_name
 
 
-def get_device_mount_point(device_name : str) -> Optional[str]:
+def get_device_mount_path(device_name : str) -> str:
     partitions = psutil.disk_partitions()
+    mount_path = None
     for part in partitions:
-        if part.get_device == device_name:
-            return part.mountpoint
-    return None
+        if part.device == device_name:
+            mount_path = part.mountpoint
+
+    if not mount_path:
+        raise FileNotFoundError(f'Could not find mount point for device {device_name}')
+
+    return mount_path
 
 
 if __name__ == '__main__':
     test_partitions = psutil.disk_partitions()
     print(test_partitions)
 
-    test_part = PartitionInfo(device_name='/dev/nvme0n1p2')
-    log(test_part.mount_point)
-    test_part.print_free_space_info()
+    # test_part = PartitionInfo(device_name='/dev/nvme0n1p3')
+    # log(test_part.mount_point)
+    # test_part.print_free_space_info()
+    print(find_device_of_path(resource_path='/'))
+
+
 
     # new_part = Partition.from_resource_path(resource_path='/media/daniel/STICKY1')
     # log(new_part.mount_point)

@@ -1,11 +1,16 @@
 from __future__ import annotations
 
-from bs4 import BeautifulSoup, NavigableString, CData, Tag
+from bs4 import BeautifulSoup, NavigableString, Tag, PageElement
 
 
 class LinkSoup(BeautifulSoup):
-    def _all_strings(self, strip=False,types=(NavigableString, CData)):
+    # noinspection PyUnresolvedReferences
+    def _all_strings(self, strip=False, types=PageElement.default):
         _ = strip
+
+        if types is self.default:
+            types = self.interesting_string_types
+
         for descendant in self.descendants:
             if isinstance(descendant, Tag) and descendant.name == 'a':
                 link_text = descendant.text.strip()
@@ -14,14 +19,17 @@ class LinkSoup(BeautifulSoup):
             if isinstance(descendant, NavigableString) and descendant.parent.name == 'a':
                 continue
 
-            # print(f'types is {types} and descendant is {descendant}')
             if types is None and not isinstance(descendant, NavigableString):
                 continue
-            if types and type(descendant) not in types:
+            descendant_type = type(descendant)
+            if isinstance(types, type):
+                if descendant_type is not types:
+                    continue
+            elif types is not None and descendant_type not in types:
                 continue
             if strip:
                 descendant = descendant.strip()
                 if len(descendant) == 0:
                     continue
-
             yield descendant
+

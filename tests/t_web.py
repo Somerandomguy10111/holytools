@@ -43,8 +43,7 @@ class VisitorTester(Unittest):
         # text = self.visitor.get_text(url=self.openai_docs, use_driver=True)
         text_content = self.visitor.get_text(url=self.openai_docs)
         print(f'openai text content : {text_content}')
-        # self.assertTrue('openai' in text.lower())
-        # print(f'OpenAI docs: {text}')
+        self.assertTrue(len(text_content) > 200)
 
 
 if __name__ == "__main__":
