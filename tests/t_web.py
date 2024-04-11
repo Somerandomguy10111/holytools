@@ -24,7 +24,7 @@ class VisitorTester(Unittest):
 
     def test_link(self):
         link_text = self.visitor.get_text(url=self.beavers_url, with_links=True)
-        self.assertIn('http')
+        self.assertIn('http', link_text)
 
     @staticmethod
     def contains_beavers(text : str) -> bool:

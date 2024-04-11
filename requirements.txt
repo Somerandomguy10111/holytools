@@ -16,3 +16,4 @@ orjson
 mss
 screeninfo
 pynput
+pillow

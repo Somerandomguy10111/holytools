@@ -13,6 +13,8 @@ class LinkSoup(BeautifulSoup):
                 yield str(f"<({link_text})[{descendant.get('href')}]> ")
             if isinstance(descendant, NavigableString) and descendant.parent.name == 'a':
                 continue
+
+            # print(f'types is {types} and descendant is {descendant}')
             if types is None and not isinstance(descendant, NavigableString):
                 continue
             if types and type(descendant) not in types:
