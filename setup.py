@@ -12,7 +12,7 @@ setup(
     author_email='daniel.hollarek@googlemail.com',
     description='Collection of general python utilities for future projects',
     url='https://github.com/Somerandomguy10111/hollarek',
-    packages=['hollarek'],
+    packages=find_packages(),
     package_data={'hollarek.file.spoof': ['*']},
     python_requires='>=3.8',
     include_package_data=True,
