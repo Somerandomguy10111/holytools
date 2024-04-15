@@ -18,7 +18,6 @@ class VisitorTester(Unittest):
     def test_driver(self):
         self.beaver_test(use_driver=True)
 
-
     def test_link(self):
         link_text = self.visitor.get_text(url=self.beavers_url, with_links=True)
         self.assertIn('http', link_text)
@@ -39,6 +38,8 @@ class VisitorTester(Unittest):
         self.assertTrue(len(text_content) > 200)
 
     def test_z_cleanup(self):
+        self.visitor.quit()
+
         current_process = psutil.Process()
         children = current_process.children(recursive=True)
         for child in children:

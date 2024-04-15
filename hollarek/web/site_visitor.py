@@ -41,7 +41,7 @@ class SiteVisitor:
             raise ValueError('Cannot extract links without using driver')
         if use_driver:
             page_html = self.get_html(url=url)
-            site_text = self.extract_text(page_html=page_html, with_links=with_links)
+            site_text = self._extract_text(page_html=page_html, with_links=with_links)
         else:
             def get_website_text():
                 downloaded = trafilatura.fetch_url(url)
@@ -50,9 +50,21 @@ class SiteVisitor:
         return site_text
 
 
+    @staticmethod
+    def _extract_text(page_html : str, with_links : bool = False) -> str:
+        SoupType = LinkSoup if with_links else BeautifulSoup
+        soup = SoupType(page_html, 'html.parser')
+        for script in soup(["script", "style"]):
+            script.decompose()
+        site_text = soup.get_text()
+        lines = (line.strip() for line in site_text.splitlines())
+        chunks = (phrase.strip() for line in lines for phrase in line.split("  "))
+        return '\n'.join(chunk for chunk in chunks if chunk)
+
+
     def get_html(self, url: str) -> str:
         try:
-            result = self.fetch_site_html(url)
+            result = self._fetch_site_html(url)
 
         except FunctionTimedOut:
             logging.warning(f'Failed to retrieve text from website {url} due to '
@@ -60,6 +72,17 @@ class SiteVisitor:
             result = ''
 
         return result
+
+    def _fetch_site_html(self, url: str) -> str:
+        def get_website_html():
+            if self.last_url != url:
+                self.engine.get(url)
+            return self.engine.page_source
+
+        content = func_timeout(timeout=SiteVisitor.max_site_loading_time, func=get_website_html)
+        self.last_url = url
+        return content
+
 
     @staticmethod
     def site_exists(url : str, verbose : bool = False) -> bool:
@@ -72,23 +95,9 @@ class SiteVisitor:
         return False
 
 
-    def fetch_site_html(self, url: str) -> str:
-        def get_website_html():
-            if self.last_url != url:
-                self.engine.get(url)
-            return self.engine.page_source
 
-        content = func_timeout(timeout=SiteVisitor.max_site_loading_time, func=get_website_html)
-        self.last_url = url
-        return content
+    def __del__(self):
+        self.quit()
 
-    @staticmethod
-    def extract_text(page_html : str, with_links : bool = False) -> str:
-        SoupType = LinkSoup if with_links else BeautifulSoup
-        soup = SoupType(page_html, 'html.parser')
-        for script in soup(["script", "style"]):
-            script.decompose()
-        site_text = soup.get_text()
-        lines = (line.strip() for line in site_text.splitlines())
-        chunks = (phrase.strip() for line in lines for phrase in line.split("  "))
-        return '\n'.join(chunk for chunk in chunks if chunk)
+    def quit(self):
+        self.engine.quit()
