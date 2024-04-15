@@ -6,7 +6,7 @@ import psutil
 class VisitorTester(Unittest):
     @classmethod
     def setUpClass(cls):
-        cls.visitor = SiteVisitor(headless=False)
+        cls.visitor = SiteVisitor(headless=True)
         cls.beavers_url = 'https://en.wikipedia.org/wiki/Beaver'
         cls.invalid_url = 'https://asldkfjskdjdkkkkkk'
         cls.openai_docs = 'https://platform.openai.com/docs/introduction'
@@ -31,9 +31,12 @@ class VisitorTester(Unittest):
         self.assertTrue(model_docs_exist)
 
 
-    def test_openai(self):
-        # text = self.visitor.get_text(url=self.openai_docs, use_driver=True)
-        text_content = self.visitor.get_text(url=self.openai_docs)
+    def test_crawl_js_required(self):
+        if not self.is_manual_mode:
+            self.skipTest(reason=f'Testing javascript requires not headless')
+
+        visitor = SiteVisitor(headless=False)
+        text_content = visitor.get_text(url=self.openai_docs)
         print(f'openai text content : {text_content}')
         self.assertTrue(len(text_content) > 200)
 
