@@ -37,7 +37,7 @@ class Configs(Loggable):
         except:
             self.log(f'Could not find key {key} in settings: Please set it manually', level=LogLevel.WARNING)
             value = input()
-            value = self.set(key=key, value=value)
+            self.set(key=key, value=value)
         return value
 
 
