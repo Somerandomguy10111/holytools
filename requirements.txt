@@ -1,5 +1,4 @@
 apscheduler
-json-repair
 requests
 func_timeout
 selenium
@@ -17,3 +16,4 @@ mss
 screeninfo
 pynput
 pillow
+configobj

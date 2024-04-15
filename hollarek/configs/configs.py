@@ -5,11 +5,11 @@ import boto3
 from boto3.session import Session
 from botocore.auth import NoCredentialsError
 from botocore.client import BaseClient
-from hollarek.core.crypt import AES
+from configobj import ConfigObj
 from .abstr import StrMap, Configs
 # ---------------------------------------------------------
 
-class AWSConfigs(Configs):
+class ConfigsAWS(Configs):
     def __init__(self, secret_name : str, region : str):
         super().__init__()
         self.secret_name: str = secret_name
@@ -77,52 +77,17 @@ class AWSConfigs(Configs):
         return self.session.client(service_name='secretsmanager', region_name=self.region)
 
 
-class LocalConfigs(Configs):
-    def __init__(self, config_fpath : str = os.path.expanduser('~/.pyconfig'),
-                       encryption_key : Optional[str] = None):
+class ConfigFile(Configs):
+    def __init__(self, config_fpath : str = os.path.expanduser('~/.pyconfig')):
         super().__init__()
         self._config_fpath : str = config_fpath
-        self._aes : AES = AES()
-        self._encr_key : Optional[str] = encryption_key
+        self._map : ConfigObj = ConfigObj()
         self.log(f'Initialized {self.__class__.__name__} with \"{self._config_fpath}\"')
-
 
     def set(self, key : str, value:  str):
         self._map[key] = value
-        parent_dir = os.path.basename(self._config_fpath)
-        os.makedirs(parent_dir)
-        with open(self._config_fpath, 'w') as configfile:
-            config_str = self._map.to_str()
-            encr = self._encrypt(content=config_str)
-            configfile.write(encr)
+        self._map.write(outfile=self._config_fpath)
 
-
-    def _retrieve_map(self):
-        try:
-            file_content = self._get_file_content()
-            settings = StrMap.from_str(json_str=file_content)
-        except FileNotFoundError:
-            settings = StrMap()
-            self.warning(msg=f'Config file \"{self._config_fpath}\" does not exist')
-        return settings
-
-    # -------------------------------------------
-    # encryption
-
-    def _get_file_content(self) -> str:
-        with open(self._config_fpath, 'r') as configfile:
-            decrypted_data = self._decrypt(configfile.read())
-            return decrypted_data
-
-
-    def _encrypt(self, content : str) -> str:
-        encr = self._aes.encrypt(content=content, key = self._encr_key) if self._encr_key else content
-        return encr
-
-
-    def _decrypt(self, content : str) -> str:
-        decr = self._aes.decrypt(content=content, key=self._encr_key) if self._encr_key else content
-        return decr
-
-
+    def _retrieve_map(self) -> ConfigObj:
+        return ConfigObj(self._config_fpath)
 
