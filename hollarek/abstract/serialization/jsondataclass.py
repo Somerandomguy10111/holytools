@@ -37,6 +37,8 @@ class JsonDataclass(Serializable):
 def get_json_entry(obj):
     if isinstance(obj, JsonDataclass):
         entry = obj.to_json()
+    elif isinstance(obj, Enum):
+        entry = obj.value
     elif hasattr(obj, '__dict__'):
         entry = {attr: value for attr, value in obj.__dict__.items() if not callable(value)}
     elif isinstance(obj, dict):
@@ -61,7 +63,7 @@ def from_json(cls : type, json_dict: dict):
         if core_dtype.__name__ in elementary_type_names:
             init_dict[key] = make_elementary(cls=core_dtype,value=value)
         elif issubclass(core_dtype, Enum):
-            init_dict[key] = core_dtype(value['_value_'])
+            init_dict[key] = core_dtype(value)
         elif core_dtype == dict:
             init_dict[key] = make_dict(dtype=dtype, value=value)
         elif dataclasses.is_dataclass(obj=core_dtype):
