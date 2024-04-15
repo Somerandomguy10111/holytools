@@ -1,6 +1,7 @@
 from __future__ import annotations
 from hollarek.web import SiteVisitor
 from hollarek.devtools import Unittest
+import psutil
 
 class VisitorTester(Unittest):
     @classmethod
@@ -17,18 +18,10 @@ class VisitorTester(Unittest):
     def test_driver(self):
         self.beaver_test(use_driver=True)
 
-    def beaver_test(self, use_driver : bool):
-        text = self.visitor.get_text(url=self.beavers_url, use_driver=use_driver)
-        self.assertTrue(self.contains_beavers(text=text))
-        print(f'Beaver text: {text[:500]}')
 
     def test_link(self):
         link_text = self.visitor.get_text(url=self.beavers_url, with_links=True)
         self.assertIn('http', link_text)
-
-    @staticmethod
-    def contains_beavers(text : str) -> bool:
-        return 'beavers' in text.lower()
 
     def test_exists(self):
         beavers_exists = self.visitor.site_exists(url=self.beavers_url)
@@ -44,6 +37,27 @@ class VisitorTester(Unittest):
         text_content = self.visitor.get_text(url=self.openai_docs)
         print(f'openai text content : {text_content}')
         self.assertTrue(len(text_content) > 200)
+
+    def test_z_cleanup(self):
+        current_process = psutil.Process()
+        children = current_process.children(recursive=True)
+        for child in children:
+            print(f'Child pid is {child.pid}')
+            print(f'Child exe is {child.exe()}')
+            child_exe_name = str(child.exe()).lower()
+            self.assertFalse(f'chrome' in child_exe_name)
+            self.assertFalse(f'google' in child_exe_name)
+
+    # -------------------------------------------
+
+    def beaver_test(self, use_driver: bool):
+        text = self.visitor.get_text(url=self.beavers_url, use_driver=use_driver)
+        self.assertTrue(self.contains_beavers(text=text))
+        print(f'Beaver text: {text[:500]}')
+
+    @staticmethod
+    def contains_beavers(text: str) -> bool:
+        return 'beavers' in text.lower()
 
 
 if __name__ == "__main__":
