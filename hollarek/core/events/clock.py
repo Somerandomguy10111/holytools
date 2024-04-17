@@ -28,6 +28,10 @@ class Countdown:
         self.one_time_lock = Lock()
         self.scheduler.start()
 
+    def start(self):
+        run_time = datetime.now() + timedelta(seconds=self.duration)
+        self.job = self.scheduler.add_job(func=self._release, trigger='date', next_run_time=run_time)
+
     def restart(self):
         try:
             self.job.remove()
@@ -35,9 +39,9 @@ class Countdown:
             pass
         self.start()
 
-    def start(self):
-        run_time = datetime.now() + timedelta(seconds=self.duration)
-        self.job = self.scheduler.add_job(func=self._release, trigger='date', next_run_time=run_time)
+    def is_active(self):
+        return not self.job is None
+
 
     def finish(self) -> Any:
         self.one_time_lock.wait()
@@ -47,8 +51,7 @@ class Countdown:
             raise ValueError("on_expiration must be set to use this method")
         return self.output_waiter.get()
 
-    def is_active(self):
-        return not self.job is None
+    # -------------------------------------------
 
     def _release(self):
         self.one_time_lock.unlock()
