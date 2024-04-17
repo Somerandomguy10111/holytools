@@ -1,3 +1,3 @@
 from .log_settings import LogLevel, LogSettings
-from .logger import Logger
-from .interface import Loggable, get_logger, add_color, Color
+from .customlogger import CustomLogger
+from .interface import Loggable, make_logger, add_color, Color

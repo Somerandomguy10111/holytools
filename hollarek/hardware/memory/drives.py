@@ -2,10 +2,10 @@ import logging
 import os
 import psutil
 
-from hollarek.core.logging import get_logger, LogSettings
+from hollarek.core.logging import make_logger, LogSettings
 # -------------------------------------------
 
-drive_logger = get_logger(settings=LogSettings(include_call_location=False))
+drive_logger = make_logger(settings=LogSettings(include_call_location=False))
 def log(msg : str, level : int = logging.INFO):
     drive_logger.log(msg=msg, level=level)
     print(drive_logger.name)

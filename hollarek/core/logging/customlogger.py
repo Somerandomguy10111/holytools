@@ -3,11 +3,12 @@ import inspect
 import logging
 import sys
 from typing import Union
+from logging import Logger
 from .log_settings import LogSettings, LogLevel, LogTarget
 # ---------------------------------------------------------
 
 
-class Logger(logging.Logger):
+class CustomLogger(logging.Logger):
     def log(self, msg : str, level : Union[int, LogLevel] = LogLevel.INFO, with_traceback : bool = False , *args, **kwargs):
         if isinstance(level, LogLevel):
             level = level.value
@@ -30,6 +31,7 @@ class Logger(logging.Logger):
 class LoggerFactory:
     _default_settings : LogSettings = LogSettings()
 
+
     @classmethod
     def set_defaults(cls, settings : LogSettings):
         cls._default_settings = settings
@@ -38,7 +40,10 @@ class LoggerFactory:
     def make_logger(cls, name : str, settings : LogSettings) -> Logger:
         settings = settings or cls._default_settings
 
-        logger = Logger(name=name)
+        logging.setLoggerClass(CustomLogger)
+        # noinspection PyTypeChecker
+        logger : CustomLogger = logging.getLogger(name=name)
+        logging.setLoggerClass(Logger)
         logger.propagate = False
         logger.setLevel(settings.threshold)
 
@@ -50,6 +55,7 @@ class LoggerFactory:
             file_handler = logging.FileHandler(settings.log_fpath)
             file_handler.setFormatter(Formatter(settings=settings, log_target=LogTarget.FILE))
             logger.addHandler(file_handler)
+
         return logger
 
 

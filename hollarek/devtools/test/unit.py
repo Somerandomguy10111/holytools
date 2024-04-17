@@ -1,7 +1,7 @@
 import unittest
 
 from typing import Optional
-from hollarek.core.logging import get_logger, LogSettings, Logger, LogLevel
+from hollarek.core.logging import make_logger, LogSettings, CustomLogger, LogLevel
 from .configurable_unit import  ConfigurableTest
 from .results import Results, DisplayOptions
 
@@ -9,9 +9,9 @@ from .results import Results, DisplayOptions
 
 
 class Runner(unittest.TextTestRunner):
-    def __init__(self, logger : Logger, settings : DisplayOptions, is_manual : bool = False):
+    def __init__(self, logger : CustomLogger, settings : DisplayOptions, is_manual : bool = False):
         super().__init__(resultclass=None)
-        self.logger : Logger = logger
+        self.logger : CustomLogger = logger
         self.display_options : DisplayOptions = settings
         self.manual_mode : bool = is_manual
 
@@ -29,7 +29,7 @@ class Runner(unittest.TextTestRunner):
 
 
 class Unittest(ConfigurableTest):
-    _logger : Logger = None
+    _logger : CustomLogger = None
 
     @classmethod
     def execute_all(cls, manual_mode : bool = True, settings : DisplayOptions = DisplayOptions()):
@@ -40,9 +40,9 @@ class Unittest(ConfigurableTest):
         return results
 
     @classmethod
-    def get_logger(cls) -> Logger:
+    def get_logger(cls) -> CustomLogger:
         if not cls._logger:
-            cls._logger = get_logger(settings=LogSettings(include_call_location=False, timestamp=False), name=cls.__name__)
+            cls._logger = make_logger(settings=LogSettings(include_call_location=False, timestamp=False), name=cls.__name__)
         return cls._logger
 
     @classmethod

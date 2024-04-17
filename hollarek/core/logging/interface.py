@@ -2,14 +2,14 @@ from typing import Optional
 from enum import Enum
 import inspect
 from .log_settings import LogSettings, LogLevel
-from .logger import Logger, LoggerFactory
+from .customlogger import CustomLogger, LoggerFactory
 # ---------------------------------------------------------
 
 class Loggable:
-    _default_logger : Optional[Logger] = None
+    _default_logger : Optional[CustomLogger] = None
 
     def __init__(self, settings : LogSettings = LogSettings()):
-        self.logger = get_logger(settings, name = self.__class__.__name__)
+        self.logger = make_logger(settings, name = self.__class__.__name__)
         self.log = self.logger.log
 
     def warning(self, msg : str, *args, **kwargs):
@@ -29,7 +29,7 @@ class Loggable:
         self.logger.log(msg=msg, *args, **kwargs)
 
 
-def get_logger(settings: LogSettings = LogSettings(), name : Optional[str] = None) -> Logger:
+def make_logger(settings: LogSettings = LogSettings(), name : Optional[str] = None) -> CustomLogger:
     if name is None:
         frame = inspect.currentframe().f_back
         module = inspect.getmodule(frame)

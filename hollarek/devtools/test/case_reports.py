@@ -3,7 +3,7 @@ from enum import Enum
 from unittest import TestCase, TestResult
 from abc import abstractmethod
 from typing import Optional
-from hollarek.core.logging import LogLevel, Logger
+from hollarek.core.logging import LogLevel, CustomLogger
 
 # ---------------------------------------------------------
 
@@ -35,7 +35,7 @@ class ReportableResult(TestResult):
     status_spaces = 10
     runtime_space = 10
 
-    def __init__(self,  logger : Logger, *args, **kwargs):
+    def __init__(self, logger : CustomLogger, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.case_results : list[CaseReport] = []
         self.log = logger.log

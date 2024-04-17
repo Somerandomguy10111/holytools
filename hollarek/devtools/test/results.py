@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from typing import Optional
 from unittest import TestCase
 
-from hollarek.core.logging import LogLevel, Logger
+from hollarek.core.logging import LogLevel, CustomLogger
 from .configurable_unit import ConfigurableTest
 from .case_reports import ReportableResult, CaseReport, CaseStatus, get_case_name
 
@@ -20,7 +20,7 @@ class DisplayOptions:
 
 
 class Results(ReportableResult):
-    def __init__(self, logger : Logger, settings : DisplayOptions, manual_mode : bool = False, *args, **kwargs):
+    def __init__(self, logger : CustomLogger, settings : DisplayOptions, manual_mode : bool = False, *args, **kwargs):
         kwargs['logger'] = logger
         super().__init__(*args, **kwargs)
         self.test_settings : DisplayOptions = settings
