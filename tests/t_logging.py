@@ -1,7 +1,7 @@
 import logging
 from hollarek.core.logging import LogLevel, make_logger
 from hollarek.devtools import Unittest
-
+from logging import getLogger
 
 class TestLoggin(Unittest):
     def test_info_error(self):
