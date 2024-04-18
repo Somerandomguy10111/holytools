@@ -32,7 +32,7 @@ class SaveManager:
 
         fpath = get_path()
         current_index = 0
-        while os.path.isfile(path=fpath):
+        while os.path.isfile(path=fpath) or os.path.isdir(fpath):
             current_index += 1
             fpath = get_path(index=current_index)
         return fpath
