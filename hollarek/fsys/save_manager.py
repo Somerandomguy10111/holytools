@@ -21,8 +21,9 @@ class SaveManager:
 
     @staticmethod
     def get_free_path(save_dirpath : str, name : str, suffix : Optional[str] = None) -> str:
-        if not suffix.startswith('.'):
-            suffix = f'.{suffix}'
+        if suffix:
+            if not suffix.startswith('.'):
+                suffix = f'.{suffix}'
 
         def get_path(index: Optional[int] = None):
             conditional_suffix = '' if suffix is None else f'{suffix}'
