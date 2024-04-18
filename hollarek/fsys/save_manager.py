@@ -1,7 +1,18 @@
 from typing import Optional
 import os
+from pathvalidate import sanitize_filename
 
 class SaveManager:
+    
+    @staticmethod
+    def as_writeable_name(name : str) -> str:
+        name = name.strip()
+        name = name.replace(' ', '_')
+        name = sanitize_filename(name)
+    
+        return name
+
+    
     @staticmethod
     def ensure_suffix(fpath: str, suffix : str) -> str:
         parts = fpath.split('.')
