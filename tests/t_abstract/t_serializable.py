@@ -2,12 +2,19 @@ from __future__ import annotations
 from uuid import UUID
 from enum import Enum
 from datetime import datetime, date, time
-from hollarek.abstract import JsonDataclass
 from dataclasses import dataclass, field
-from hollarek.devtools import Unittest
 from tempfile import NamedTemporaryFile
-import os
+from abc import abstractmethod
+from hollarek.abstract import SerializableType, JsonDataclass
+from hollarek.devtools import Unittest
 
+
+class MyEnum(Enum):
+    OPTION_A = 1
+    OPTION_B = 2
+
+    def __str__(self):
+        return self.name
 
 @dataclass
 class SimpleDataclass(JsonDataclass):
@@ -18,24 +25,8 @@ class SimpleDataclass(JsonDataclass):
     unique_id: UUID
 
 
-@dataclass
-class ComplexDataclass(JsonDataclass):
-    date_field: date
-    time_field: time
-    enum_field: MyEnum
-    simple_data: SimpleDataclass
-    dictionary_data: dict[str, str] = field(default_factory=dict)
 
-    def __post_init__(self):
-        self.dictionary_data = {'key1': 'value1', 'key2': 'value2'}
-
-
-class MyEnum(Enum):
-    OPTION_A = 1
-    OPTION_B = 2
-
-
-class TestSerializableClasses(Unittest):
+class SerializationBaseTest(Unittest):
     # noinspection PyUnresolvedReferences
     @classmethod
     def setUpClass(cls):
@@ -43,6 +34,21 @@ class TestSerializableClasses(Unittest):
         cls.test_date = date.today()
         cls.test_time = time(12, 34, 56)
         cls.test_uuid = UUID('12345678-1234-5678-1234-567812345678')
+
+        ClassType = cls.get_serializable()
+
+        @dataclass
+        class ComplexDataclass(ClassType):
+            date_field: date
+            time_field: time
+            simple_data: SimpleDataclass
+            dictionary_data: dict[str, str] = field(default_factory=dict)
+
+            def __post_init__(self):
+                self.dictionary_data = {'key1': 'value1', 'key2': 'value2'}
+
+        cls.ComplexDataclass = ComplexDataclass
+
         cls.simple_data_instance = SimpleDataclass(
             id=1,
             name='Test',
@@ -53,13 +59,12 @@ class TestSerializableClasses(Unittest):
         cls.complex_data_instance = ComplexDataclass(
             date_field=cls.test_date,
             time_field=cls.test_time,
-            enum_field=MyEnum.OPTION_A,
             simple_data=cls.simple_data_instance
         )
 
     def test_serialization_roundtrip(self):
         serialized_str = self.complex_data_instance.to_str()
-        reloaded_data = ComplexDataclass.from_str(serialized_str)
+        reloaded_data = self.ComplexDataclass.from_str(serialized_str)
         self.assertEqual(self.complex_data_instance.__dict__, reloaded_data.__dict__,
                          "Original and reloaded data should match")
 
@@ -67,9 +72,33 @@ class TestSerializableClasses(Unittest):
         with NamedTemporaryFile(delete=False) as temp_file:
             temp_file_path = temp_file.name
         self.complex_data_instance.save(temp_file_path, force_overwrite=True)
-        reloaded_data = ComplexDataclass.load(temp_file_path)
-        self.assertEqual(self.complex_data_instance.__dict__, reloaded_data.__dict__,"Original and reloaded data should match")
+        reloaded_data = self.ComplexDataclass.load(temp_file_path)
+
+        original_dict = self.complex_data_instance.__dict__
+        reloaded_dict = reloaded_data.__dict__
+        self.assertEqual(original_dict, reloaded_dict)
+
+    @classmethod
+    @abstractmethod
+    def get_serializable(cls) -> SerializableType:
+        pass
+
+
+class TestJsonDataclass(SerializationBaseTest):
+    @classmethod
+    def get_serializable(cls):
+        from hollarek.abstract.serialization import JsonDataclass
+        return JsonDataclass
+
+
+class TestDillable(SerializationBaseTest):
+    @classmethod
+    def get_serializable(cls):
+        from hollarek.abstract.serialization import Dillable
+        return Dillable
+
 
 
 if __name__ == '__main__':
-    TestSerializableClasses.execute_all()
+    TestJsonDataclass.execute_all()
+    TestDillable.execute_all()
