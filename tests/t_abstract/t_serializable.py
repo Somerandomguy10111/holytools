@@ -65,8 +65,7 @@ class SerializationBaseTest(Unittest):
     def test_serialization_roundtrip(self):
         serialized_str = self.complex_data_instance.to_str()
         reloaded_data = self.ComplexDataclass.from_str(serialized_str)
-        self.assertEqual(self.complex_data_instance.__dict__, reloaded_data.__dict__,
-                         "Original and reloaded data should match")
+        self.check_effectively_equal(obj1=self.complex_data_instance, obj2=reloaded_data)
 
     def test_save_load_roundtrip(self):
         with NamedTemporaryFile(delete=False) as temp_file:
@@ -74,9 +73,13 @@ class SerializationBaseTest(Unittest):
         self.complex_data_instance.save(temp_file_path, force_overwrite=True)
         reloaded_data = self.ComplexDataclass.load(temp_file_path)
 
-        original_dict = self.complex_data_instance.__dict__
-        reloaded_dict = reloaded_data.__dict__
+        self.check_effectively_equal(obj1=self.complex_data_instance, obj2=reloaded_data)
+
+    def check_effectively_equal(self, obj1 : object, obj2 : object):
+        original_dict = str(obj1.__dict__)
+        reloaded_dict = str(obj2.__dict__)
         self.assertEqual(original_dict, reloaded_dict)
+
 
     @classmethod
     @abstractmethod

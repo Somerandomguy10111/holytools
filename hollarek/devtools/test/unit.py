@@ -55,9 +55,11 @@ class Unittest(ConfigurableTest):
     def assertEqual(self, first : object, second : object, msg : Optional[str] = None):
         if not first == second:
             first_str = str(first).__repr__()
-            second_str =str(second).__repr__()
+            second_str = str(second).__repr__()
             if msg is None:
-                msg = f'{first_str} != {second_str}'
+                msg = (f'Tested expressions should match:'
+                       f'\nFirst : {first_str}'
+                       f'\nSecond: {second_str}')
             raise AssertionError(msg)
 
 
