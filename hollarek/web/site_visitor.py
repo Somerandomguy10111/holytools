@@ -28,7 +28,7 @@ class SiteVisitor:
             "download.prompt_for_download": False,
         }
         chrome_options.add_experimental_option("prefs", prefs)
-        self.engine = webdriver.Chrome(options=chrome_options)
+        self.drive = webdriver.Chrome(options=chrome_options)
         self.last_url : Optional[str] = None
 
 
@@ -50,6 +50,17 @@ class SiteVisitor:
         return site_text
 
 
+    def get_html(self, url: str) -> str:
+        try:
+            result = self._fetch_site_html(url)
+
+        except FunctionTimedOut:
+            logging.warning(f'Failed to retrieve text from website {url} due to '
+                            f'timeout after {SiteVisitor.max_site_loading_time} seconds')
+            result = ''
+
+        return result
+
     @staticmethod
     def _extract_text(page_html : str, with_links : bool = False) -> str:
         SoupType = LinkSoup if with_links else BeautifulSoup
@@ -62,22 +73,11 @@ class SiteVisitor:
         return '\n'.join(chunk for chunk in chunks if chunk)
 
 
-    def get_html(self, url: str) -> str:
-        try:
-            result = self._fetch_site_html(url)
-
-        except FunctionTimedOut:
-            logging.warning(f'Failed to retrieve text from website {url} due to '
-                            f'timeout after {SiteVisitor.max_site_loading_time} seconds')
-            result = ''
-
-        return result
-
     def _fetch_site_html(self, url: str) -> str:
         def get_website_html():
             if self.last_url != url:
-                self.engine.get(url)
-            return self.engine.page_source
+                self.drive.get(url)
+            return self.drive.page_source
 
         content = func_timeout(timeout=SiteVisitor.max_site_loading_time, func=get_website_html)
         self.last_url = url
@@ -100,4 +100,4 @@ class SiteVisitor:
         self.quit()
 
     def quit(self):
-        self.engine.quit()
+        self.drive.quit()
