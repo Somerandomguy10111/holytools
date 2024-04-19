@@ -25,17 +25,25 @@ class SimpleDataclass(JsonDataclass):
     unique_id: UUID
 
 
+simple_data_instance = SimpleDataclass(
+    id=1,
+    name='Test',
+    timestamp=datetime.now(),
+    is_active=True,
+    unique_id=UUID('12345678-1234-5678-1234-567812345678')
+)
+
 
 class SerializationBaseTest(Unittest):
-    # noinspection PyUnresolvedReferences
-    @classmethod
-    def setUpClass(cls):
-        # Setup shared test date and time once for all test methods
-        cls.test_date = date.today()
-        cls.test_time = time(12, 34, 56)
-        cls.test_uuid = UUID('12345678-1234-5678-1234-567812345678')
+    def setUp(self):
+        self.instance, self.cls = self.get_instance_and_cls()
 
-        ClassType = cls.get_serializable()
+    def get_instance_and_cls(self) -> (SerializableType, type[SerializableType]):
+        test_date = date.today()
+        test_time = time(12, 34, 56)
+
+
+        ClassType = self.get_serializable()
 
         @dataclass
         class ComplexDataclass(ClassType):
@@ -48,34 +56,31 @@ class SerializationBaseTest(Unittest):
             def __post_init__(self):
                 self.dictionary_data = {'key1': 'value1', 'key2': 'value2'}
 
-        cls.ComplexDataclass = ComplexDataclass
 
-        cls.simple_data_instance = SimpleDataclass(
-            id=1,
-            name='Test',
-            timestamp=datetime.now(),
-            is_active=True,
-            unique_id=cls.test_uuid
-        )
-        cls.complex_data_instance = ComplexDataclass(
-            date_field=cls.test_date,
-            time_field=cls.test_time,
+
+        
+        instance = ComplexDataclass(
+            date_field=test_date,
+            time_field=test_time,
             enum_field=MyEnum.OPTION_A,
-            simple_data=cls.simple_data_instance
+            simple_data=simple_data_instance
         )
+
+        return instance, ComplexDataclass
+
 
     def test_serialization_roundtrip(self):
-        serialized_str = self.complex_data_instance.to_str()
-        reloaded_data = self.ComplexDataclass.from_str(serialized_str)
-        self.check_effectively_equal(obj1=self.complex_data_instance, obj2=reloaded_data)
+        serialized_str = self.instance.to_str()
+        reloaded_data = self.cls.from_str(serialized_str)
+        self.check_effectively_equal(obj1=self.instance, obj2=reloaded_data)
 
     def test_save_load_roundtrip(self):
         with NamedTemporaryFile(delete=False) as temp_file:
             temp_file_path = temp_file.name
-        self.complex_data_instance.save(temp_file_path, force_overwrite=True)
-        reloaded_data = self.ComplexDataclass.load(temp_file_path)
+        self.instance.save(temp_file_path, force_overwrite=True)
+        reloaded_data = self.cls.load(temp_file_path)
 
-        self.check_effectively_equal(obj1=self.complex_data_instance, obj2=reloaded_data)
+        self.check_effectively_equal(obj1=self.instance, obj2=reloaded_data)
 
     def check_effectively_equal(self, obj1 : object, obj2 : object):
         original_dict = str(obj1.__dict__)
@@ -102,8 +107,19 @@ class TestDillable(SerializationBaseTest):
         from hollarek.abstract.serialization import Dillable
         return Dillable
 
+class TestPicklable(SerializationBaseTest):
+    @classmethod
+    def get_serializable(cls):
+        from hollarek.abstract.serialization import Picklable
+        return Picklable
+
+    def get_instance_and_cls(self) -> (SerializableType, type[SerializableType]):
+        instance = simple_data_instance
+        cls = SimpleDataclass
+        return instance, cls
 
 
 if __name__ == '__main__':
     TestJsonDataclass.execute_all()
     TestDillable.execute_all()
+    TestPicklable.execute_all()
