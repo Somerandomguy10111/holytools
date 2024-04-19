@@ -1,4 +1,5 @@
 import dill
+from pickle import dumps, loads
 from .serializable import Serializable
 
 class Dillable(Serializable):
@@ -9,6 +10,14 @@ class Dillable(Serializable):
     def from_str(cls, dill_str: str):
         return dill.loads(bytes.fromhex(dill_str))
 
+
+class Picklable(Serializable):
+    def to_str(self) -> str:
+        return dumps(self).hex()
+
+    @classmethod
+    def from_str(cls, pickl_str: str):
+        return loads(bytes.fromhex(pickl_str))
 
 
 # Example usage:
