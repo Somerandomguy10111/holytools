@@ -41,6 +41,7 @@ class SerializationBaseTest(Unittest):
         class ComplexDataclass(ClassType):
             date_field: date
             time_field: time
+            enum_field : MyEnum
             simple_data: SimpleDataclass
             dictionary_data: dict[str, str] = field(default_factory=dict)
 
@@ -59,6 +60,7 @@ class SerializationBaseTest(Unittest):
         cls.complex_data_instance = ComplexDataclass(
             date_field=cls.test_date,
             time_field=cls.test_time,
+            enum_field=MyEnum.OPTION_A,
             simple_data=cls.simple_data_instance
         )
 
