@@ -2,7 +2,7 @@ import logging
 import os
 import psutil
 
-from hollarek.core.logging import make_logger, LogSettings
+from hollarek.logging import make_logger, LogSettings
 # -------------------------------------------
 
 drive_logger = make_logger(settings=LogSettings(include_call_location=False))

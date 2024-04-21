@@ -1,8 +1,9 @@
 import os.path
 from configobj import ConfigObj
-from hollarek.configs.abstr import Configs, StrMap
+
 from typing import Optional
 import subprocess
+from hollarek.configs.abstr import Configs, StrMap
 
 # ---------------------------------------------------------
 

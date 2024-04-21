@@ -1,4 +1,3 @@
-import unittest
 import os
 from hollarek.fsys import LocationManager
 from hollarek.devtools import Unittest

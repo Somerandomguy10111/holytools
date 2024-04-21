@@ -1,7 +1,7 @@
 import unittest
 
 from typing import Optional
-from hollarek.core.logging import make_logger, LogSettings, CustomLogger, LogLevel
+from hollarek.logging import make_logger, LogSettings, CustomLogger, LogLevel
 from .configurable_unit import  ConfigurableTest
 from .results import Results, DisplayOptions
 

@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from typing import Optional
 from unittest import TestCase
 
-from hollarek.core.logging import LogLevel, CustomLogger
+from hollarek.logging import LogLevel, CustomLogger
 from .configurable_unit import ConfigurableTest
 from .case_reports import ReportableResult, CaseReport, CaseStatus, get_case_name
 

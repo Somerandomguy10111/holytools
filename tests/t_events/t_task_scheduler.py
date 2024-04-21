@@ -22,7 +22,7 @@ class TestTaskScheduler(Unittest):
         def task():
             output.append('should not run')
 
-        t = self.scheduler.submit_once(task, delay=1)
+        self.scheduler.submit_once(task, delay=1)
         self.scheduler.cancel_all()
         time.sleep(1.5)
         self.assertEqual(output, [])
@@ -30,6 +30,7 @@ class TestTaskScheduler(Unittest):
 
     def test_submit_invalid_task(self):
         def task_with_args(x):
+            _ = x
             pass
 
         with self.assertRaises(InvalidCallableException):

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from abc import abstractmethod
 import json
-from hollarek.core.logging import Loggable, LogLevel
+from hollarek.logging import Loggable, LogLevel
 # ---------------------------------------------------------
 
 
