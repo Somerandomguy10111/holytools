@@ -1,14 +1,5 @@
-import sched
-import threading
-import time
-from typing import Callable, Optional
-
-
 import time
 import threading
-from queue import Queue
-from concurrent.futures import ThreadPoolExecutor
-from dataclasses import dataclass, field
 from typing import Callable
 
 
@@ -33,6 +24,11 @@ class TaskScheduler:
 
         threading.Thread(target=do_delayed).start()
 
+    def submit_at_rate(self, tasks : list[Callable], rate_per_second : float):
+        for task in tasks:
+            time.sleep(1/rate_per_second)
+            self._schedule_task(task, delay=0)
+
 
 # Example usage
 if __name__ == "__main__":
@@ -41,9 +37,17 @@ if __name__ == "__main__":
         time.sleep(2)
         print(f'I work up at {time.ctime()}')
 
+    def get_print_function(num : int):
+        def print_num():
+            print(num)
+        return print_num
+
+
     scheduler = TaskScheduler()
     # scheduler.submit_once(my_task, delay=2)
-    scheduler.submit_periodic(my_task, interval=1)
+    # scheduler.submit_periodic(my_task, interval=1)
+
+    scheduler.submit_at_rate(tasks=[get_print_function(i) for i in range(10)], rate_per_second=5)
 
     print(f'Sleepting at {time.ctime()}')
     time.sleep(15)
