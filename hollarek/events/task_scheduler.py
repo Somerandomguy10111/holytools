@@ -9,7 +9,9 @@ from dataclasses import dataclass
 class Task:
     func : Callable
     is_canceled : bool = False
-    id: str = str(uuid.uuid4())
+
+    def __post_init__(self):
+        self.id: str = str(uuid.uuid4())
 
     def run(self):
         if not self.is_canceled:
