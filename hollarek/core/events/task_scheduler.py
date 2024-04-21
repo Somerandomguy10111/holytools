@@ -32,9 +32,12 @@ class TaskScheduler:
             time.sleep(1/rate_per_second)
             self._schedule_task(task, delay=0)
 
-    @staticmethod
-    def cancel_task(task : Task):
-        task.is_canceled = True
+    def cancel_all(self):
+        for task in self.scheduled_tasks:
+            task.is_canceled = True
+
+    def is_active(self):
+        return len(self.scheduled_tasks) != 0
 
     # ---------------------------------------------------------
 
@@ -55,8 +58,6 @@ class TaskScheduler:
         
         threading.Thread(target=do_delayed).start()
         return task
-
-
 
 
 class InvalidCallableException(Exception):

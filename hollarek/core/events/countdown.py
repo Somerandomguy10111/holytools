@@ -1,39 +1,26 @@
-from datetime import datetime, timedelta
 from threading import Event
-from typing import Callable, Optional, Any
-import inspect
+from typing import Callable, Any
 from .task_scheduler import TaskScheduler
-
 from .input_waiter import InputWaiter
-
-class InvalidCallableException(Exception):
-    """Exception raised when a callable with arguments is passed where none are expected."""
-    pass
 
 
 class Countdown:
     def __init__(self, duration: float, on_expiration: Callable = lambda *args, **kwargs: None):
-        parameters = inspect.signature(on_expiration).parameters.values()
-        for param in parameters:
-            # Check if the parameter is mandatory (i.e., has no default value and is not a *args or **kwargs kind)
-            if (param.default is param.empty) and (param.kind not in [param.VAR_POSITIONAL, param.VAR_KEYWORD]):
-                raise InvalidCallableException("on_expiration should not take any mandatory arguments")
         self.duration : float = duration
         self.on_expiration : Callable = on_expiration
         self.output_waiter : InputWaiter = InputWaiter()
-        self.one_time_lock = Lock()
         self.scheduler : TaskScheduler = TaskScheduler()
+        self.one_time_lock = Lock()
 
     def start(self):
         self.scheduler.submit_once(task=self._release, delay=self.duration)
 
     def restart(self):
-
+        self.scheduler.cancel_all()
         self.start()
 
     def is_active(self):
-        return not self.job is None
-
+        return self.scheduler.is_active()
 
     def finish(self) -> Any:
         self.one_time_lock.wait()
@@ -49,7 +36,6 @@ class Countdown:
         self.one_time_lock.unlock()
         out = self.on_expiration()
         self.output_waiter.write(out)
-        self.job = None
 
 
 class Lock:
@@ -64,18 +50,4 @@ class Lock:
         self._event.set()
 
 
-class Timer:
-    def __init__(self):
-        self.start_time : Optional[datetime] = None
-
-    def start(self):
-        self.start_time = datetime.now()
-
-    def capture(self, verbose : bool = True) -> float:
-        now = datetime.now()
-        delta = now-self.start_time
-        delta_sec = delta.total_seconds()
-        if verbose:
-            print(f'Time has been running for {delta_sec} seconds')
-        return delta_sec
 
