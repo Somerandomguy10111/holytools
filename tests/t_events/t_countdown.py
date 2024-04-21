@@ -58,7 +58,7 @@ class TestCountdown(Unittest):
     #     self.on_expiration.assert_called_once()
 
     def tearDown(self):
-        sys.stdout = default_stderr
+        sys.stderr = default_stderr
 
 if __name__ == '__main__':
     TestCountdown.execute_all()

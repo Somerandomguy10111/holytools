@@ -55,5 +55,8 @@ class TestTaskScheduler(Unittest):
         self.assertFalse(self.scheduler.is_active())
 
 
+    def tearDown(self):
+        self.scheduler.cancel_all()
+
 if __name__ == '__main__':
     TestTaskScheduler.execute_all()
