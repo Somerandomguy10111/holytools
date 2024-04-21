@@ -14,7 +14,7 @@ class FunctionTask:
     kwargs: dict = field(default_factory=dict)
 
 
-class RateLimitedPool:
+class RateLimitedTaskPool:
     def __init__(self, tasks_per_second : int, max_workers=10):
         super().__init__()
         self.max_rate = tasks_per_second
@@ -47,7 +47,7 @@ if __name__ == "__main__":
         print(f'Current time is {time.time()}')
         return n * 2
 
-    pool = RateLimitedPool(tasks_per_second=5)
+    pool = RateLimitedTaskPool(tasks_per_second=5)
     pool.start()
 
     # Submit tasks
