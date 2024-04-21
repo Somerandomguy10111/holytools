@@ -1,12 +1,25 @@
 import time
 import threading
-from typing import Callable
 import inspect
+from typing import Callable
+from dataclasses import dataclass
+
+@dataclass
+class Task:
+    func : Callable
+    is_canceled : bool = False
+
+    def run(self):
+        if not self.is_canceled:
+            self.func()
 
 
 class TaskScheduler:
-    def submit_once(self, task: Callable, delay: float):
-        self._schedule_task(task=task, delay=delay)
+    def __init__(self):
+        self.scheduled_tasks: set[Task] = set()
+    
+    def submit_once(self, task: Callable, delay: float) -> Task:
+        return self._schedule_task(task=task, delay=delay)
 
     def submit_periodic(self, task: Callable, interval: float):
         def periodic():
@@ -14,10 +27,18 @@ class TaskScheduler:
             self.submit_periodic(task, interval)
         self._schedule_task(task=periodic, delay=interval)
 
-    # ---------------------------------------------------------
+    def submit_at_rate(self, tasks : list[Callable], rate_per_second : float):
+        for task in tasks:
+            time.sleep(1/rate_per_second)
+            self._schedule_task(task, delay=0)
 
     @staticmethod
-    def _schedule_task(task : Callable, delay : float):
+    def cancel_task(task : Task):
+        task.is_canceled = True
+
+    # ---------------------------------------------------------
+
+    def _schedule_task(self, task : Callable, delay : float) -> Task:
         parameters = inspect.signature(task).parameters.values()
         for param in parameters:
             not_args_or_kwargs = (param.kind not in [param.VAR_POSITIONAL, param.VAR_KEYWORD])
@@ -25,16 +46,15 @@ class TaskScheduler:
             if has_no_defaults and not_args_or_kwargs:
                 raise InvalidCallableException("Cannot schedule task that requires arguments")
 
+        task = Task(func=task)
         def do_delayed():
+            self.scheduled_tasks.add(task)
             time.sleep(delay)
-            task()
-
+            task.run()
+            self.scheduled_tasks.remove(task)
+        
         threading.Thread(target=do_delayed).start()
-
-    def submit_at_rate(self, tasks : list[Callable], rate_per_second : float):
-        for task in tasks:
-            time.sleep(1/rate_per_second)
-            self._schedule_task(task, delay=0)
+        return task
 
 
 
@@ -42,9 +62,6 @@ class TaskScheduler:
 class InvalidCallableException(Exception):
     """Exception raised when a callable with arguments is passed where none are expected."""
     pass
-
-
-
 
 
 # Example usage

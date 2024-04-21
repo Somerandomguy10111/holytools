@@ -1,9 +1,8 @@
 from datetime import datetime, timedelta
 from threading import Event
 from typing import Callable, Optional, Any
-from apscheduler.schedulers.background import BackgroundScheduler
-from apscheduler.job import Job
 import inspect
+from .task_scheduler import TaskScheduler
 
 from .input_waiter import InputWaiter
 
@@ -20,23 +19,16 @@ class Countdown:
             if (param.default is param.empty) and (param.kind not in [param.VAR_POSITIONAL, param.VAR_KEYWORD]):
                 raise InvalidCallableException("on_expiration should not take any mandatory arguments")
         self.duration : float = duration
-        self.scheduler : BackgroundScheduler = BackgroundScheduler()
-        self.job: Optional[Job] = None
         self.on_expiration : Callable = on_expiration
         self.output_waiter : InputWaiter = InputWaiter()
-
         self.one_time_lock = Lock()
-        self.scheduler.start()
+        self.scheduler : TaskScheduler = TaskScheduler()
 
     def start(self):
-        run_time = datetime.now() + timedelta(seconds=self.duration)
-        self.job = self.scheduler.add_job(func=self._release, trigger='date', next_run_time=run_time)
+        self.scheduler.submit_once(task=self._release, delay=self.duration)
 
     def restart(self):
-        try:
-            self.job.remove()
-        except:
-            pass
+
         self.start()
 
     def is_active(self):
@@ -72,7 +64,6 @@ class Lock:
         self._event.set()
 
 
-# Usage examples
 class Timer:
     def __init__(self):
         self.start_time : Optional[datetime] = None
