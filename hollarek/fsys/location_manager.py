@@ -26,14 +26,10 @@ class LocationManager:
         cls._root_dirpath = root_dirpath
 
     @classmethod
-    def setup_dirs(cls):
-        for dirpath in cls._dirs:
-            os.makedirs(dirpath, exist_ok=True)
-
-    @classmethod
     def relative_dir(cls, relative_path: str) -> str:
         dirpath = cls._get_relative_path(relative_path=relative_path)
-        cls._dirs.append(dirpath)
+        if not os.path.isdir(dirpath):
+            os.makedirs(dirpath)
 
         return dirpath
 
