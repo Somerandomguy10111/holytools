@@ -1,16 +1,14 @@
 from __future__ import annotations
-
+import re
 from typing import Optional
 import logging
 import requests
 
-import trafilatura
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from func_timeout import func_timeout, FunctionTimedOut
 from selenium.webdriver.chrome.options import Options
-from .mail_addresses import get_mail_addresses_in_text
-from .link_soup import LinkSoup
+from hollarek.web.link_soup import LinkSoup
 # ---------------------------------------------------------
 
 
@@ -28,7 +26,7 @@ class SiteVisitor:
             "download.prompt_for_download": False,
         }
         chrome_options.add_experimental_option("prefs", prefs)
-        self.drive = webdriver.Chrome(options=chrome_options)
+        self.driver = webdriver.Chrome(options=chrome_options)
         self.last_url : Optional[str] = None
 
 
@@ -36,24 +34,17 @@ class SiteVisitor:
         return get_mail_addresses_in_text(text=self.get_html(url=url))
 
 
-    def get_text(self, url: str, use_driver : bool = True, with_links : bool = False) -> str:
-        if with_links and not use_driver:
-            raise ValueError('Cannot extract links without using driver')
-        if use_driver:
-            page_html = self.get_html(url=url)
-            site_text = self._extract_text(page_html=page_html, with_links=with_links)
-        else:
-            def get_website_text():
-                downloaded = trafilatura.fetch_url(url)
-                return trafilatura.extract(downloaded)
-            site_text = func_timeout(timeout=SiteVisitor.max_site_loading_time, func=get_website_text)
+    def get_text(self, url: str, with_links : bool = False) -> str:
+        def do_extract_text() -> str:
+            return self._extract_text(page_html=page_html, with_links=with_links)
+        page_html = self.get_html(url=url)
+        site_text = func_timeout(timeout=SiteVisitor.max_site_loading_time, func=do_extract_text)
         return site_text
 
 
     def get_html(self, url: str) -> str:
         try:
             result = self._fetch_site_html(url)
-
         except FunctionTimedOut:
             logging.warning(f'Failed to retrieve text from website {url} due to '
                             f'timeout after {SiteVisitor.max_site_loading_time} seconds')
@@ -76,8 +67,8 @@ class SiteVisitor:
     def _fetch_site_html(self, url: str) -> str:
         def get_website_html():
             if self.last_url != url:
-                self.drive.get(url)
-            return self.drive.page_source
+                self.driver.get(url)
+            return self.driver.page_source
 
         content = func_timeout(timeout=SiteVisitor.max_site_loading_time, func=get_website_html)
         self.last_url = url
@@ -95,9 +86,24 @@ class SiteVisitor:
         return False
 
 
-
     def __del__(self):
         self.quit()
 
     def quit(self):
-        self.drive.quit()
+        self.driver.quit()
+
+
+
+def get_mail_addresses_in_text(text: str) -> list[str]:
+    username_part = r'[A-Za-z0-9._%+-]+'
+    domain_part = r'[A-Za-z0-9.-]+'
+    tld_part = r'[A-Z|a-z]{2,}'
+    at_symbol = r'(?:@|\[at\]| \[at\] )'  # Non-capturing group
+
+    email_pattern = fr'\b{username_part}{at_symbol}{domain_part}\.{tld_part}\b'
+
+    mail_addresses = re.findall(email_pattern, text)
+    mail_addresses = [address.replace(' [at] ', '@') for address in mail_addresses]
+    mail_addresses = [address.replace('[at]', '@') for address in mail_addresses]
+
+    return mail_addresses
