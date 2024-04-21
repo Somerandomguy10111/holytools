@@ -1,7 +1,7 @@
 import time
 import threading
 from typing import Callable
-
+import inspect
 
 
 class TaskScheduler:
@@ -18,6 +18,13 @@ class TaskScheduler:
 
     @staticmethod
     def _schedule_task(task : Callable, delay : float):
+        parameters = inspect.signature(task).parameters.values()
+        for param in parameters:
+            not_args_or_kwargs = (param.kind not in [param.VAR_POSITIONAL, param.VAR_KEYWORD])
+            has_no_defaults = (param.default is param.empty)
+            if has_no_defaults and not_args_or_kwargs:
+                raise InvalidCallableException("Cannot schedule task that requires arguments")
+
         def do_delayed():
             time.sleep(delay)
             task()
@@ -28,6 +35,16 @@ class TaskScheduler:
         for task in tasks:
             time.sleep(1/rate_per_second)
             self._schedule_task(task, delay=0)
+
+
+
+
+class InvalidCallableException(Exception):
+    """Exception raised when a callable with arguments is passed where none are expected."""
+    pass
+
+
+
 
 
 # Example usage
@@ -43,11 +60,16 @@ if __name__ == "__main__":
         return print_num
 
 
+    def invalid_task(num : int):
+        print(num)
+
+
     scheduler = TaskScheduler()
     # scheduler.submit_once(my_task, delay=2)
     # scheduler.submit_periodic(my_task, interval=1)
+    scheduler.submit_once(task=invalid_task, delay=0)
 
-    scheduler.submit_at_rate(tasks=[get_print_function(i) for i in range(10)], rate_per_second=5)
-
-    print(f'Sleepting at {time.ctime()}')
-    time.sleep(15)
+    # scheduler.submit_at_rate(tasks=[get_print_function(i) for i in range(10)], rate_per_second=5)
+    #
+    # print(f'Sleepting at {time.ctime()}')
+    # time.sleep(15)
