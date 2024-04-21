@@ -1,5 +1,5 @@
 from abc import abstractmethod
-from hollarek.configs import Configs, ConfigFile
+from hollarek.configs import Configs, ConfigFile, PassConfig
 from hollarek.devtools import Unittest
 from unittest.mock import patch
 
@@ -31,10 +31,14 @@ class BaesConfigTest(Unittest):
         pass
 
 
-class FileConfigs(BaesConfigTest):
+class FileConfigsTests(BaesConfigTest):
     def get_configs(self) -> Configs:
         return ConfigFile()
 
+class PassConfigTests(BaesConfigTest):
+    def get_configs(self) -> Configs:
+        return PassConfig(pass_dirpath='"/home/daniel/Drive/.password-store')
 
 if __name__ == '__main__':
-    FileConfigs.execute_all()
+    FileConfigsTests.execute_all()
+    PassConfigTests.execute_all()

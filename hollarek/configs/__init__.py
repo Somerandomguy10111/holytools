@@ -1,1 +1,1 @@
-from .configs import ConfigFile, Configs
+from .configs import ConfigFile, Configs, PassConfig
