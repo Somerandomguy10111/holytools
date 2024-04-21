@@ -12,11 +12,8 @@ class VisitorTester(Unittest):
         cls.openai_docs = 'https://platform.openai.com/docs/introduction'
         cls.models_docs = 'https://platform.openai.com/docs/models'
 
-    def test_static(self):
-        self.beaver_test(use_driver=False)
-
     def test_driver(self):
-        self.beaver_test(use_driver=True)
+        self.beaver_test()
 
     def test_link(self):
         link_text = self.visitor.get_text(url=self.beavers_url, with_links=True)
@@ -54,8 +51,8 @@ class VisitorTester(Unittest):
 
     # -------------------------------------------
 
-    def beaver_test(self, use_driver: bool):
-        text = self.visitor.get_text(url=self.beavers_url, use_driver=use_driver)
+    def beaver_test(self):
+        text = self.visitor.get_text(url=self.beavers_url)
         self.assertTrue(self.contains_beavers(text=text))
         print(f'Beaver text: {text[:500]}')
 

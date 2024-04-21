@@ -1,1 +1,1 @@
-from .configs import ConfigsAWS, ConfigFile, Configs
+from .configs import ConfigFile, Configs
