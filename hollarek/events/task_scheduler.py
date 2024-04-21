@@ -9,7 +9,7 @@ from dataclasses import dataclass
 class Task:
     func : Callable
     is_canceled : bool = False
-    id: str = uuid.uuid4()
+    id: str = str(uuid.uuid4())
 
     def run(self):
         if not self.is_canceled:
@@ -24,7 +24,7 @@ class Task:
 
 class TaskScheduler:
     def __init__(self):
-        self.scheduled_tasks: set[Task] = set()
+        self.scheduled_tasks: dict[str, Task] = {}
     
     def submit_once(self, task: Callable, delay: float) -> Task:
         return self._schedule_task(task=task, delay=delay)
@@ -41,7 +41,7 @@ class TaskScheduler:
             self._schedule_task(task, delay=0)
 
     def cancel_all(self):
-        for task in self.scheduled_tasks:
+        for task in self.scheduled_tasks.values():
             task.is_canceled = True
 
     def is_active(self):
@@ -59,10 +59,12 @@ class TaskScheduler:
 
         task = Task(func=task)
         def do_delayed():
-            self.scheduled_tasks.add(task)
+            self.scheduled_tasks[task.id] = task
             time.sleep(delay)
             task.run()
-            self.scheduled_tasks.remove(task)
+            print(f'Scheduled tasks is {self.scheduled_tasks}')
+            print(f'Task id is {task.id}')
+            del self.scheduled_tasks[task.id]
         
         threading.Thread(target=do_delayed).start()
         return task
