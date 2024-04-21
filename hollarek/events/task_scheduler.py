@@ -1,6 +1,7 @@
 import time
 import threading
 import inspect
+import uuid
 from typing import Callable
 from dataclasses import dataclass
 
@@ -8,10 +9,17 @@ from dataclasses import dataclass
 class Task:
     func : Callable
     is_canceled : bool = False
+    id: str = uuid.uuid4()
 
     def run(self):
         if not self.is_canceled:
             self.func()
+
+    def __hash__(self):
+        return hash(self.id)
+
+    def __eq__(self, other):
+        return self.id == other.id
 
 
 class TaskScheduler:
