@@ -10,7 +10,6 @@ dill
 cryptography
 trafilatura
 PyYAML
-boto3
 orjson
 mss
 screeninfo
