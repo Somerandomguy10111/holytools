@@ -3,8 +3,6 @@ from typing import Optional
 from pathlib import Path as PathWrapper
 import tempfile, shutil
 import os, stat
-from hollarek.abstract import TreeNode, Tree
-from hollarek.abstract.integer_inf import IntInf
 # -------------------------------------------
 
 class FsysNode(TreeNode):
@@ -27,7 +25,9 @@ class FsysNode(TreeNode):
         return child
 
 
-    def get_tree(self, max_depth : int = IntInf(), max_size : int = IntInf(), exclude_hidden : bool = False) -> Tree:
+    def get_tree(self, max_depth : Optional[int] = None,
+                 max_size : Optional[int] = None,
+                 exclude_hidden : bool = False) -> Tree:
         return super().get_tree(max_depth=max_depth, max_size=max_size, exclude_hidden=exclude_hidden)
 
 

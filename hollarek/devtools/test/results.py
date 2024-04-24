@@ -9,7 +9,7 @@ from unittest import TestCase
 
 from hollarek.logging import LogLevel, CustomLogger
 from .configurable_unit import ConfigurableTest
-from .case_reports import ReportableResult, CaseReport, CaseStatus, get_case_name
+from .cases import ReportableResult, CaseReport, CaseStatus, get_case_name
 
 # ---------------------------------------------------------
 
@@ -55,7 +55,15 @@ class Results(ReportableResult):
     def get_err_details(err) -> str:
         err_class, err_instance, err_traceback = err
         tb_list = traceback.extract_tb(err_traceback)
-        relevant_tb = [tb for tb in tb_list if not os.path.dirname(unittest.__file__) in tb.filename]
+
+        def is_relevant(tb):
+            not_unittest = not os.path.dirname(unittest.__file__) in tb.filename
+            not_custom_unittest = not os.path.dirname(__file__) in tb.filename
+
+            print(f'The unittest directory is: {os.path.dirname(unittest.__file__)}')
+            return not_unittest and not_custom_unittest
+            # return not_unittest
+        relevant_tb = [tb for tb in tb_list if is_relevant(tb)]
 
         result = ''
         for frame in relevant_tb:
