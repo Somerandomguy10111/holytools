@@ -1,7 +1,8 @@
 import socket
 from enum import Enum
-
+import subprocess
 import requests
+from hollarek.network.adapter import Adapter
 
 
 class NetworkArea(Enum):
@@ -52,3 +53,27 @@ class IpProvider:
         if err:
             raise err
         return public_ip
+
+
+    @staticmethod
+    def get_ipconfig() -> str:
+        command = "nmcli device show"
+        process = subprocess.Popen(command.split(), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        output, error = process.communicate()
+
+        if error:
+            raise Exception(f"Error executing nmcli: {error.decode()}")
+
+        ipconfig = ''
+        sections = "".join(output.decode()).split("\n\n")
+
+        for section in sections:
+            if section.strip():
+                new_adapter = Adapter.from_nmcli_output(section)
+                ipconfig += f'\n\n{new_adapter}'
+
+        return ipconfig
+
+
+if __name__ == "__main__":
+    print(IpProvider.get_ipconfig())
