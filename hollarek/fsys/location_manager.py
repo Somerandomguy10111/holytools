@@ -13,6 +13,10 @@ class LocationManager:
         raise ValueError(f'Cannot initialize {self.__class__.__name__}, it is used as a class only')
 
     @classmethod
+    def is_initialized(cls) -> bool:
+        return cls._root_dirpath is not None
+
+    @classmethod
     def set_root(cls, root_dirpath: str):
         if not cls._root_dirpath is None:
             raise ValueError(f'Root directory already set to {cls._root_dirpath}')
