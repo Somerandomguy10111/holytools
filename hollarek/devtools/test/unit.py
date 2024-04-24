@@ -87,6 +87,7 @@ class Unittest(ConfigurableTest):
                 msg = f'Tested expression should be true'
             raise AssertionError(msg)
 
+
     def assertFalse(self, expr : bool, msg : Optional[str] = None):
         if expr:
             if msg is None:
@@ -94,5 +95,16 @@ class Unittest(ConfigurableTest):
             raise AssertionError(msg)
 
 
+    def assertStrEqual(self, first : object, second : object, msg : Optional[str] = None):
+        self.assertEqual(str(first), str(second), msg=msg)
 
 
+    def assertRecursivelyEqual(self, first : dict, second : dict, msg : Optional[str] = None):
+        for key in first:
+            first_obj = first[key]
+            second_obj = second[key]
+            self.assertEqual(type(first_obj), type(second_obj))
+            if isinstance(first_obj, dict):
+                self.assertRecursivelyEqual(first_obj, second_obj, msg=msg)
+            else:
+                self.assertStrEqual(first[key], second[key])
