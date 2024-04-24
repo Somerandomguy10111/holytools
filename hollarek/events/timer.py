@@ -4,9 +4,9 @@ from typing import Optional
 
 class Timer:
     def __init__(self):
-        self.start_time : Optional[datetime] = None
+        self.start_time : datetime = datetime.now()
 
-    def start(self):
+    def restart(self):
         self.start_time = datetime.now()
 
     def capture(self, verbose : bool = True) -> float:
@@ -16,3 +16,4 @@ class Timer:
         if verbose:
             print(f'Time has been running for {delta_sec} seconds')
         return delta_sec
+
