@@ -106,6 +106,8 @@ class FsysNode(FsysResource):
         return self._path_wrapper.parent == self._path_wrapper
 
 
+    def __str__(self):
+        return self.get_name()
 
 # noinspection DuplicatedCode
 class FsysTree(dict[FsysNode, dict]):

@@ -1,4 +1,4 @@
-from hollarek.fsys import FsysNode
+from hollarek.fsys.fsys_node import FsysNode, FsysTree
 from hollarek.abstract import Tree
 from hollarek.devtools import Unittest
 import shutil
@@ -64,13 +64,14 @@ class TestFsyNode(FsysTemplate):
 class TestTree(FsysTemplate):
     def test_tree_ok(self):
         the_tree = self.root_node.get_tree()
-        self.assertIsInstance(the_tree, Tree)
+        self.assertIsInstance(the_tree, FsysTree)
 
     def test_tree_as_str(self):
         the_tree = self.root_node.get_tree()
         tree_str = the_tree.as_str()
         self.assertIsInstance(tree_str, str)
         print(f'Tree as string is \n{tree_str}')
+        self.assertIn(f'.dat', tree_str)
 
     def test_tree_len(self):
         the_tree = self.root_node.get_tree()
