@@ -1,11 +1,16 @@
 from typing import Optional
 import os
 from pathvalidate import sanitize_filename
+import tempfile
+
 
 class SaveManager:
-    
     @staticmethod
-    def as_writeable_name(name : str) -> str:
+    def tmp_fpath(suffix : str) -> str:
+        return tempfile.mktemp(suffix=suffix)
+
+    @staticmethod
+    def as_valid_filename(name : str) -> str:
         name = name.strip()
         name = name.replace(' ', '_')
         name = sanitize_filename(name)
