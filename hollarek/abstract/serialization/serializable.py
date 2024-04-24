@@ -15,6 +15,9 @@ class Serializable:
         pass
 
     def save(self, fpath : str, force_overwrite : bool = False):
+        fpath = os.path.abspath(path=fpath)
+        dirpath = os.path.dirname(fpath)
+        os.makedirs(dirpath, exist_ok=True)
         if os.path.isfile(fpath) and not force_overwrite:
             raise ValueError(f'File {fpath} already exists')
         with open(fpath, 'w') as f:
