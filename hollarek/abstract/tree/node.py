@@ -10,7 +10,9 @@ class TreeNode(ABC):
     def get_name(self) -> str:
         pass
 
+    # noinspection DuplicatedCode
     def get_tree(self, max_depth : Optional[int] = None, max_size : Optional[int] = None, **kwargs) -> Tree:
+        # noinspection DuplicatedCode
         def get_subdict(node : TreeNode, depth : int) -> dict:
             nonlocal root_size
             the_dict = {node : {}}
@@ -19,9 +21,9 @@ class TreeNode(ABC):
             depth_ok = depth <= max_depth if not max_depth is None else True
             size_ok = root_size <= max_size if not max_size is None else True
 
-            if depth_ok:
+            if not depth_ok:
                 raise ValueError(f'Exceeded max depth of {max_depth}')
-            if size_ok:
+            if not size_ok:
                 raise ValueError(f'Exceeded max size of {max_size}')
 
             child_nodes = node.get_child_nodes(**kwargs)
