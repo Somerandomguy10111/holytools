@@ -29,7 +29,7 @@ class Configs(ABC, Loggable):
             self._map  = self._retrieve_map()
 
         print(f'Map : {self._map}')
-        if self._map.is_empty():
+        if self.is_empty():
             self.log(msg=f'No settings found', level=LogLevel.WARNING)
         try:
             value = self._map.get(key)
@@ -41,6 +41,8 @@ class Configs(ABC, Loggable):
             self.set(key=key, value=value)
         return value
 
+    def is_empty(self) -> bool:
+        return len(self._map) == 0
 
     @abstractmethod
     def _retrieve_map(self) -> StrMap:
