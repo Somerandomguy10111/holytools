@@ -5,10 +5,9 @@ from unittest.mock import patch
 from hollarek.fsys import SaveManager
 
 
-class BaesConfigTest(Unittest):
+class BaseConfigTests(Unittest):
     def setUp(self):
-        args = () if Configs == PassConfigs else SaveManager.tmp_fpath()
-        self.configs = Configs(*args)
+        self.configs = self.get_configs()
         self.test_key = "test_key"
         self.test_val = "test_value"
         self.configs._map[self.test_key] = self.test_val
@@ -33,11 +32,11 @@ class BaesConfigTest(Unittest):
         pass
 
 
-class FileConfigsTests(BaesConfigTest):
+class FileConfigsTests(BaseConfigTests):
     def get_configs(self) -> Configs:
-        return FileConfigs()
+        return FileConfigs(config_fpath=SaveManager.tmp_fpath())
 
-class PassConfigTests(BaesConfigTest):
+class PassConfigTests(BaseConfigTests):
     def get_configs(self) -> Configs:
         return PassConfigs(pass_dirpath='"/home/daniel/Drive/.password-store')
 

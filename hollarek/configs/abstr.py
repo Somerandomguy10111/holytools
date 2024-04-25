@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from abc import abstractmethod
+from abc import abstractmethod, ABC
 import json
 from hollarek.logging import Loggable, LogLevel
 # ---------------------------------------------------------
@@ -18,7 +18,7 @@ class StrMap(dict[str,str]):
         return len(self) == 0
 
 
-class Configs(Loggable):
+class Configs(ABC, Loggable):
     def __init__(self, *args, **kwargs):
         super().__init__()
         self._map: StrMap = StrMap()
@@ -52,7 +52,11 @@ class Configs(Loggable):
         pass
 
 
+
+
+
 if __name__ == '__main__':
-    sts = { 'abc' : 'value'}
-    the_settings = StrMap(sts)
-    print(the_settings.to_str())
+    pass
+    # sts = { 'abc' : 'value'}
+    # the_settings = StrMap(sts)
+    # print(the_settings.to_str())
