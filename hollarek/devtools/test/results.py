@@ -59,10 +59,8 @@ class Results(ReportableResult):
         def is_relevant(tb):
             not_unittest = not os.path.dirname(unittest.__file__) in tb.filename
             not_custom_unittest = not os.path.dirname(__file__) in tb.filename
-
-            print(f'The unittest directory is: {os.path.dirname(unittest.__file__)}')
             return not_unittest and not_custom_unittest
-            # return not_unittest
+
         relevant_tb = [tb for tb in tb_list if is_relevant(tb)]
 
         result = ''

@@ -1,12 +1,14 @@
 from abc import abstractmethod
-from hollarek.configs import Configs, ConfigFile, PassConfig
+from hollarek.configs import Configs, FileConfigs, PassConfigs
 from hollarek.devtools import Unittest
 from unittest.mock import patch
+from hollarek.fsys import SaveManager
+
 
 class BaesConfigTest(Unittest):
     def setUp(self):
-        self.configs = Configs()
-
+        args = () if Configs == PassConfigs else SaveManager.tmp_fpath()
+        self.configs = Configs(*args)
         self.test_key = "test_key"
         self.test_val = "test_value"
         self.configs._map[self.test_key] = self.test_val
@@ -33,11 +35,11 @@ class BaesConfigTest(Unittest):
 
 class FileConfigsTests(BaesConfigTest):
     def get_configs(self) -> Configs:
-        return ConfigFile()
+        return FileConfigs()
 
 class PassConfigTests(BaesConfigTest):
     def get_configs(self) -> Configs:
-        return PassConfig(pass_dirpath='"/home/daniel/Drive/.password-store')
+        return PassConfigs(pass_dirpath='"/home/daniel/Drive/.password-store')
 
 if __name__ == '__main__':
     FileConfigsTests.execute_all()

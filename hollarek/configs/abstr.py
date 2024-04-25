@@ -20,7 +20,7 @@ class StrMap(dict[str,str]):
 
 class Configs(Loggable):
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        super().__init__()
         self._map: StrMap = StrMap()
         self.is_setup: bool = False
 
@@ -28,6 +28,7 @@ class Configs(Loggable):
         if not self.is_setup:
             self._map  = self._retrieve_map()
 
+        print(f'Map : {self._map}')
         if self._map.is_empty():
             self.log(msg=f'No settings found', level=LogLevel.WARNING)
         try:

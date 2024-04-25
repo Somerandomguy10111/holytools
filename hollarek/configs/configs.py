@@ -7,7 +7,7 @@ from hollarek.configs.abstr import Configs, StrMap
 
 # ---------------------------------------------------------
 
-class ConfigFile(Configs):
+class FileConfigs(Configs):
     def __init__(self, config_fpath : str = os.path.expanduser('~/.pyconfig')):
         super().__init__()
         self._config_fpath : str = config_fpath
@@ -22,7 +22,7 @@ class ConfigFile(Configs):
         return ConfigObj(self._config_fpath)
 
 
-class PassConfig(Configs):
+class PassConfigs(Configs):
     def __init__(self, pass_dirpath : str):
         super().__init__()
         self._pass_dirpath : str = pass_dirpath
@@ -60,7 +60,7 @@ class PassConfig(Configs):
 
 
 if __name__ == "__main__":
-    pass_config = PassConfig(pass_dirpath='/home/daniel/Drive/.password-store')
+    pass_config = PassConfigs(pass_dirpath='/home/daniel/Drive/.password-store')
     pypi_key = pass_config.get(key='pypi')
     # pass_config.set(key='this', value='that')
     print(pypi_key)
