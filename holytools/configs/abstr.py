@@ -21,7 +21,7 @@ class Configs(ABC, Loggable):
 
     # ---------------------------------------------------------
 
-    def get(self, key : str) -> str:
+    def get(self, key : str) -> ConfigValue:
         if len(key.split()) > 1:
             raise ValueError(f'Key must not contain whitespaces, got : \"{key}\"')
 
