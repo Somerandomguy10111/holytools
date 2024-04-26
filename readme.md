@@ -1,6 +1,6 @@
 ## Holytools
 A collection of general utilities in various very general areas that aim for simplicity in use. 
-Functiontionalities include:
+Functionalities include:
 
 - object serialization -> holytools.abstract.serialization
 - fileIO and mock files -> holytools.file
