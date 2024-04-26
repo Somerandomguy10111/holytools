@@ -13,15 +13,8 @@ class Configs(ABC, Loggable):
     def __init__(self, *args, **kwargs):
         super().__init__()
         self._map : DictType = self._retrieve_map()
-        self.is_setup: bool = False
 
     def get(self, key : str) -> str:
-        if not self.is_setup:
-            self._map  = self._retrieve_map()
-
-        print(f'Map : {self._map}')
-        if self.is_empty():
-            self.log(msg=f'No settings found', level=LogLevel.WARNING)
         try:
             value = self._map.get(key)
             if not value:

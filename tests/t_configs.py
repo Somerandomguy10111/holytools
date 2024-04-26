@@ -24,7 +24,10 @@ class BaseConfigTests(Unittest):
 
     @patch('builtins.input', lambda *args : '42')
     def test_get_nonexistent_key(self):
-        value = self.configs.get('non_existent key')
+        key = 'non_existent key'
+        self.configs.get(key)
+        value = self.configs.get(key)
+        print(f'Value is {value}')
         self.assertEqual(value,'42')
 
     @abstractmethod
