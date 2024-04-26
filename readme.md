@@ -25,6 +25,7 @@ git clone https://github.com/Somerandomguy10111/holytools && pip install ./holyt
 
 
 #### Examples
+- holytools.fsys -> Zip a file or folder or get resource information
 ```
 # fsys
 from holytools.fsys import FsysNode
@@ -33,6 +34,7 @@ zip_bytes = node.get_zip()
 last_modified : float = node.get_epochtime_last_modified()
 file_size_mb : float = node.get_size_in_MB()
 ```
+- holytools.config -> set/get configs from a config file or from unix password manager "pass" 
 ```
 # config
 from holytools.configs import FileConfigs
@@ -40,7 +42,10 @@ configs = FileConfigs(config_fpath='~/myconfigs.ini')
 key = 'plot_images'
 configs.set(key=key, value=False)
 plot_images : bool = configs.get(key=key) # False
+
+configs = PassConfigs()
 ```
+- holytools.abstract -> Save/load
 ```
 # serialization
 from holytools.abstract import Picklable

@@ -11,12 +11,9 @@ from holytools.configs.abstr import Configs, DictType
 
 class FileConfigs(Configs):
     def __init__(self, config_fpath : str = '~/.pyconfig'):
-        config_fpath = os.path.expanduser(path=config_fpath)
-        config_fpath = os.path.abspath(config_fpath)
-        config_dir = os.path.dirname(config_fpath)
-        os.makedirs(config_dir, exist_ok=True)
-
-        self._config_fpath: str = config_fpath
+        self._config_fpath: str = as_absolute(path=config_fpath)
+        config_dirpath = os.path.dirname(self._config_fpath)
+        os.makedirs(config_dirpath, exist_ok=True)
         super().__init__()
 
     def _retrieve_map(self) -> ConfigObj:
@@ -28,8 +25,8 @@ class FileConfigs(Configs):
 
 
 class PassConfigs(Configs):
-    def __init__(self, pass_dirpath : str):
-        self._pass_dirpath: str = pass_dirpath
+    def __init__(self, pass_dirpath : str = '~/.password-store' ):
+        self._pass_dirpath: str = as_absolute(path=pass_dirpath)
         os.environ['PASSWORD_STORE_DIR'] = pass_dirpath
         super().__init__()
 
@@ -62,6 +59,10 @@ class PassConfigs(Configs):
         return keys
 
 
+def as_absolute(path : str) -> str:
+    path = os.path.expanduser(path=path)
+    path = os.path.abspath(path)
+    return path
 
 
 if __name__ == "__main__":
