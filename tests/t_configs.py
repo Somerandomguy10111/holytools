@@ -54,17 +54,19 @@ class Hider:
         def get_configs(self) -> Configs:
             pass
 
+    class PassConfigTests(BaseConfigTests):
+        def get_configs(self) -> Configs:
+            return PassConfigs(pass_dirpath='/home/daniel/Drive/.password-store')
+
 
 class FileConfigsTests(Hider.BaseConfigTests):
     def get_configs(self) -> Configs:
         return FileConfigs(config_fpath=self.configs_fpath)
 
-class PassConfigTests(Hider.BaseConfigTests):
-    def get_configs(self) -> Configs:
-        return PassConfigs(pass_dirpath='/home/daniel/Drive/.password-store')
+
+
 
 if __name__ == '__main__':
     FileConfigsTests.execute_all()
-    PassConfigTests.execute_all()
     # configs = FileConfigs()
     # configs2 = FileConfigs()
