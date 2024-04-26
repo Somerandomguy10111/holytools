@@ -1,11 +1,12 @@
 from __future__ import annotations
 
+import ast
 from abc import abstractmethod, ABC
 from typing import TypeVar, Union
 from holytools.logging import Loggable, LogLevel
 
 DictType = TypeVar(name='DictType', bound=dict)
-ConfigValue = Union[str, int, bool]
+ConfigValue = Union[str, int, bool, float]
 
 # ---------------------------------------------------------
 
@@ -14,31 +15,49 @@ class Configs(ABC, Loggable):
         super().__init__()
         self._map : DictType = self._retrieve_map()
 
+    @abstractmethod
+    def _retrieve_map(self) -> DictType:
+        pass
+
+    # ---------------------------------------------------------
+
     def get(self, key : str) -> str:
         if len(key.split()) > 1:
             raise ValueError(f'Key must not contain whitespaces, got : \"{key}\"')
 
         try:
+            print(f'Configs map: {self._map}; key = {key}')
             value = self._map.get(key)
-            if not value:
+            if value is None:
                 raise KeyError
         except:
             self.log(f'Could not find key {key} in settings: Please set it manually', level=LogLevel.WARNING)
             value = input()
             self.set(key=key, value=value)
+
+        value = self.convert_string(value)
         return value
 
-    def is_empty(self) -> bool:
-        return len(self._map) == 0
+
+    def set(self, key : str, value : ConfigValue):
+        if not isinstance(value, ConfigValue):
+            raise ValueError(f'Value must be of type {ConfigValue} got : \"{value}\"')
+        self._map[key] = value
+        self.update_config_resouce(key=key, value=str(value))
+
 
     @abstractmethod
-    def _retrieve_map(self) -> DictType:
+    def update_config_resouce(self, key : str, value : str):
         pass
 
 
-    @abstractmethod
-    def set(self, key : str, value : str):
-        pass
+    @staticmethod
+    def convert_string(value) -> ConfigValue:
+        try:
+            return ast.literal_eval(value)
+        except (ValueError, SyntaxError):
+            return value
+
 
 
 if __name__ == '__main__':

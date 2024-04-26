@@ -16,18 +16,27 @@ class BaseConfigTests(Unittest):
         self.test_val = "test_value"
         self.non_existent_key = 'asdf'
 
+        self.bool_test_key = 'test_bool'
+
 
     @patch('builtins.input', lambda *args : '42')
     def test_get_nonexistent_key(self):
         self.configs.get(self.non_existent_key)
         value = self.configs.get(self.non_existent_key)
         print(f'Value is {value}')
-        self.assertEqual(value,'42')
+        self.assertEqual(value, 42)
+
 
     def test_set_get_key(self):
-        self.configs.set(key=self.test_key, value=self.test_val)
-        value = self.configs.get(self.test_key)
-        self.assertEqual(value, self.test_val)
+        # self.configs.set(key=self.test_key, value=self.test_val)
+        # value = self.configs.get(self.test_key)
+        # self.assertEqual(value, self.test_val)
+
+        expected_val = False
+        self.configs.set(key=self.bool_test_key, value=expected_val)
+        print(f'Configs map : {self.configs._map}')
+        actual = self.configs.get(key=self.bool_test_key)
+        self.assertEqual(actual, expected_val)
 
 
     @patch('builtins.input', lambda *args: '')

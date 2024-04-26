@@ -12,14 +12,13 @@ class FileConfigs(Configs):
     def __init__(self, config_fpath : str = os.path.expanduser('~/.pyconfig')):
         self._config_fpath: str = config_fpath
         super().__init__()
-        #self.log(f'Initialized {self.__class__.__name__} with \"{self._config_fpath}\"')
-
-    def set(self, key : str, value:  str):
-        self._map[key] = value
-        self._map.write()
+        # self.log(f'Initialized {self.__class__.__name__} with \"{self._config_fpath}\"')
 
     def _retrieve_map(self) -> ConfigObj:
         return ConfigObj(self._config_fpath)
+
+    def update_config_resouce(self, key : str, value : str):
+        self._map.write()
 
 
 class PassConfigs(Configs):
@@ -28,12 +27,9 @@ class PassConfigs(Configs):
         os.environ['PASSWORD_STORE_DIR'] = pass_dirpath
         super().__init__()
 
-
-    def set(self, key : str, value : str):
-        self._map[key] = value
+    def update_config_resouce(self, key : str, value : str):
         insert_command = f"echo \"{value}\" | pass insert --echo {key}"
         self.try_run_cmd(cmd=insert_command)
-
 
     def _retrieve_map(self) -> DictType:
         keys = self.get_keys()
@@ -42,12 +38,7 @@ class PassConfigs(Configs):
             config_map[k] = self.try_run_cmd(f'pass {k}')
         return config_map
 
-
-    def get_keys(self) -> list[str]:
-        filenames = os.listdir(path=self._pass_dirpath)
-        keys = [os.path.splitext(f)[0] for f in filenames if f.endswith('.gpg')]
-        return keys
-
+    # ---------------------------------------------------------
 
     def try_run_cmd(self, cmd : str) -> Optional[str]:
         try:
@@ -58,6 +49,13 @@ class PassConfigs(Configs):
                      f'err = \"{e}\"\n', level=LogLevel.WARNING)
             result = None
         return result
+
+    def get_keys(self) -> list[str]:
+        filenames = os.listdir(path=self._pass_dirpath)
+        keys = [os.path.splitext(f)[0] for f in filenames if f.endswith('.gpg')]
+        return keys
+
+
 
 
 if __name__ == "__main__":
