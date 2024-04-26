@@ -15,6 +15,14 @@ class TrackedInt:
         self.progressbar = ProgressBar(min_value=start_value, max_value=max_value)
 
     def update(self, incr : int):
+        if self.progressbar.finished():
+            return
+
+        new_value = self._value + incr
+        if new_value > self.progressbar.max_value:
+            self.progressbar.finish()
+            return
+
         self._value += incr
         self.progressbar.update(value=self._value)
 
@@ -26,14 +34,4 @@ class TrackedInt:
 
     def __add__(self, other):
         raise NotImplementedError(f'Can only add to tracked integer in place')
-
-
-if __name__ == "__main__":
-    this = TrackedInt(start_value=5, max_value=10)
-    for _ in range(10):
-        this += 1
-        time.sleep(0.2)
-
-
-
 
