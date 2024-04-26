@@ -1,24 +1,13 @@
 from __future__ import annotations
 
 from abc import abstractmethod, ABC
-import json
-from typing import TypeVar
+from typing import TypeVar, Union
 from holytools.logging import Loggable, LogLevel
-# ---------------------------------------------------------
-
-
-class StrMap(dict[str,str]):
-    @staticmethod
-    def from_str(json_str : str) -> StrMap:
-        return StrMap(json.loads(json_str))
-
-    def to_str(self) -> str:
-        return json.dumps(self)
-
-    def is_empty(self):
-        return len(self) == 0
 
 DictType = TypeVar(name='DictType', bound=dict)
+ConfigValue = Union[str, int, bool]
+
+# ---------------------------------------------------------
 
 class Configs(ABC, Loggable):
     def __init__(self, *args, **kwargs):
@@ -47,14 +36,13 @@ class Configs(ABC, Loggable):
         return len(self._map) == 0
 
     @abstractmethod
-    def _retrieve_map(self) -> StrMap:
+    def _retrieve_map(self) -> DictType:
         pass
 
 
     @abstractmethod
     def set(self, key : str, value : str):
         pass
-
 
 
 if __name__ == '__main__':

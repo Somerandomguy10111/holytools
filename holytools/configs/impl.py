@@ -3,7 +3,7 @@ from configobj import ConfigObj
 
 import subprocess
 from typing import Optional
-from holytools.configs.abstr import Configs, StrMap
+from holytools.configs.abstr import Configs, DictType
 
 # ---------------------------------------------------------
 
@@ -33,12 +33,13 @@ class PassConfigs(Configs):
         self.run_cmd(cmd=insert_command)
 
 
-    def _retrieve_map(self) -> StrMap:
+    def _retrieve_map(self) -> DictType:
         keys = self.get_keys()
-        str_map = StrMap()
+        config_map = {}
         for k in keys:
-            str_map[k] = self.run_cmd(f'pass {k}')
-        return str_map
+            config_map[k] = self.run_cmd(f'pass {k}')
+
+        return config_map
 
     def get_keys(self) -> list[str]:
         filenames = os.listdir(path=self._pass_dirpath)
