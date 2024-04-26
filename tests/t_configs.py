@@ -65,3 +65,5 @@ class PassConfigTests(BaseConfigTests):
 if __name__ == '__main__':
     FileConfigsTests.execute_all()
     PassConfigTests.execute_all()
+    # configs = FileConfigs()
+    # configs2 = FileConfigs()

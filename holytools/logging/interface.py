@@ -1,3 +1,4 @@
+import uuid
 from typing import Optional
 from enum import Enum
 import inspect
@@ -9,7 +10,7 @@ class Loggable:
     _default_logger : Optional[CustomLogger] = None
 
     def __init__(self, settings : LogSettings = LogSettings()):
-        self.logger = make_logger(settings, name = self.__class__.__name__)
+        self.logger = make_logger(settings, name = str(uuid.uuid4()))
         self.log = self.logger.log
 
     def warning(self, msg : str, *args, **kwargs):
