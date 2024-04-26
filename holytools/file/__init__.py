@@ -1,2 +1,2 @@
-from .examples.example_provider import FileExamples
+from .mock.file_mock import FileMock
 from .types import *

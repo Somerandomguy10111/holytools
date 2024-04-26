@@ -16,40 +16,40 @@ def create_temp_copy(filename: str) -> str:
     return temp_filepath
 
 
-class FileExamples:
+class FileMock:
     @staticmethod
     def lend_png() -> ImageFile:
-        fpath = create_temp_copy('spoof.png')
+        fpath = create_temp_copy('mock.png')
         return ImageFile(fpath=fpath)
 
     @staticmethod
     def lend_jpg() -> ImageFile:
-        fpath = create_temp_copy('spoof.jpg')
+        fpath = create_temp_copy('mock.jpg')
         return ImageFile(fpath=fpath)
 
     @staticmethod
     def lend_pdf() -> PlaintextFile:
-        fpath = create_temp_copy('spoof.pdf')
+        fpath = create_temp_copy('mock.pdf')
         return PlaintextFile(fpath=fpath)
 
     @staticmethod
     def lend_txt() -> PlaintextFile:
-        fpath = create_temp_copy('spoof.txt')
+        fpath = create_temp_copy('mock.txt')
         return PlaintextFile(fpath=fpath)
 
     @staticmethod
     def lend_csv() -> PlaintextFile:
-        fpath = create_temp_copy('spoof.csv')
+        fpath = create_temp_copy('mock.csv')
         return PlaintextFile(fpath=fpath)
 
     @staticmethod
     def lend_bin() -> BinaryFile:
-        fpath = create_temp_copy('spoof.bin')
+        fpath = create_temp_copy('mock.bin')
         return BinaryFile(fpath=fpath)
 
     @staticmethod
     def lend_wav() -> BinaryFile:
-        fpath = create_temp_copy('spoof.wav')
+        fpath = create_temp_copy('mock.wav')
         return BinaryFile(fpath=fpath)
 
 if __name__ == "__main__":

@@ -7,7 +7,7 @@ dynamic = ["dependencies"]
 urls = { "repository" = "https://github.com/Somerandomguy10111/hollarek" }
 
 [tool.setuptools.package-data]
-"holytools.file.examples" = ["*"]
+"holytools.file.mock" = ["*"]
 
 
 [tool.setuptools.dynamic]
