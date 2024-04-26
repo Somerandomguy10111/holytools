@@ -37,13 +37,14 @@ file_size_mb : float = node.get_size_in_MB()
 - holytools.config -> set/get configs from a config file or from unix password manager "pass" 
 ```
 # config
-from holytools.configs import FileConfigs
+from holytools.configs import FileConfigs, PassConfigs
 configs = FileConfigs(config_fpath='~/myconfigs.ini')
 key = 'plot_images'
 configs.set(key=key, value=False)
 plot_images : bool = configs.get(key=key) # False
 
-configs = PassConfigs()
+pass_configs = PassConfigs()
+secret_key = pass_configs.get(key='secret_key')
 ```
 - holytools.abstract -> Save/load
 ```
