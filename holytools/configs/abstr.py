@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from abc import abstractmethod, ABC
 import json
+from typing import TypeVar
 from holytools.logging import Loggable, LogLevel
 # ---------------------------------------------------------
 
@@ -17,11 +18,12 @@ class StrMap(dict[str,str]):
     def is_empty(self):
         return len(self) == 0
 
+DictType = TypeVar(name='DictType', bound=dict)
 
 class Configs(ABC, Loggable):
     def __init__(self, *args, **kwargs):
         super().__init__()
-        self._map: StrMap = StrMap()
+        self._map : DictType = self._retrieve_map()
         self.is_setup: bool = False
 
     def get(self, key : str) -> str:
@@ -52,8 +54,6 @@ class Configs(ABC, Loggable):
     @abstractmethod
     def set(self, key : str, value : str):
         pass
-
-
 
 
 

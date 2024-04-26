@@ -1,8 +1,8 @@
 import os.path
 from configobj import ConfigObj
 
-from typing import Optional
 import subprocess
+from typing import Optional
 from holytools.configs.abstr import Configs, StrMap
 
 # ---------------------------------------------------------
@@ -11,7 +11,6 @@ class FileConfigs(Configs):
     def __init__(self, config_fpath : str = os.path.expanduser('~/.pyconfig')):
         super().__init__()
         self._config_fpath : str = config_fpath
-        self._map : ConfigObj = ConfigObj(infile=config_fpath)
         self.log(f'Initialized {self.__class__.__name__} with \"{self._config_fpath}\"')
 
     def set(self, key : str, value:  str):
