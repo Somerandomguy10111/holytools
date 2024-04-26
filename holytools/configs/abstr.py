@@ -15,6 +15,9 @@ class Configs(ABC, Loggable):
         self._map : DictType = self._retrieve_map()
 
     def get(self, key : str) -> str:
+        if len(key.split()) > 1:
+            raise ValueError(f'Key must not contain whitespaces, got : \"{key}\"')
+
         try:
             value = self._map.get(key)
             if not value:
