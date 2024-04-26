@@ -38,7 +38,7 @@ class FileConfigsTests(BaseConfigTests):
 
 class PassConfigTests(BaseConfigTests):
     def get_configs(self) -> Configs:
-        return PassConfigs(pass_dirpath='"/home/daniel/Drive/.password-store')
+        return PassConfigs(pass_dirpath='/home/daniel/Drive/.password-store')
 
 if __name__ == '__main__':
     FileConfigsTests.execute_all()
