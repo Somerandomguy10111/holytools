@@ -26,7 +26,6 @@ class Configs(ABC, Loggable):
             raise ValueError(f'Key must not contain whitespaces, got : \"{key}\"')
 
         try:
-            print(f'Configs map: {self._map}; key = {key}')
             value = self._map.get(key)
             if value is None:
                 raise KeyError
