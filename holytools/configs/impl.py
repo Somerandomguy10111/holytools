@@ -55,7 +55,7 @@ class PassConfigs(Configs):
             return result.stdout.strip()
         except Exception as e:
             self.log(f"An error occurred during command execution, you configuration is likely not saved to pass:\n"
-                     f'err = \"{e}\"\n"', level=LogLevel.WARNING)
+                     f'err = \"{e}\"\n', level=LogLevel.WARNING)
             result = None
         return result
 
