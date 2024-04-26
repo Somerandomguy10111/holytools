@@ -3,7 +3,7 @@ A collection of general utilities in various very general areas that aim for sim
 Functiontionalities include:
 
 - object serialization -> holytools.abstract.serialization
-- fileIO and file spoofing -> holytools.file
+- fileIO and mock files -> holytools.file
 - configuration management -> holytools.configs
 - file system navigation and management -> holytools.fsys
 - task/event scheduling -> holytools.events
