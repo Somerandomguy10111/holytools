@@ -1,6 +1,6 @@
-from hollarek.fsys.fsys_node import FsysNode, FsysTree
-from hollarek.abstract import Tree
-from hollarek.devtools import Unittest
+from holytools.fsys.fsys_node import FsysNode, FsysTree
+from holytools.abstract import Tree
+from holytools.devtools import Unittest
 import shutil
 import os
 import tempfile

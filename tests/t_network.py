@@ -1,5 +1,5 @@
-from hollarek.devtools import Unittest
-from hollarek.network import IpProvider, NetworkArea
+from holytools.devtools import Unittest
+from holytools.network import IpProvider, NetworkArea
 
 class TestIpProvider(Unittest):
     def get_ip(self):

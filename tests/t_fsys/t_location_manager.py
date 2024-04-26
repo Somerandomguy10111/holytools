@@ -1,6 +1,6 @@
 import os
-from hollarek.fsys import LocationManager
-from hollarek.devtools import Unittest
+from holytools.fsys import LocationManager
+from holytools.devtools import Unittest
 
 class TestLocationManager(Unittest):
     #noinspection PyUnresolvedReferences

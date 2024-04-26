@@ -1,6 +1,6 @@
-from hollarek.file import BinaryFile, PlaintextFile, ImageFile, ImageConverter, ImageFormat, FileSpoofer, ImageSerializer
-from hollarek.devtools import Unittest
-from hollarek.fsys import FsysNode
+from holytools.file import BinaryFile, PlaintextFile, ImageFile, ImageConverter, ImageFormat, FileSpoofer, ImageSerializer
+from holytools.devtools import Unittest
+from holytools.fsys import FsysNode
 from PIL.Image import Image
 from unittest.mock import patch
 import io

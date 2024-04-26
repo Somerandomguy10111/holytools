@@ -1,7 +1,7 @@
 from __future__ import annotations
 import os
 from typing import Optional
-from hollarek.fsys.resource import FsysResource, is_hidden
+from holytools.fsys.resource import FsysResource, is_hidden
 # -------------------------------------------
 
 class FsysNode(FsysResource):

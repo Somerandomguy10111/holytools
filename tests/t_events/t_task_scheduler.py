@@ -1,6 +1,6 @@
 import time
-from hollarek.devtools import Unittest
-from hollarek.events import TaskScheduler, InvalidCallableException
+from holytools.devtools import Unittest
+from holytools.events import TaskScheduler, InvalidCallableException
 
 class TestTaskScheduler(Unittest):
     def setUp(self):

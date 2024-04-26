@@ -1,8 +1,8 @@
 from abc import abstractmethod
-from hollarek.configs import Configs, FileConfigs, PassConfigs
-from hollarek.devtools import Unittest
+from holytools.configs import Configs, FileConfigs, PassConfigs
+from holytools.devtools import Unittest
 from unittest.mock import patch
-from hollarek.fsys import SaveManager
+from holytools.fsys import SaveManager
 
 
 class BaseConfigTests(Unittest):

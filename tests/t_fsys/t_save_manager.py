@@ -1,8 +1,8 @@
 import os
 import tempfile
 
-from hollarek.devtools import Unittest
-from hollarek.fsys import SaveManager
+from holytools.devtools import Unittest
+from holytools.fsys import SaveManager
 
 
 class TestSaveManager(Unittest):

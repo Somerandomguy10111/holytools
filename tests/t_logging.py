@@ -1,6 +1,6 @@
 import logging
-from hollarek.logging import LogLevel, make_logger
-from hollarek.devtools import Unittest
+from holytools.logging import LogLevel, make_logger
+from holytools.devtools import Unittest
 
 class TestLoggin(Unittest):
     def test_info_error(self):

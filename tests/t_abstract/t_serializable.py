@@ -5,8 +5,8 @@ from datetime import datetime, date, time
 from dataclasses import dataclass, field
 from tempfile import NamedTemporaryFile
 from abc import abstractmethod
-from hollarek.abstract import SerializableType, JsonDataclass
-from hollarek.devtools import Unittest
+from holytools.abstract import SerializableType, JsonDataclass
+from holytools.devtools import Unittest
 
 
 class ThisParticularEnum(Enum):
@@ -97,7 +97,7 @@ class HiderClass:
 class TestJsonDataclass(HiderClass.SerializationBase):
     @classmethod
     def get_serializable(cls):
-        from hollarek.abstract.serialization import JsonDataclass
+        from holytools.abstract.serialization import JsonDataclass
         return JsonDataclass
 
 
@@ -105,13 +105,13 @@ class TestDillable(HiderClass.SerializationBase):
     @classmethod
     def get_serializable(cls):
         print(f' Getting serializable for Dillable')
-        from hollarek.abstract.serialization import Dillable
+        from holytools.abstract.serialization import Dillable
         return Dillable
 
 class TestPicklable(HiderClass.SerializationBase):
     @classmethod
     def get_serializable(cls):
-        from hollarek.abstract.serialization import Picklable
+        from holytools.abstract.serialization import Picklable
         return Picklable
 
     def get_instance_and_cls(self) -> (SerializableType, type[SerializableType]):

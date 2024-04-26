@@ -7,8 +7,8 @@ class Dillable(Serializable):
         return dill.dumps(self).hex()
 
     @classmethod
-    def from_str(cls, dill_str: str):
-        return dill.loads(bytes.fromhex(dill_str))
+    def from_str(cls, s: str):
+        return dill.loads(bytes.fromhex(s))
 
 
 class Picklable(Serializable):
@@ -16,8 +16,8 @@ class Picklable(Serializable):
         return dumps(self).hex()
 
     @classmethod
-    def from_str(cls, pickl_str: str):
-        return loads(bytes.fromhex(pickl_str))
+    def from_str(cls, s: str):
+        return loads(bytes.fromhex(s))
 
 
 # Example usage:

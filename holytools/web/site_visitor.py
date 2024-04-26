@@ -8,7 +8,7 @@ from bs4 import BeautifulSoup
 from selenium import webdriver
 from func_timeout import func_timeout, FunctionTimedOut
 from selenium.webdriver.chrome.options import Options
-from hollarek.web.link_soup import LinkSoup
+from holytools.web.link_soup import LinkSoup
 # ---------------------------------------------------------
 
 

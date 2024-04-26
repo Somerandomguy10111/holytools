@@ -1,4 +1,4 @@
-from hollarek.devtools import ModuleInspector, Unittest, Argument
+from holytools.devtools import ModuleInspector, Unittest, Argument
 
 
 class SampleClass:

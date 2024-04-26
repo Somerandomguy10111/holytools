@@ -2,7 +2,7 @@ import socket
 from enum import Enum
 import subprocess
 import requests
-from hollarek.network.adapter import Adapter
+from holytools.network.adapter import Adapter
 
 
 class NetworkArea(Enum):

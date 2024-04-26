@@ -1,6 +1,6 @@
 from __future__ import annotations
-from hollarek.web import SiteVisitor
-from hollarek.devtools import Unittest
+from holytools.web import SiteVisitor
+from holytools.devtools import Unittest
 import psutil
 
 class VisitorTester(Unittest):

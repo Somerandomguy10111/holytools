@@ -2,8 +2,8 @@ import time
 
 from pynput.mouse import Button
 from pynput.mouse import Controller as MouseController
-from hollarek.hardware.display import Display, LatticePoint, Vector
-from hollarek.hardware.display import Grid
+from holytools.hardware.display import Display, LatticePoint, Vector
+from holytools.hardware.display import Grid
 from typing import Optional
 
 class Mouse:

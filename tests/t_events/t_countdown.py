@@ -1,8 +1,8 @@
 import sys
 import time
 from unittest.mock import MagicMock
-from hollarek.events import Countdown
-from hollarek.devtools import Unittest
+from holytools.events import Countdown
+from holytools.devtools import Unittest
 
 default_stderr = sys.stderr
 

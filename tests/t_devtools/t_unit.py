@@ -1,4 +1,4 @@
-from hollarek.devtools import Unittest
+from holytools.devtools import Unittest
 from tests.t_devtools.t_dtyping import TestOptionalTyping
 
 

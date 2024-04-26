@@ -1,5 +1,5 @@
 from typing import Optional, Union
-from hollarek.devtools import Unittest, TypeInspector
+from holytools.devtools import Unittest, TypeInspector
 
 
 

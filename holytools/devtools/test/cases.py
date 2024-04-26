@@ -3,7 +3,7 @@ from enum import Enum
 from unittest import TestCase, TestResult
 from abc import abstractmethod
 from typing import Optional
-from hollarek.logging import LogLevel, CustomLogger
+from holytools.logging import LogLevel, CustomLogger
 
 # ---------------------------------------------------------
 

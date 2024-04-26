@@ -3,7 +3,7 @@ from configobj import ConfigObj
 
 from typing import Optional
 import subprocess
-from hollarek.configs.abstr import Configs, StrMap
+from holytools.configs.abstr import Configs, StrMap
 
 # ---------------------------------------------------------
 

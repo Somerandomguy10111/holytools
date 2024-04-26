@@ -1,4 +1,4 @@
-from hollarek.userIO import InteractiveCLI
+from holytools.userIO import InteractiveCLI
 
 class Person:
     def __init__(self, name: str, active: bool = True):
