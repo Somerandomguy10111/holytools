@@ -1,10 +1,10 @@
 [project]
 name = "holytools"
-version = "0.9.0"
+version = "0.9.1"
 authors = [{name = "Daniel Hollarek", email = "daniel.hollarek@googlemail.com"}]
 description = "Collection of general python utilities for future projects"
 dynamic = ["dependencies"]
-urls = { "repository" = "https://github.com/Somerandomguy10111/hollarek" }
+urls = { "repository" = "https://github.com/Somerandomguy10111/holytools" }
 
 [tool.setuptools.package-data]
 "holytools.file.mock" = ["*"]
