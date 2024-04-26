@@ -1,2 +1,2 @@
-from .spoof.file_spoofer import FileSpoofer
+from .examples.example_provider import FileExamples
 from .types import *

@@ -1,4 +1,4 @@
-from holytools.file import BinaryFile, PlaintextFile, ImageFile, ImageConverter, ImageFormat, FileSpoofer, ImageSerializer
+from holytools.file import BinaryFile, PlaintextFile, ImageFile, ImageConverter, ImageFormat, FileExamples, ImageSerializer
 from holytools.devtools import Unittest
 from holytools.fsys import FsysNode
 from PIL.Image import Image
@@ -13,9 +13,9 @@ class TestFile(Unittest):
         pass
 
     def setUp(self):
-        self.text_fpath = FileSpoofer.lend_txt().fpath
-        self.jpg_fpath = FileSpoofer.lend_jpg().fpath
-        self.png_fpath = FileSpoofer.lend_png().fpath
+        self.text_fpath = FileExamples.lend_txt().fpath
+        self.jpg_fpath = FileExamples.lend_jpg().fpath
+        self.png_fpath = FileExamples.lend_png().fpath
 
 
     def test_binary_size(self):
@@ -69,7 +69,7 @@ class TestFile(Unittest):
 
 class TestImageConverter(Unittest):
     def setUp(self):
-        spoofer = FileSpoofer()
+        spoofer = FileExamples()
         self.jpg_file = spoofer.lend_jpg().fpath
         self.png_file = spoofer.lend_png().fpath
 
@@ -104,7 +104,7 @@ class TestImageConverter(Unittest):
 
 class TestImageSerializer(Unittest):
     def setUp(self):
-        spoofer = FileSpoofer()
+        spoofer = FileExamples()
         self.jpg_file = spoofer.lend_jpg()
         self.png_file = spoofer.lend_jpg()
 

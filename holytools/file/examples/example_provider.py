@@ -16,7 +16,7 @@ def create_temp_copy(filename: str) -> str:
     return temp_filepath
 
 
-class FileSpoofer:
+class FileExamples:
     @staticmethod
     def lend_png() -> ImageFile:
         fpath = create_temp_copy('spoof.png')
