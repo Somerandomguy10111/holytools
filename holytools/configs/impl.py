@@ -8,13 +8,19 @@ from holytools.configs.abstr import Configs, DictType
 
 # ---------------------------------------------------------
 
+
 class FileConfigs(Configs):
-    def __init__(self, config_fpath : str = os.path.expanduser('~/.pyconfig')):
+    def __init__(self, config_fpath : str = '~/.pyconfig'):
+        config_fpath = os.path.expanduser(path=config_fpath)
+        config_fpath = os.path.abspath(config_fpath)
+        config_dir = os.path.dirname(config_fpath)
+        os.makedirs(config_dir, exist_ok=True)
+
         self._config_fpath: str = config_fpath
         super().__init__()
-        # self.log(f'Initialized {self.__class__.__name__} with \"{self._config_fpath}\"')
 
     def _retrieve_map(self) -> ConfigObj:
+        self.log(f'Initialized {self.__class__.__name__} with config file at \"{self._config_fpath}\"')
         return ConfigObj(self._config_fpath)
 
     def update_config_resouce(self, key : str, value : str):

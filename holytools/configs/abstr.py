@@ -10,7 +10,7 @@ ConfigValue = Union[str, int, bool, float]
 
 # ---------------------------------------------------------
 
-class Configs(ABC, Loggable):
+class Configs(Loggable):
     def __init__(self, *args, **kwargs):
         super().__init__()
         self._map : DictType = self._retrieve_map()
