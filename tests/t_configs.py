@@ -11,11 +11,11 @@ from holytools.fsys import SaveManager
 class Hider:
     class BaseConfigTests(Unittest):
         configs_fpath = SaveManager.tmp_fpath()
+        pass_dirpath = '/home/daniel/Drive/.password-store'
 
-        def setUp(self):
-            self.configs = self.get_configs()
-            self.test_key = "test_key"
-            self.test_val = "test_value"
+        @classmethod
+        def setUpClass(cls):
+            cls.configs = cls.get_configs()
 
 
         @patch('builtins.input', lambda *args : '42')
@@ -28,12 +28,13 @@ class Hider:
 
 
         def test_set_get_key(self):
-            self.configs.set(key=self.test_key, value=self.test_val)
-            value = self.configs.get(self.test_key)
-            self.assertEqual(value, self.test_val)
+            str_key, str_val = self.make_random_str(), self.make_random_str()
+            self.configs.set(key=str_key, value=str_val)
+            value = self.configs.get(str_key)
+            self.assertEqual(value, str_val)
 
             expected_val = False
-            bool_key = str(uuid.uuid4())
+            bool_key = self.make_random_str()
             self.configs.set(key=bool_key, value=expected_val)
             actual = self.configs.get(key=bool_key)
             self.assertEqual(actual, expected_val)
@@ -41,32 +42,41 @@ class Hider:
 
         @patch('builtins.input', lambda *args: '')
         def test_new_obj_get(self):
-            new_key = str(uuid.uuid4())
-            self.configs.set(key=new_key, value=self.test_val)
+            str_key, str_val = self.make_random_str(), self.make_random_str()
+            self.configs.set(key=str_key, value=str_val)
 
             new_configs = self.get_configs()
-            value = new_configs.get(key=new_key)
-            self.assertEqual(value, self.test_val)
+            value = new_configs.get(key=str_key)
+            self.assertEqual(value, str_val)
 
         # ---------------------------------------------------------
 
+        @staticmethod
+        def make_random_str() -> str:
+            return str(uuid.uuid4())
+
+        @classmethod
         @abstractmethod
-        def get_configs(self) -> Configs:
+        def get_configs(cls) -> Configs:
             pass
 
+
     class PassConfigTests(BaseConfigTests):
-        def get_configs(self) -> Configs:
-            return PassConfigs(pass_dirpath='/home/daniel/Drive/.password-store')
+        @classmethod
+        def get_configs(cls) -> Configs:
+            return PassConfigs(pass_dirpath=cls.pass_dirpath)
 
 
 class FileConfigsTests(Hider.BaseConfigTests):
-    def get_configs(self) -> Configs:
-        return FileConfigs(config_fpath=self.configs_fpath)
+    @classmethod
+    def get_configs(cls) -> Configs:
+        return FileConfigs(config_fpath=cls.configs_fpath)
 
 
 
 
 if __name__ == '__main__':
     FileConfigsTests.execute_all()
+    Hider.PassConfigTests.execute_all()
     # configs = FileConfigs()
     # configs2 = FileConfigs()
