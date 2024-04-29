@@ -36,6 +36,13 @@ class TestTrackedInt(Unittest):
             ti += 1
             time.sleep(0.05)
 
+    def test_incremenation_beyond_max_val(self):
+        ti = TrackedInt(start_value=0, max_value=10)
+        for _ in range(20):
+            ti += 1
+            time.sleep(0.05)
+        self.assertEqual(ti,20)
+
     def test_comparison(self):
         ti = TrackedInt(start_value=0, max_value=10)
         is_smaller =  -1 < ti
