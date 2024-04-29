@@ -1,4 +1,7 @@
-from holytools.userIO import InteractiveCLI
+import time
+
+from holytools.userIO import InteractiveCLI, TrackedInt
+from holytools.devtools import Unittest
 
 class Person:
     def __init__(self, name: str, active: bool = True):
@@ -26,7 +29,23 @@ class Person:
         self.active = False
         return "Account deactivated"
 
+class TestTrackedInt(Unittest):
+    def test_incrementation(self):
+        ti = TrackedInt(start_value=0, max_value=10)
+        for _ in range(20):
+            ti += 1
+            time.sleep(0.05)
+
+    def test_comparison(self):
+        ti = TrackedInt(start_value=0, max_value=10)
+        is_smaller =  -1 < ti
+        self.assertTrue(is_smaller)
+
+
+
+
 if __name__ == "__main__":
     # Assuming InteractiveCLI and TestClass are defined
-    cli = InteractiveCLI(Person, "This is a test class with various types of methods.")
-    cli.loop()
+    # cli = InteractiveCLI(Person, "This is a test class with various types of methods.")
+    # cli.loop()
+    TestTrackedInt.execute_all()
