@@ -10,8 +10,8 @@ class TrackedInt:
 
     def __init__(self, start_value : int, max_value : int):
         self._value : int = start_value
-        self.iterator : Iterable = iter(range(start_value, max_value))
         self.progressbar = ProgressBar(min_value=start_value, max_value=max_value)
+        self.progressbar.update()
 
     def update(self, incr : int):
         self._value += incr
