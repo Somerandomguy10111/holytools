@@ -48,7 +48,14 @@ class TestTrackedInt(Unittest):
         is_smaller =  -1 < ti
         self.assertTrue(is_smaller)
 
-
+    def test_sticky(self):
+        start_val = 0
+        max_val = 1000
+        j = TrackedInt(start_value=start_val, max_value=max_val)
+        for k in range(start_val, max_val):
+            print(f'just random spam')
+            time.sleep(0.01)
+            j += 1
 if __name__ == "__main__":
     # Assuming InteractiveCLI and TestClass are defined
     # cli = InteractiveCLI(Person, "This is a test class with various types of methods.")
