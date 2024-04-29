@@ -15,11 +15,11 @@ class TrackedInt:
 
     def update(self, incr : int):
         self._value += incr
-        
+
         if self.progressbar.finished():
             return
 
-        if self._value > self.progressbar.max_value:
+        if self._value >= self.progressbar.max_value:
             self.progressbar.finish()
             return
 

@@ -41,6 +41,8 @@ class TestCountdown(Unittest):
         """ Test that finish waits for the countdown to complete. """
         self.countdown.start()
         self.countdown.finish()
+        #It needs little bit of time to release the lock
+        time.sleep(0.05)
         self.assertFalse(self.countdown.is_active())
 
     def test_get_output(self):
