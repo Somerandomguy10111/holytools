@@ -1,4 +1,3 @@
-import time
 from typing import Iterable
 
 import progressbar
@@ -26,6 +25,9 @@ class TrackedInt:
         self._value += incr
         self.progressbar.update(value=self._value)
 
+    def get_value(self) -> int:
+        return self._value
+
     def __iadd__(self, other):
         if not isinstance(other, int):
             raise ValueError("Only integers can be added to a TrackedInt.")
@@ -35,3 +37,40 @@ class TrackedInt:
     def __add__(self, other):
         raise NotImplementedError(f'Can only add to tracked integer in place')
 
+    def __eq__(self, other):
+        if isinstance(other, TrackedInt):
+            return self._value == other._value
+        elif isinstance(other, int):
+            return self._value == other
+        return NotImplemented
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+    def __lt__(self, other):
+        if isinstance(other, TrackedInt):
+            return self._value < other._value
+        elif isinstance(other, int):
+            return self._value < other
+        return NotImplemented
+
+    def __le__(self, other):
+        if isinstance(other, TrackedInt):
+            return self._value <= other._value
+        elif isinstance(other, int):
+            return self._value <= other
+        return NotImplemented
+
+    def __gt__(self, other):
+        if isinstance(other, TrackedInt):
+            return self._value > other._value
+        elif isinstance(other, int):
+            return self._value > other
+        return NotImplemented
+
+    def __ge__(self, other):
+        if isinstance(other, TrackedInt):
+            return self._value >= other._value
+        elif isinstance(other, int):
+            return self._value >= other
+        return NotImplemented

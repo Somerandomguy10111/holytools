@@ -42,8 +42,6 @@ class TestTrackedInt(Unittest):
         self.assertTrue(is_smaller)
 
 
-
-
 if __name__ == "__main__":
     # Assuming InteractiveCLI and TestClass are defined
     # cli = InteractiveCLI(Person, "This is a test class with various types of methods.")
