@@ -14,15 +14,15 @@ class TrackedInt:
         self.progressbar = ProgressBar(min_value=start_value, max_value=max_value)
 
     def update(self, incr : int):
+        self._value += incr
+        
         if self.progressbar.finished():
             return
 
-        new_value = self._value + incr
-        if new_value > self.progressbar.max_value:
+        if self._value > self.progressbar.max_value:
             self.progressbar.finish()
             return
 
-        self._value += incr
         self.progressbar.update(value=self._value)
 
     def get_value(self) -> int:
