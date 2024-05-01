@@ -4,12 +4,12 @@ from configobj import ConfigObj
 import subprocess
 from typing import Optional
 from holytools.logging import LogLevel
-from holytools.configs.abstr import Configs, DictType
+from holytools.configs.templ import BaseConfigs, DictType
 
 # ---------------------------------------------------------
 
 
-class FileConfigs(Configs):
+class FileConfigs(BaseConfigs):
     def __init__(self, config_fpath : str = '~/.pyconfig'):
         self._config_fpath: str = as_absolute(path=config_fpath)
         config_dirpath = os.path.dirname(self._config_fpath)
@@ -20,17 +20,17 @@ class FileConfigs(Configs):
         self.log(f'Initialized {self.__class__.__name__} with config file at \"{self._config_fpath}\"')
         return ConfigObj(self._config_fpath)
 
-    def update_config_resouce(self, key : str, value : str):
+    def update_config_resouce(self, key : str, value : str, section : Optional[str] = None):
         self._map.write()
 
 
-class PassConfigs(Configs):
+class PassConfigs(BaseConfigs):
     def __init__(self, pass_dirpath : str = '~/.password-store' ):
         self._pass_dirpath: str = as_absolute(path=pass_dirpath)
         os.environ['PASSWORD_STORE_DIR'] = pass_dirpath
         super().__init__()
 
-    def update_config_resouce(self, key : str, value : str):
+    def update_config_resouce(self, key : str, value : str, section : Optional[str] = None):
         insert_command = f"echo \"{value}\" | pass insert --echo {key}"
         self.try_run_cmd(cmd=insert_command)
 

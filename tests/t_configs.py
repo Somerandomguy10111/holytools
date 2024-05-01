@@ -2,7 +2,8 @@ import uuid
 from abc import abstractmethod
 from unittest.mock import patch
 
-from holytools.configs import Configs, FileConfigs, PassConfigs
+from holytools.configs import BaseConfigs, FileConfigs, PassConfigs
+from holytools.file import PlaintextFile
 from holytools.devtools import Unittest
 from holytools.fsys import SaveManager
 
@@ -57,26 +58,30 @@ class Hider:
 
         @classmethod
         @abstractmethod
-        def get_configs(cls) -> Configs:
+        def get_configs(cls) -> BaseConfigs:
             pass
 
 
     class PassConfigTests(BaseConfigTests):
         @classmethod
-        def get_configs(cls) -> Configs:
+        def get_configs(cls) -> BaseConfigs:
             return PassConfigs(pass_dirpath=cls.pass_dirpath)
 
 
 class FileConfigsTests(Hider.BaseConfigTests):
     @classmethod
-    def get_configs(cls) -> Configs:
+    def get_configs(cls) -> BaseConfigs:
         return FileConfigs(config_fpath=cls.configs_fpath)
 
+    def tearDown(self):
+        print(f'State of configs file at {self.configs_fpath}: {PlaintextFile.get_text(fpath=self.configs_fpath)}')
 
 
 
 if __name__ == '__main__':
-    FileConfigsTests.execute_all()
-    Hider.PassConfigTests.execute_all()
+    # FileConfigsTests.execute_all()
+    confs = FileConfigs(f'test')
+    confs.set(key='abc', value='asdf')
+    # Hider.PassConfigTests.execute_all()
     # configs = FileConfigs()
     # configs2 = FileConfigs()
