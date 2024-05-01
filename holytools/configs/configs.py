@@ -4,7 +4,7 @@ from configobj import ConfigObj
 import subprocess
 from typing import Optional
 from holytools.logging import LogLevel
-from holytools.configs.templ import BaseConfigs, DictType
+from holytools.configs.base import BaseConfigs, DictType
 
 # ---------------------------------------------------------
 

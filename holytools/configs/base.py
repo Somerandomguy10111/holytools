@@ -44,7 +44,10 @@ class BaseConfigs(Loggable, ABC):
             raise ValueError(f'Key \"{key}\" already exists in settings')
         if not isinstance(value, ConfigValue):
             raise ValueError(f'Value must be of type {ConfigValue} got : \"{value}\"')
-        self._map[section][key] = value
+        if not section is None:
+            self._map[section] = {}
+        inner_dict = self._map if section is None else self._map[section]
+        inner_dict[key] = value
         self.update_config_resouce(key=key, value=str(value), section=section)
 
 

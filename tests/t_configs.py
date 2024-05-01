@@ -81,7 +81,8 @@ class FileConfigsTests(Hider.BaseConfigTests):
 if __name__ == '__main__':
     # FileConfigsTests.execute_all()
     confs = FileConfigs(f'test')
-    confs.set(key='abc', value='asdf')
+    confs.set(key='newnew', value='asdf', section='!!!')
+    confs.get(key='newnew')
     # Hider.PassConfigTests.execute_all()
     # configs = FileConfigs()
     # configs2 = FileConfigs()
