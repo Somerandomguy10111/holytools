@@ -48,13 +48,7 @@ class TestTrackedInt(Unittest):
         is_smaller =  -1 < ti
         self.assertTrue(is_smaller)
 
-    def test_sticky(self):
-        start_val = 0
-        max_val = 1000
-        import progressbar
-        for k in progressbar.ProgressBar(start_val,max_val, line_offset=1):
-            print(f'just random spam')
-            time.sleep(0.1)
+    # def test_sticky(s3
 
 if __name__ == "__main__":
     # Assuming InteractiveCLI and TestClass are defined
