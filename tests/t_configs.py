@@ -10,7 +10,7 @@ from holytools.fsys import SaveManager
 # ---------------------------------------------------------
 
 class Hider:
-    class BaseConfigTests(Unittest):
+    class ConfigTest(Unittest):
         configs_fpath = SaveManager.tmp_fpath()
         pass_dirpath = '/home/daniel/Drive/.password-store'
 
@@ -50,6 +50,13 @@ class Hider:
             value = new_configs.get(key=str_key)
             self.assertEqual(value, str_val)
 
+        def test_section_set_get(self):
+            section = self.make_random_str()
+            key, value = self.make_random_str(), self.make_random_str()
+            self.configs.set(key=key, value=value, section=section)
+            value = self.configs.get(key=key)
+            self.assertEqual(value, value)
+
         # ---------------------------------------------------------
 
         @staticmethod
@@ -62,13 +69,13 @@ class Hider:
             pass
 
 
-    class PassConfigTests(BaseConfigTests):
+    class PassConfigTests(ConfigTest):
         @classmethod
         def get_configs(cls) -> BaseConfigs:
             return PassConfigs(pass_dirpath=cls.pass_dirpath)
 
 
-class FileConfigsTests(Hider.BaseConfigTests):
+class FileConfigsTests(Hider.ConfigTest):
     @classmethod
     def get_configs(cls) -> BaseConfigs:
         return FileConfigs(config_fpath=cls.configs_fpath)
@@ -79,10 +86,11 @@ class FileConfigsTests(Hider.BaseConfigTests):
 
 
 if __name__ == '__main__':
-    # FileConfigsTests.execute_all()
-    confs = FileConfigs(f'test')
-    confs.set(key='newnew', value='asdf', section='!!!')
-    confs.get(key='newnew')
+    FileConfigsTests.execute_all()
+    Hider.PassConfigTests.execute_all()
+    # confs = FileConfigs(f'test')
+    # confs.set(key='newnew', value='asdf', section='!!!')
+    # confs.get(key='newnew')
     # Hider.PassConfigTests.execute_all()
     # configs = FileConfigs()
     # configs2 = FileConfigs()
