@@ -36,13 +36,12 @@ class SaveManager:
             return None
 
     @staticmethod
-    def get_free_path(save_dirpath : str, name : str, suffix : Optional[str] = None, start_zero_indexed : bool = False) -> str:
+    def get_free_path(save_dirpath: str, name: str, suffix: Optional[str] = None, start_index: int = 0) -> str:
         if suffix:
             if not suffix.startswith('.'):
                 suffix = f'.{suffix}'
 
-        start_index = 0 if start_zero_indexed else None
-        def get_path(index : int = start_index):
+        def get_path(index: int = start_index):
             conditional_suffix = '' if suffix is None else f'{suffix}'
             conditional_index = f'_{index}' if not index is None else ''
             return os.path.join(save_dirpath, f'{name}{conditional_index}{conditional_suffix}')
