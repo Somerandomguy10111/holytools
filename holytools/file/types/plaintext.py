@@ -24,3 +24,9 @@ class PlaintextFile(File):
     def get_non_plaintext_formats(cls) -> list[str]:
         return [".doc", ".docx", ".eml", ".epub", ".gif", ".jpg", ".jpeg", ".json", ".html", ".htm",
                     ".msg", ".odt", ".ogg", ".pdf", ".png", ".pptx", ".ps", ".rtf", ".xlsx", ".xls"]
+
+    @classmethod
+    def get_text(cls, fpath : str) -> str:
+        with open(fpath, 'r') as f:
+            text = f.read()
+        return text
