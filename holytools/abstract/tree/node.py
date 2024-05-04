@@ -39,6 +39,7 @@ class TreeNode(ABC):
     # descendants
 
     def get_subnodes(self, *args, **kwargs) -> list[TreeNode]:
+        _, __ = args, kwargs
         subnodes = []
         for child in self.get_child_nodes():
             subnodes.append(child)

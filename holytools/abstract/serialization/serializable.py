@@ -23,7 +23,6 @@ class Serializable:
             fpath = get_free_path(save_dirpath=dirpath, name=os.path.basename(fpath), start_index=1)
             print(f'Warning: File already exists at specified filepath. Saving to {fpath} instead.')
 
-
         with open(fpath, 'w') as f:
             f.write(self.to_str())
 

@@ -1,5 +1,3 @@
-from typing import Iterable
-
 import progressbar
 from progressbar import ProgressBar
 # ---------------------------------------------------------
