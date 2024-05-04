@@ -13,9 +13,10 @@ class Profilable:
 
     def set_profiling(self):
         methods = self.profiled_methods()
-        for method in methods:
-            profiled_method = self.profile(method)
-            setattr(self, method.__name__, profiled_method)
+        for mthd in methods:
+            bound_mthd = getattr(self, mthd.__name__)
+            profiled_method = self.profile(bound_mthd)
+            setattr(self, mthd.__name__, profiled_method)
 
     def profile(self, func):
         @wraps(func)
@@ -31,7 +32,7 @@ class Profilable:
 
         return wrapper
 
-    def get_report(self):
+    def get_report(self) -> str:
         table = []
         headers = ["Method", "Average Time", "Total Time", "No. Calls"]
         for method, stats in self._execution_times.items():
