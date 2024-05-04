@@ -1,71 +1,52 @@
 import time
-from functools import wraps
-from typing import Callable
-from abc import abstractmethod
 from tabulate import tabulate
 
-# ---------------------------------------------------------
+
+class TimedScope:
+    def __init__(self, name: str, storage : dict):
+        self.name : str = name
+        self.storage : dict = storage
+
+    def __enter__(self):
+        self.start_time = time.time()
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        end_time = time.time()
+        elapsed = end_time - self.start_time
+        if self.name in self.storage:
+            self.storage[self.name][0].append(elapsed)
+            self.storage[self.name][1] += 1
+        else:
+            self.storage[self.name] = [[elapsed], 1]
 
 class Profilable:
     def __init__(self):
         self._execution_times = {}
-        self.set_profiling()
-
-    def set_profiling(self):
-        methods = self.profiled_methods()
-        for mthd in methods:
-            bound_mthd = getattr(self, mthd.__name__)
-            profiled_method = self.profile(bound_mthd)
-            setattr(self, mthd.__name__, profiled_method)
-
-    def profile(self, func):
-        @wraps(func)
-        def wrapper(*args, **kwargs):
-            start_time = time.time()
-            result = func(*args, **kwargs)
-            elapsed_time = time.time() - start_time
-            if func.__name__ not in self._execution_times:
-                self._execution_times[func.__name__] = {'total_time': 0, 'calls': 0}
-            self._execution_times[func.__name__]['total_time'] += elapsed_time
-            self._execution_times[func.__name__]['calls'] += 1
-            return result
-
-        return wrapper
 
     def get_report(self) -> str:
+        headers = ["Section", "Total Time (s)", "Average Time (s)", "Calls"]
         table = []
-        headers = ["Method", "Average Time", "Total Time", "No. Calls"]
-        for method, stats in self._execution_times.items():
-            average_time = stats['total_time'] / stats['calls']
-            table.append([method, f"{round(average_time,6)}s", f"{round(stats['total_time'],6)}s", stats['calls']])
+        for section, (times, calls) in self._execution_times.items():
+            total_time = sum(times)
+            average_time = total_time / calls
+            table.append([section, f"{total_time:.6f}", f"{average_time:.6f}", calls])
+        return tabulate(table, headers=headers, tablefmt="psql")
 
-        return tabulate(table, headers=headers, tablefmt="grid")
-
-    @classmethod
-    @abstractmethod
-    def profiled_methods(cls) -> list[Callable]:
-        pass
+    def timed_scope(self, name : str) -> TimedScope:
+        return TimedScope(name, self._execution_times)
 
 
-class This(Profilable):
-    @classmethod
-    def profiled_methods(cls) -> list[Callable]:
-        return [cls.do_this, cls.another_method]
-
-    @staticmethod
-    def do_this():
-        print('abc')
-
-    @staticmethod
-    def another_method(x):
-        print(x)
-
+class ExampleClass(Profilable):
+    def some_method(self):
+        with self.timed_scope(name='being_work'):
+            time.sleep(0.1)
+        with self.timed_scope(name='phase2'):
+            time.sleep(0.1)
+        with self.timed_scope(name='phase3'):
+            time.sleep(0.1)
 
 if __name__ == "__main__":
-    a = This()
-    a.do_this()
-    a.do_this()
-    a.another_method(0.1)
-    a.another_method(0.2)
-
-    print(a.get_report())
+    instance = ExampleClass()
+    instance.some_method()  # Execute the profiled method multiple times to see accumulation
+    instance.some_method()
+    print(instance.get_report())  # Output the profiling report
