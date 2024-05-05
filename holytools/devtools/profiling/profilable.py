@@ -23,7 +23,7 @@ class Profilable:
     def __init__(self):
         self._execution_times = {}
 
-    def get_report(self) -> str:
+    def make_report(self) -> str:
         headers = ["Section", "Total Time (s)", "Average Time (s)", "Calls"]
         table = []
         for section, (times, calls) in self._execution_times.items():
@@ -49,4 +49,4 @@ if __name__ == "__main__":
     instance = ExampleClass()
     instance.some_method()  # Execute the profiled method multiple times to see accumulation
     instance.some_method()
-    print(instance.get_report())  # Output the profiling report
+    print(instance.make_report())  # Output the profiling report
