@@ -2,7 +2,7 @@
 name = "holytools"
 version = "0.9.4"
 authors = [{name = "Daniel Hollarek", email = "daniel.hollarek@googlemail.com"}]
-description = "Collection of general python utilities for future projects"
+description = "Collection of very general python utilities "
 readme = "readme.md"
 dynamic = ["dependencies"]
 urls = { "repository" = "https://github.com/Somerandomguy10111/holytools" }
