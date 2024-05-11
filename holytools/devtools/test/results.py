@@ -8,8 +8,8 @@ from typing import Optional
 from unittest import TestCase
 
 from holytools.logging import LogLevel, CustomLogger
-from .configurable_unit import ConfigurableTest
-from .cases import ReportableResult, CaseReport, CaseStatus, get_case_name
+from .base import ReportableResult, CaseReport, CaseStatus, get_case_name, ConfigurableTest
+
 
 # ---------------------------------------------------------
 

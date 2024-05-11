@@ -1,3 +1,4 @@
+import unittest
 from enum import Enum
 
 from unittest import TestCase, TestResult
@@ -71,3 +72,15 @@ def get_case_name(test: TestCase) -> str:
     last_parts = parts[-2:]
     test_name = '.'.join(last_parts)
     return test_name
+
+
+class ConfigurableTest(unittest.TestCase):
+    def __init__(self, *args):
+        super().__init__(*args)
+        self.is_manual_mode : bool = False
+
+    def set_manual(self):
+        self.is_manual_mode = True
+
+    def get_is_manual(self):
+        return self.is_manual_mode

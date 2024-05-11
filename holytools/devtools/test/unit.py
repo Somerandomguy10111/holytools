@@ -2,7 +2,7 @@ import unittest
 
 from typing import Optional
 from holytools.logging import make_logger, LogSettings, CustomLogger, LogLevel
-from .configurable_unit import  ConfigurableTest
+from .base import ConfigurableTest
 from .results import Results, DisplayOptions
 
 # ---------------------------------------------------------
