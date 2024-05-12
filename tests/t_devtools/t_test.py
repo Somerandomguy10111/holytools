@@ -1,5 +1,6 @@
 from holytools.devtools import Unittest, patch_module
 from tests.t_devtools.t_inspection import TestOptionalTyping
+from holytools.file import File
 import os
 
 
@@ -15,13 +16,6 @@ class RealCar:
 class FakeCar:
     def drive(self):
         return "Driving the Fake Car"
-
-class File:
-    def __init__(self, fpath):
-        self.fpath = fpath
-
-    def write(self, content):
-        print(f"Writing {content} to {self.fpath}")
 
 class CustomFile:
     def write(self, content : str):
@@ -52,6 +46,8 @@ class TestPatchMechanism(Unittest):
     def test_stdlib_function(self):
         result = os.path.abspath("anything")
         self.assertEqual(result, "/fake/path")
+
+
 
 if __name__ == "__main__":
     TestPatchMechanism.execute_all()
