@@ -18,13 +18,16 @@ class FakeCar:
         return "Driving the Fake Car"
 
 class CustomFile:
+    def __init__(self, fpath : str):
+        print(f'This is just a *fake* CustomFile you fool!')
+
     def write(self, content : str):
         return f'Pranked!'
 
 
 class TestPatchMechanism(Unittest):
     # noinspection PyNoneFunctionAssignment
-    @patch_module(File.write, CustomFile.write)
+    @patch_module(File, CustomFile)
     def test_imported_cls(self):
         file_instance = File(fpath='any')
         output = file_instance.write(content='this content')

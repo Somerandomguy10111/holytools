@@ -3,19 +3,26 @@ import inspect
 from holytools.file.types import File
 from typing import Callable
 import os
+import sys
 
 
-def patch_module(original : type | Callable, replacement : type | Callable):
+
+def patch_module(original: type | Callable, replacement: type | Callable):
     module_path = inspect.getmodule(original).__name__
     qualified_name = original.__qualname__
-    full_path = f"{module_path}.{qualified_name}"
+    main_module = sys.modules['__main__']
 
-    # print(f'Original full path = {full_path}')
+    try:
+        getattr(main_module, qualified_name)
+        full_path = f"__main__.{qualified_name}"
+    except:
+        full_path = f"{module_path}.{qualified_name}"
 
+    print(f'Full path = {full_path}')
     def decorator(func):
         return unittest.mock.patch(full_path, replacement)(func)
-    return decorator
 
+    return decorator
 
 
 
