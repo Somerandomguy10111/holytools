@@ -1,6 +1,6 @@
 import unittest.mock
 import inspect
-from holytools.file.types.file import File
+from holytools.file.types import File
 from typing import Callable
 import os
 
@@ -10,7 +10,7 @@ def patch_module(original : type | Callable, replacement : type | Callable):
     qualified_name = original.__qualname__
     full_path = f"{module_path}.{qualified_name}"
 
-    print(f'Original full path = {full_path}')
+    # print(f'Original full path = {full_path}')
 
     def decorator(func):
         return unittest.mock.patch(full_path, replacement)(func)
@@ -27,7 +27,7 @@ if __name__ == "__main__":
 
 
     class TestTheWriting(unittest.TestCase):
-        @unittest.mock.patch('holytools.file.types.file.File', CustomFile)
+        @patch_module(File, CustomFile)
         def test_do_write(self):
             print(f'The file type is = {File}')
             print(f'Writing to ')
