@@ -10,8 +10,8 @@ from holytools.configs.base import BaseConfigs, DictType
 
 
 class FileConfigs(BaseConfigs):
-    def __init__(self, config_fpath : str = '~/.pyconfig'):
-        self._config_fpath: str = as_absolute(path=config_fpath)
+    def __init__(self, fpath : str = '~/.pyconfig'):
+        self._config_fpath: str = as_absolute(path=fpath)
         config_dirpath = os.path.dirname(self._config_fpath)
         os.makedirs(config_dirpath, exist_ok=True)
         super().__init__()

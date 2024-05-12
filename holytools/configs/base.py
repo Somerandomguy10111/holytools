@@ -31,7 +31,7 @@ class BaseConfigs(Loggable, ABC):
             if value is None:
                 raise KeyError
         except:
-            self.log(f'Could not find key {key} in settings: Please set it manually', level=LogLevel.WARNING)
+            self.log(f'Could not find key \"{key}\" in settings: Please set it manually', level=LogLevel.WARNING)
             value = input()
             self.set(key=key, value=value)
 

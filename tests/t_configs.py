@@ -78,7 +78,7 @@ class Hider:
 class FileConfigsTests(Hider.ConfigTest):
     @classmethod
     def get_configs(cls) -> BaseConfigs:
-        return FileConfigs(config_fpath=cls.configs_fpath)
+        return FileConfigs(fpath=cls.configs_fpath)
 
     def tearDown(self):
         print(f'State of configs file at {self.configs_fpath}: {PlaintextFile.get_text(fpath=self.configs_fpath)}')
