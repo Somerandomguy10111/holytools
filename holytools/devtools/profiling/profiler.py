@@ -54,6 +54,16 @@ class Profiler:
         return TimedScope(name, self._execution_profiles)
 
 
+    @staticmethod
+    def measure(self, func):
+        def wrapper(*args, **kwargs):
+            with self.timed_scope(name=func.__name__):
+                result = func(*args, **kwargs)
+            return result
+
+        return wrapper
+
+
 if __name__ == "__main__":
     class ExampleClass(Profiler):
         def some_method(self):
