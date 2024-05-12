@@ -1,3 +1,6 @@
+import time
+from typing import Iterator
+
 import progressbar
 from progressbar import ProgressBar
 # ---------------------------------------------------------
@@ -11,8 +14,8 @@ class TrackedInt:
         self.progressbar = ProgressBar(min_value=start_value, max_value=max_value)
         self.progressbar.update()
 
-    def update(self, incr : int):
-        self._value += incr
+    def increment(self, to_add : int):
+        self._value += to_add
 
         if self.progressbar.finished():
             return
@@ -29,7 +32,7 @@ class TrackedInt:
     def __iadd__(self, other):
         if not isinstance(other, int):
             raise ValueError("Only integers can be added to a TrackedInt.")
-        self.update(incr=other)
+        self.increment(to_add=other)
         return self
 
     def __add__(self, other):
@@ -72,3 +75,15 @@ class TrackedInt:
         elif isinstance(other, int):
             return self._value >= other
         return NotImplemented
+
+    def as_range(self) -> Iterator[int]:
+        while self._value < int(self.progressbar.max_value):
+            yield self._value
+            self.increment(to_add=1)
+
+
+if __name__ == "__main__":
+    this = TrackedInt(start_value=0, max_value=10)
+    for k in this.as_range():
+        print(f'k = {k}')
+        time.sleep(0.1)
