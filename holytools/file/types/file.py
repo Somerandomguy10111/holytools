@@ -4,13 +4,14 @@ import os
 from enum import Enum
 from pathlib import Path
 from base64 import b64encode
+from abc import ABC
 
 class Access(Enum):
     READABLE = os.R_OK
     WRITABLE = os.W_OK
     EXECUTABLE = os.X_OK
 
-class File:
+class File(ABC):
     def __init__(self, fpath : str, require_writable : bool = True, require_executable : bool = False):
         self.fpath : str = str(Path(fpath).absolute())
         required_permissions : set[Access] = {Access.READABLE}
