@@ -27,15 +27,21 @@ class BaseConfigs(Loggable, ABC):
 
         try:
             flatten_dict = flatten(self._map)
-            value = flatten_dict.get(key)
-            if value is None:
+            config_value = flatten_dict.get(key)
+            if config_value is None:
                 raise KeyError
         except:
             self.log(f'Could not find key \"{key}\" in settings: Please set it manually', level=LogLevel.WARNING)
-            value = input()
-            self.set(key=key, value=value)
+            config_value = input()
+            self.set(key=key, value=config_value)
 
-        value = self.convert_string(value)
+        print(f'value = {config_value} of type {type(config_value)}')
+        if isinstance(config_value, str):
+            value = self.cast_string(config_value)
+        elif isinstance(config_value, list):
+            value = [self.cast_string(v) for v in config_value]
+        else:
+            value =  config_value
         return value
 
 
@@ -57,11 +63,13 @@ class BaseConfigs(Loggable, ABC):
 
 
     @staticmethod
-    def convert_string(value) -> ConfigValue:
+    def cast_string(value : str | list[str] | ConfigValue) -> ConfigValue:
+        # print(f'casting {value} of type {type(value)}')
         try:
-            return ast.literal_eval(value)
+            value = ast.literal_eval(value)
         except (ValueError, SyntaxError):
-            return value
+            pass
+        return value
 
 
 def flatten(obj : dict) -> dict:

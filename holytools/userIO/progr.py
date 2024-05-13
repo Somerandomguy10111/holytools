@@ -81,6 +81,8 @@ class TrackedInt:
             yield self._value
             self.increment(to_add=1)
 
+    def __str__(self):
+        return str(self._value)
 
 if __name__ == "__main__":
     this = TrackedInt(start_value=0, max_value=10)
