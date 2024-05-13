@@ -35,7 +35,7 @@ class BaseConfigs(Loggable, ABC):
             config_value = input()
             self.set(key=key, value=config_value)
 
-        print(f'value = {config_value} of type {type(config_value)}')
+        # print(f'value = {config_value} of type {type(config_value)}')
         if isinstance(config_value, str):
             value = self.cast_string(config_value)
         elif isinstance(config_value, list):

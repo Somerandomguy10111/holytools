@@ -57,6 +57,13 @@ class Hider:
             value = self.configs.get(key=key)
             self.assertEqual(value, value)
 
+
+        def test_list_of_int_set_get(self):
+            key = self.make_random_str()
+            list_of_ints = [i for i in range(10)]
+            self.configs.set(key=key, value=list_of_ints)
+            value = self.configs.get(key=key)
+            self.assertEqual(value, list_of_ints)
         # ---------------------------------------------------------
 
         @staticmethod
