@@ -6,7 +6,8 @@ from typing import TypeVar, Union, Optional
 from holytools.logging import Loggable, LogLevel
 
 DictType = TypeVar(name='DictType', bound=dict)
-ConfigValue = Union[str, int, bool, float]
+BasicValue = Union[str, int, bool, float]
+ConfigValue = Union[BasicValue, list]
 
 # ---------------------------------------------------------
 
@@ -39,6 +40,7 @@ class BaseConfigs(Loggable, ABC):
         if isinstance(config_value, str):
             value = self.cast_string(config_value)
         elif isinstance(config_value, list):
+
             value = [self.cast_string(v) for v in config_value]
         else:
             value =  config_value
@@ -50,6 +52,8 @@ class BaseConfigs(Loggable, ABC):
             raise ValueError(f'Key \"{key}\" already exists in settings')
         if not isinstance(value, ConfigValue):
             raise ValueError(f'Value must be of type {ConfigValue} got : \"{value}\"')
+        if isinstance(value, list):
+            self.check_list_ok(the_list=value)
         if not section is None:
             self._map[section] = {}
         inner_dict = self._map if section is None else self._map[section]
@@ -63,13 +67,27 @@ class BaseConfigs(Loggable, ABC):
 
 
     @staticmethod
-    def cast_string(value : str | list[str] | ConfigValue) -> ConfigValue:
+    def cast_string(value : list[str] | ConfigValue) -> ConfigValue:
         # print(f'casting {value} of type {type(value)}')
         try:
             value = ast.literal_eval(value)
         except (ValueError, SyntaxError):
             pass
         return value
+
+
+    @staticmethod
+    def check_list_ok(the_list : list):
+        if len(the_list) == 0:
+            return True
+        if not isinstance(the_list[0], BasicValue):
+            raise ValueError(f'List the_lists must be of type {BasicValue} got:'
+                             f' {the_list[0]} of type {type(the_list[0])}')
+        list_dtype = type(the_list[0])
+        print(f'List dtype = {list_dtype}')
+        is_uniform = all(isinstance(entry, list_dtype) for entry in the_list)
+        if not is_uniform:
+            raise ValueError(f'List values must be of the same type, got : {the_list}')
 
 
 def flatten(obj : dict) -> dict:
