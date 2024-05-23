@@ -3,19 +3,20 @@ import inspect
 from holytools.file.types import File
 from typing import Callable
 import os
-import sys
-
 
 
 def patch_module(original: type | Callable, replacement: type | Callable):
     module_path = inspect.getmodule(original).__name__
     qualified_name = original.__qualname__
-    main_module = sys.modules['__main__']
+    frame = inspect.currentframe().f_back
+    caller_module = inspect.getmodule(frame)
 
     try:
-        getattr(main_module, qualified_name)
-        full_path = f"__main__.{qualified_name}"
-    except:
+        # corresponds to "from [caller_module] import [original]
+        _ = getattr(caller_module, qualified_name)
+        full_path = f"{caller_module.__name__}.{qualified_name}"
+    except Exception as e:
+        # corresponds to import [caller_module].[original]
         full_path = f"{module_path}.{qualified_name}"
 
     print(f'Full path = {full_path}')
