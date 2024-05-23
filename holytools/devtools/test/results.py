@@ -61,9 +61,10 @@ class Results(ReportableResult):
             not_custom_unittest = not os.path.dirname(__file__) in tb.filename
             return not_unittest and not_custom_unittest
 
-        relevant_tb = [tb for tb in tb_list if is_relevant(tb)]
+        user_tb = [tb for tb in tb_list if is_relevant(tb)]
 
         result = ''
+        relevant_tb = user_tb if not len(user_tb) == 0 else tb_list
         for frame in relevant_tb:
             file_path = frame.filename
             line_number = frame.lineno
