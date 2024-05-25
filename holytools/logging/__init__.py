@@ -1,6 +1,5 @@
 import logging
 
-from .log_settings import LogSettings
 from .factory import Loggable, LoggerFactory
 from .modifier import LoggingModifier
 

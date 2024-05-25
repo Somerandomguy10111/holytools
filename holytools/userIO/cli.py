@@ -1,6 +1,6 @@
 from typing import Callable
 import inspect
-from holytools.logging import Loggable, LogSettings, LogLevel
+from holytools.logging import Loggable, LogLevel
 # ---------------------------------------------------------
 
 
@@ -8,7 +8,7 @@ class InteractiveCLI(Loggable):
     _exit_str = 'q'
 
     def __init__(self, cls : type, description : str = ''):
-        super().__init__(settings=LogSettings(timestamp=False))
+        super().__init__()
         self.cls : type = cls
         self.desc : str = description
 

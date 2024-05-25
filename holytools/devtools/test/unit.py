@@ -5,7 +5,7 @@ import unittest
 from typing import Optional, Callable
 import unittest.mock
 from logging import Logger
-from holytools.logging import LogSettings, LoggerFactory
+from holytools.logging import LoggerFactory
 from .custom_testcase import CustomTestCase
 from .testrun_result import TestrunResult, DisplayOptions
 
@@ -46,7 +46,7 @@ class Unittest(CustomTestCase):
     @classmethod
     def get_logger(cls) -> Logger:
         if not cls._logger:
-            cls._logger = LoggerFactory.make_logger(settings=LogSettings(include_call_location=False, timestamp=False), name=cls.__name__)
+            cls._logger = LoggerFactory.make_logger(include_location=False, include_timestamp=False, name=cls.__name__)
         return cls._logger
 
     @classmethod
