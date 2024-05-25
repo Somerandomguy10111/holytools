@@ -9,7 +9,6 @@ class TestLoggin(Unittest):
         my_logger.error(msg=f'Error text')
 
     def test_make_logger(self):
-        raise ValueError()
         logger_name = "basic_xyz_logger"
         _ = LoggerFactory.make_logger(name=logger_name)
 

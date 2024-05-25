@@ -64,7 +64,6 @@ class Formatter(logging.Formatter):
 
     def format(self, record):
         log_fmt = "%(message)s"
-        # print(f' Formatting this message !1')
 
         if self.log_settings.timestamp:
             custom_time = self.formatTime(record, "%Y-%m-%d %H:%M:%S")
@@ -73,11 +72,7 @@ class Formatter(logging.Formatter):
             log_fmt = f"{timestamp}: {log_fmt}"
 
         if self.log_settings.include_call_location:
-            filename = record.pathname
-            lineno = record.lineno
-            func_name = record.funcName
-            code_line = linecache.getline(filename, lineno).strip()
-            log_fmt += f' (File "{filename}", line {lineno}, in {func_name})\n    {code_line}'
+            log_fmt += f'\t\t| Location: File "{record.pathname}:{record.lineno}"'
 
         if self.log_target == LogTarget.CONSOLE:
             color_prefix = Formatter.colors.get(record.levelno, "")
