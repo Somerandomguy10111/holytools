@@ -67,7 +67,7 @@ class HiderClass:
             return instance, ComplexDataclass
 
 
-        def test_serialization_roundtrip(self):
+        def test_tostr_fromstr_roundtrip(self):
             serialized_str = self.instance.to_str()
             reloaded_data = self.cls.from_str(serialized_str)
             self.check_effectively_equal(obj1=self.instance, obj2=reloaded_data)

@@ -11,6 +11,15 @@ from enum import Enum
 import json
 
 from holytools.abstract.serialization.serializable import Serializable
+
+typecast_classes = ['Decimal', 'UUID', 'Path', 'str', 'int', 'float', 'bool']
+conversion_map = {
+    datetime: datetime.fromisoformat,
+    date: date.fromisoformat,
+    time: time.fromisoformat,
+}
+elementary_type_names : list[str] = typecast_classes + [cls.__name__ for cls in conversion_map.keys()]
+
 # -------------------------------------------
 
 
@@ -18,6 +27,10 @@ class JsonDataclass(Serializable):
     def __init__(self):
         if not dataclasses.is_dataclass(self):
             raise TypeError(f'{self.__class__} must be a dataclass to be Jsonifyable')
+
+    @classmethod
+    def from_json(cls, json_dict : dict) -> JsonDataclass:
+        return from_json(cls=cls, json_dict=json_dict)
 
     @classmethod
     def from_str(cls, json_str: str):
@@ -30,22 +43,6 @@ class JsonDataclass(Serializable):
 
     def to_dict(self) -> dict:
         return {attr: get_jsonifyable_entry(obj=value) for attr, value in self.__dict__.items()}
-
-    @classmethod
-    def from_json(cls, json_dict : dict) -> JsonDataclass:
-        return from_json(cls=cls, json_dict=json_dict)
-
-
-def get_jsonifyable_entry(obj):
-    if isinstance(obj, JsonDataclass):
-        entry = obj.to_dict()
-    elif isinstance(obj, Enum):
-        entry = obj.value
-    elif hasattr(obj, '__dict__'):
-        entry = {attr: value for attr, value in obj.__dict__.items() if not callable(value)}
-    else:
-        entry = obj
-    return entry
 
 
 def from_json(cls : type, json_dict: dict):
@@ -65,7 +62,7 @@ def from_json(cls : type, json_dict: dict):
         elif issubclass(dtype, Enum):
             init_dict[key] = dtype(value)
         elif get_origin(dtype) == dict:
-            init_dict[key] = make_dict(dtype=dtype, value=value)
+            init_dict[key] = value
         elif get_origin(dtype) == list:
             init_dict[key] = value
         elif dataclasses.is_dataclass(obj=dtype):
@@ -76,36 +73,16 @@ def from_json(cls : type, json_dict: dict):
     return cls(**init_dict)
 
 
-def make_dict(dtype : type, value : str):
-    key_type, value_type = get_dict_item_types(dtype=dtype)
-    item_types = {key_type.__name__, value_type.__name__}
-    supported_types = set(elementary_type_names)
-    if any(item_type not in supported_types for item_type in item_types):
-        raise TypeError(f'Unsupported type in dict {item_types}')
-
-    str_dict = json.loads(value)
-    dict_value = {make_elementary(cls=key_type, value=k): make_elementary(cls=value_type, value=v) for k, v in
-                  str_dict.items()}
-    return dict_value
-
-
-def make_elementary(cls, value : str):
-    if cls in conversion_map:
-        return conversion_map[cls](value)
-    elif cls.__name__ in typecast_classes:
-        return cls(value)
+def get_jsonifyable_entry(obj):
+    if isinstance(obj, JsonDataclass):
+        entry = obj.to_dict()
+    elif isinstance(obj, Enum):
+        entry = obj.value
+    elif hasattr(obj, '__dict__'):
+        entry = {attr: value for attr, value in obj.__dict__.items() if not callable(value)}
     else:
-        raise TypeError(f'Unsupported type {cls}')
-
-
-def get_dict_item_types(dtype : type) -> (type, type):
-    if not strip_nonetype(dtype) == dict:
-        raise TypeError(f'{dtype} is not a dict')
-    args = get_args(dtype)
-    if not len(args) == 2:
-        raise ValueError(f'{dtype} does not have key and value annotations')
-    key_type, value_type = args
-    return key_type, value_type
+        entry = obj
+    return entry
 
 
 # noinspection DuplicatedCode
@@ -123,13 +100,15 @@ def strip_nonetype(dtype : type) -> type:
     return core_type
 
 
-typecast_classes = ['Decimal', 'UUID', 'Path', 'str', 'int', 'float', 'bool']
-conversion_map = {
-    datetime: datetime.fromisoformat,
-    date: date.fromisoformat,
-    time: time.fromisoformat,
-}
-elementary_type_names : list[str] = typecast_classes + [cls.__name__ for cls in conversion_map.keys()]
+def make_elementary(cls, value : str):
+    if cls in conversion_map:
+        return conversion_map[cls](value)
+    elif cls.__name__ in typecast_classes:
+        return cls(value)
+    else:
+        raise TypeError(f'Unsupported type {cls}')
+
+
 
 if __name__ == "__main__":
     this_dtype = list[float]
