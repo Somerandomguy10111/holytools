@@ -1,7 +1,6 @@
+import logging
 import unittest
 from enum import Enum
-
-from holytools.logging import LogLevel
 
 
 # ---------------------------------------------------------
@@ -12,12 +11,12 @@ class CaseStatus(Enum):
     FAIL = "FAIL"
     SKIPPED = "SKIPPED"
 
-    def get_log_level(self) -> LogLevel:
+    def get_log_level(self) -> int:
         status_to_logging = {
-            CaseStatus.SUCCESS: LogLevel.INFO,
-            CaseStatus.ERROR: LogLevel.CRITICAL,
-            CaseStatus.FAIL: LogLevel.ERROR,
-            CaseStatus.SKIPPED: LogLevel.INFO
+            CaseStatus.SUCCESS: logging.INFO,
+            CaseStatus.ERROR: logging.CRITICAL,
+            CaseStatus.FAIL: logging.ERROR,
+            CaseStatus.SKIPPED: logging.INFO
         }
         return status_to_logging[self]
 

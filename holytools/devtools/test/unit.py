@@ -1,9 +1,11 @@
 import inspect
+import logging
 import unittest
 
 from typing import Optional, Callable
 import unittest.mock
-from holytools.logging import LogSettings, LogLevel
+from logging import Logger
+from holytools.logging import LogSettings, LoggerFactory
 from .custom_testcase import CustomTestCase
 from .testrun_result import TestrunResult, DisplayOptions
 
@@ -11,9 +13,9 @@ from .testrun_result import TestrunResult, DisplayOptions
 
 
 class Runner(unittest.TextTestRunner):
-    def __init__(self, logger : CustomLogger, settings : DisplayOptions, is_manual : bool = False):
+    def __init__(self, logger : Logger, settings : DisplayOptions, is_manual : bool = False):
         super().__init__(resultclass=None)
-        self.logger : CustomLogger = logger
+        self.logger : Logger = logger
         self.display_options : DisplayOptions = settings
         self.manual_mode : bool = is_manual
 
@@ -31,7 +33,7 @@ class Runner(unittest.TextTestRunner):
 
 
 class Unittest(CustomTestCase):
-    _logger : CustomLogger = None
+    _logger : Logger = None
 
     @classmethod
     def execute_all(cls, manual_mode : bool = True, settings : DisplayOptions = DisplayOptions()):
@@ -42,14 +44,14 @@ class Unittest(CustomTestCase):
         return results
 
     @classmethod
-    def get_logger(cls) -> CustomLogger:
+    def get_logger(cls) -> Logger:
         if not cls._logger:
-            cls._logger = make_logger(settings=LogSettings(include_call_location=False, timestamp=False), name=cls.__name__)
+            cls._logger = LoggerFactory.make_logger(settings=LogSettings(include_call_location=False, timestamp=False), name=cls.__name__)
         return cls._logger
 
     @classmethod
-    def log(cls, msg : str, level : LogLevel = LogLevel.INFO):
-        cls.get_logger().log(f'--> {msg}', level=level)
+    def log(cls, msg : str, level : int = logging.INFO):
+        cls.get_logger().log(msg=f'--> {msg}', level=level)
 
     # ---------------------------------------------------------
     # assertions

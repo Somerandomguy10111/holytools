@@ -5,7 +5,7 @@ import sys
 from logging import Logger
 from typing import Optional
 
-from .log_settings import LogSettings, LogLevel, LogTarget
+from .log_settings import LogSettings, LogTarget
 
 # ---------------------------------------------------------
 
@@ -22,7 +22,7 @@ class LoggerFactory:
 
         logger = logging.getLogger(name=name)
         logger.propagate = False
-        logger.setLevel(settings.threshold.value)
+        logger.setLevel(settings.threshold)
 
         stdout_handler = logging.StreamHandler(sys.stdout)
         stdout_handler.setFormatter(Formatter(settings=settings, log_target=LogTarget.CONSOLE))
@@ -93,17 +93,17 @@ class Loggable:
         self.log = self.logger.log
 
     def warning(self, msg : str, *args, **kwargs):
-        kwargs['level'] = LogLevel.WARNING
+        kwargs['level'] = logging.WARNING
         self.logger.log(msg=msg, *args, **kwargs)
 
     def error(self, msg : str, *args, **kwargs):
-        kwargs['level'] = LogLevel.ERROR
+        kwargs['level'] = logging.ERROR
         self.logger.log(msg=msg, *args, **kwargs)
 
     def critical(self, msg : str, *args, **kwargs):
-        kwargs['level'] = LogLevel.CRITICAL
+        kwargs['level'] = logging.CRITICAL
         self.logger.log(msg=msg, *args, **kwargs)
 
     def info(self, msg : str, *args, **kwargs):
-        kwargs['level'] = LogLevel.INFO
+        kwargs['level'] = logging.INFO
         self.logger.log(msg=msg, *args, **kwargs)

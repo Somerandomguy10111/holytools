@@ -1,11 +1,11 @@
 import logging
-from holytools.logging import LogLevel, LoggerFactory
+from holytools.logging import LoggerFactory
 from holytools.devtools import Unittest
 
 class TestLoggin(Unittest):
     def test_info_error(self):
-        self.log(f'Info text', level=LogLevel.INFO)
-        self.log(f'Error text', level=LogLevel.ERROR)
+        self.log(f'Info text', level=logging.INFO)
+        self.log(f'Error text', level=logging.ERROR)
 
     def test_make_logger(self):
         logger_name = "basic_xyz_logger"

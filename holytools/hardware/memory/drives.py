@@ -2,10 +2,10 @@ import logging
 import os
 import psutil
 
-from holytools.logging import make_logger, LogSettings
+from holytools.logging import LogSettings, LoggerFactory
 # -------------------------------------------
 
-drive_logger = make_logger(settings=LogSettings(include_call_location=False))
+drive_logger = LoggerFactory.make_logger(settings=LogSettings(include_call_location=False),name=__file__)
 def log(msg : str, level : int = logging.INFO):
     drive_logger.log(msg=msg, level=level)
     print(drive_logger.name)

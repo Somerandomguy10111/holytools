@@ -1,6 +1,6 @@
 import time
 
-from holytools.userIO import InteractiveCLI, TrackedInt
+from holytools.userIO import TrackedInt
 from holytools.devtools import Unittest
 
 class Person:

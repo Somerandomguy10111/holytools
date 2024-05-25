@@ -6,8 +6,7 @@ import unittest
 from dataclasses import dataclass
 from typing import Optional
 from unittest import TestCase, TestResult
-
-from holytools.logging import LogLevel, CustomLogger
+import logging
 from .custom_testcase import CaseReport, CaseStatus, CustomTestCase
 
 # ---------------------------------------------------------
@@ -22,17 +21,20 @@ class TestrunResult(TestResult):
     status_spaces = 10
     runtime_space = 10
 
-    def __init__(self, logger : CustomLogger,
+    def __init__(self, logger : logging.Logger,
                  settings : DisplayOptions,
                  manual_mode : bool = False,
                  *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.log = logger.log
+        self.logger = logger
         self.test_settings : DisplayOptions = settings
         self.case_reports : list[CaseReport] = []
         self.start_times : dict[str, float] = {}
         self.is_manual : bool = manual_mode
         self.print_header(f'  Test suite for \"{self.__class__.__name__}\"  ')
+
+    def log(self, msg : str, level : int = logging.INFO):
+        self.logger.log(msg=msg, level=level)
 
     def stopTestRun(self):
         super().stopTestRun()
@@ -41,7 +43,7 @@ class TestrunResult(TestResult):
     def startTest(self, test : CustomTestCase):
         if self.is_manual:
             test.set_manual()
-        self.log(msg=f'------> {test.get_name()[:self.test_spaces]} ', level=LogLevel.INFO)
+        self.log(msg=f'------> {test.get_name()[:self.test_spaces]} ', level=logging.INFO)
         self.start_times[test.id()] = time.time()
         super().startTest(test)
 
@@ -106,7 +108,8 @@ class TestrunResult(TestResult):
             time_in_sec =  time.time() - self.start_times[test_id]
             return round(time_in_sec, 3)
         else:
-            self.log(f'Couldnt find start time of test {test_id}. Current start_times : {self.start_times}', level=LogLevel.ERROR)
+            self.log(msg=f'Couldnt find start time of test {test_id}. Current start_times : {self.start_times}',
+                     level=logging.ERROR)
 
     # ---------------------------------------------------------
     # summary logging
@@ -120,7 +123,7 @@ class TestrunResult(TestResult):
             runtime_str = f'{case.runtime_sec}s'
             runtime_msg = f'{runtime_str:^{self.runtime_space}}'
 
-            self.log(f'{name_msg}{status_msg}{runtime_msg}', level=level)
+            self.log(msg=f'{name_msg}{status_msg}{runtime_msg}', level=level)
         self.log(self.get_final_status())
         self.print_header(msg='')
 
@@ -130,7 +133,7 @@ class TestrunResult(TestResult):
         total_len += self.runtime_space
         line_len = max(total_len- len(msg), 0)
         lines = seperator * int(line_len / 2.)
-        self.log(f'{lines}{msg}{lines}')
+        self.log(msg=f'{lines}{msg}{lines}')
 
 
     def get_final_status(self) -> str:
