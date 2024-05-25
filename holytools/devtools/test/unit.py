@@ -1,9 +1,11 @@
+import inspect
 import unittest
 
-from typing import Optional
+from typing import Optional, Callable
+import unittest.mock
 from holytools.logging import make_logger, LogSettings, CustomLogger, LogLevel
-from .base import ConfigurableTest
-from .results import Results, DisplayOptions
+from .custom_testcase import CustomTestCase
+from .testrun_result import TestrunResult, DisplayOptions
 
 # ---------------------------------------------------------
 
@@ -15,20 +17,20 @@ class Runner(unittest.TextTestRunner):
         self.display_options : DisplayOptions = settings
         self.manual_mode : bool = is_manual
 
-    def run(self, test) -> Results:
-        result = Results(logger=self.logger,
-                         stream=self.stream,
-                         settings=self.display_options,
-                         descriptions=self.descriptions,
-                         verbosity=2,
-                         manual_mode=self.manual_mode)
+    def run(self, test) -> TestrunResult:
+        result = TestrunResult(logger=self.logger,
+                               stream=self.stream,
+                               settings=self.display_options,
+                               descriptions=self.descriptions,
+                               verbosity=2,
+                               manual_mode=self.manual_mode)
         test(result)
         result.printErrors()
 
         return result
 
 
-class Unittest(ConfigurableTest):
+class Unittest(CustomTestCase):
     _logger : CustomLogger = None
 
     @classmethod
@@ -108,3 +110,24 @@ class Unittest(ConfigurableTest):
                 self.assertRecursivelyEqual(first_obj, second_obj, msg=msg)
             else:
                 self.assertStrEqual(first[key], second[key])
+
+    @staticmethod
+    def patch_module(original: type | Callable, replacement: type | Callable):
+        module_path = inspect.getmodule(original).__name__
+        qualified_name = original.__qualname__
+        frame = inspect.currentframe().f_back
+        caller_module = inspect.getmodule(frame)
+
+        try:
+            # corresponds to "from [caller_module] import [original]
+            _ = getattr(caller_module, qualified_name)
+            full_path = f"{caller_module.__name__}.{qualified_name}"
+        except Exception as e:
+            # corresponds to import [caller_module].[original]
+            full_path = f"{module_path}.{qualified_name}"
+
+        print(f'Full path = {full_path}')
+        def decorator(func):
+            return unittest.mock.patch(full_path, replacement)(func)
+
+        return decorator

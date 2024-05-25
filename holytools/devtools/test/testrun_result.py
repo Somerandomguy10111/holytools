@@ -1,29 +1,35 @@
+import linecache
 import os
 import time
 import traceback
 import unittest
-import linecache
 from dataclasses import dataclass
 from typing import Optional
-from unittest import TestCase
+from unittest import TestCase, TestResult
 
 from holytools.logging import LogLevel, CustomLogger
-from .base import ReportableResult, CaseReport, CaseStatus, get_case_name, ConfigurableTest
-
+from .custom_testcase import CaseReport, CaseStatus, CustomTestCase
 
 # ---------------------------------------------------------
 
 @dataclass
 class DisplayOptions:
-    show_runtimes : bool =True
     show_details : bool = True
 
 
-class Results(ReportableResult):
-    def __init__(self, logger : CustomLogger, settings : DisplayOptions, manual_mode : bool = False, *args, **kwargs):
-        kwargs['logger'] = logger
+class TestrunResult(TestResult):
+    test_spaces = 50
+    status_spaces = 10
+    runtime_space = 10
+
+    def __init__(self, logger : CustomLogger,
+                 settings : DisplayOptions,
+                 manual_mode : bool = False,
+                 *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.log = logger.log
         self.test_settings : DisplayOptions = settings
+        self.case_reports : list[CaseReport] = []
         self.start_times : dict[str, float] = {}
         self.is_manual : bool = manual_mode
         self.print_header(f'  Test suite for \"{self.__class__.__name__}\"  ')
@@ -32,19 +38,39 @@ class Results(ReportableResult):
         super().stopTestRun()
         self.print_summary()
 
-    def startTest(self, test : ConfigurableTest):
+    def startTest(self, test : CustomTestCase):
         if self.is_manual:
             test.set_manual()
-        self.log(msg=f'------> {get_case_name(test=test)[:self.test_spaces]} ', level=LogLevel.INFO)
+        self.log(msg=f'------> {test.get_name()[:self.test_spaces]} ', level=LogLevel.INFO)
         self.start_times[test.id()] = time.time()
         super().startTest(test)
 
     # ---------------------------------------------------------
     # case logging
 
-    def report(self, test : TestCase, status: CaseStatus, err : Optional[tuple] = None):
-        case_result = CaseReport(test=test, status=status, runtime=self.get_runtime(test=test))
-        self.case_results.append(case_result)
+    # noinspection PyTypeChecker
+    def addSuccess(self, test):
+        super().addSuccess(test)
+        self.log_report(test, CaseStatus.SUCCESS)
+
+    # noinspection PyTypeChecker
+    def addError(self, test, err):
+        super().addError(test, err)
+        self.log_report(test, CaseStatus.ERROR, err)
+
+    # noinspection PyTypeChecker
+    def addFailure(self, test, err):
+        super().addFailure(test, err)
+        self.log_report(test, CaseStatus.FAIL, err)
+
+    # noinspection PyTypeChecker
+    def addSkip(self, test, reason):
+        super().addSkip(test, reason)
+        self.log_report(test, CaseStatus.SKIPPED)
+
+    def log_report(self, test : CustomTestCase, status: CaseStatus, err : Optional[tuple] = None):
+        report = test.make_report(runtime=self.get_runtime(test), status=status)
+        self.case_reports.append(report)
 
         conditional_err_msg = f'\n{self.get_err_details(err)}' if err and self.test_settings.show_details else ''
         finish_log_msg = f'Status: {status.value}{conditional_err_msg}\n'
@@ -87,12 +113,12 @@ class Results(ReportableResult):
 
     def print_summary(self):
         self.print_header(msg=' Summary ', seperator='-')
-        for case in self.case_results:
+        for case in self.case_reports:
             level = case.status.get_log_level()
             name_msg = f'{case.name[:self.test_spaces - 4]:<{self.test_spaces}}'
             status_msg = f'{case.status.value:<{self.status_spaces}}'
             runtime_str = f'{case.runtime_sec}s'
-            runtime_msg = f'{runtime_str:^{self.runtime_space}}' if self.test_settings.show_runtimes else ''
+            runtime_msg = f'{runtime_str:^{self.runtime_space}}'
 
             self.log(f'{name_msg}{status_msg}{runtime_msg}', level=level)
         self.log(self.get_final_status())
@@ -101,7 +127,7 @@ class Results(ReportableResult):
 
     def print_header(self, msg: str, seperator : str = '='):
         total_len = self.test_spaces + self.status_spaces
-        total_len += self.runtime_space if self.test_settings.show_runtimes else 0
+        total_len += self.runtime_space
         line_len = max(total_len- len(msg), 0)
         lines = seperator * int(line_len / 2.)
         self.log(f'{lines}{msg}{lines}')
