@@ -11,7 +11,7 @@ class LogSettings:
     log_fpath: Optional[str] = None
     timestamp: bool = True
     include_ms : bool = False
-    include_call_location : bool = False
+    include_call_location : bool = True
 
 
 class LogTarget:

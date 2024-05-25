@@ -4,10 +4,12 @@ from holytools.devtools import Unittest
 
 class TestLoggin(Unittest):
     def test_info_error(self):
-        self.log(f'Info text', level=logging.INFO)
-        self.log(f'Error text', level=logging.ERROR)
+        my_logger = LoggerFactory.make_logger(name='testlogger')
+        my_logger.info(msg=f'Info text')
+        my_logger.error(msg=f'Error text')
 
     def test_make_logger(self):
+        raise ValueError()
         logger_name = "basic_xyz_logger"
         _ = LoggerFactory.make_logger(name=logger_name)
 
