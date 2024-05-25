@@ -2,36 +2,36 @@ from __future__ import annotations
 
 import logging
 import sys
+from dataclasses import dataclass
+from enum import Enum
 from logging import Logger
 from typing import Optional
-import linecache
 
-from .log_settings import LogSettings, LogTarget
 
 # ---------------------------------------------------------
 
+
 class LoggerFactory:
-    _default_settings : LogSettings = LogSettings()
-
     @classmethod
-    def set_defaults(cls, settings : LogSettings):
-        cls._default_settings = settings
-
-    @classmethod
-    def make_logger(cls, name : str, settings : Optional[LogSettings] = None) -> Logger:
-        settings = settings or cls._default_settings
-
+    def make_logger(cls, name : str,
+                    log_fpath : Optional[str] = None,
+                    include_timestamp : bool = True,
+                    include_location : bool = False,
+                    threshold : int = logging.INFO) -> Logger:
         logger = logging.getLogger(name=name)
         logger.propagate = False
-        logger.setLevel(settings.threshold)
+        logger.setLevel(threshold)
+        formatting = Formatting(print_timestamp=include_timestamp, print_location=include_location)
 
-        stdout_handler = logging.StreamHandler(sys.stdout)
-        stdout_handler.setFormatter(Formatter(settings=settings, log_target=LogTarget.CONSOLE))
-        logger.addHandler(stdout_handler)
+        console_handler = logging.StreamHandler(sys.stdout)
+        console_formatter = Formatter(log_target=LogTarget.CONSOLE, formatting=formatting)
+        console_handler.setFormatter(console_formatter)
+        logger.addHandler(console_handler)
 
-        if settings.log_fpath:
-            file_handler = logging.FileHandler(settings.log_fpath)
-            file_handler.setFormatter(Formatter(settings=settings, log_target=LogTarget.FILE))
+        if log_fpath:
+            file_handler = logging.FileHandler(log_fpath)
+            file_formatter = Formatter(log_target=LogTarget.FILE, formatting=formatting)
+            file_handler.setFormatter(file_formatter)
             logger.addHandler(file_handler)
 
         return logger
@@ -40,14 +40,6 @@ class LoggerFactory:
 class Formatter(logging.Formatter):
     custom_file_name = 'custom_file_name'
     custom_line_no = 'custom_lineno'
-
-    #         file_name = caller_frame.filename
-    #         line_no = caller_frame.lineno
-    #
-    #         extra_info = {Formatter.custom_file_name: file_name, Formatter.custom_line_no: line_no}
-    #         super().log(msg=msg, level=level, extra=extra_info, exc_info = with_traceback, *args, **kwargs)
-    #
-
     colors: dict = {
         logging.DEBUG: '\033[20m',
         logging.INFO: '\033[20m',
@@ -56,8 +48,8 @@ class Formatter(logging.Formatter):
         logging.CRITICAL: '\x1b[31;1m'  # Bold Red
     }
 
-    def __init__(self, settings : LogSettings, log_target : LogTarget):
-        self.log_settings : LogSettings = settings
+    def __init__(self, log_target : LogTarget, formatting : Formatting):
+        self.formatting : Formatting = formatting
         self.log_target : LogTarget = log_target
         super().__init__()
 
@@ -65,13 +57,12 @@ class Formatter(logging.Formatter):
     def format(self, record):
         log_fmt = "%(message)s"
 
-        if self.log_settings.timestamp:
+        if self.formatting.print_timestamp:
             custom_time = self.formatTime(record, "%Y-%m-%d %H:%M:%S")
-            conditional_millis = f" {int(record.msecs)}ms" if self.log_settings.include_ms else ""
-            timestamp = f"[{custom_time}{conditional_millis}]"
+            timestamp = f"[{custom_time}]"
             log_fmt = f"{timestamp}: {log_fmt}"
 
-        if self.log_settings.include_call_location:
+        if self.formatting.print_location:
             log_fmt += f'\t\t| Location: File "{record.pathname}:{record.lineno}"'
 
         if self.log_target == LogTarget.CONSOLE:
@@ -85,8 +76,8 @@ class Formatter(logging.Formatter):
 
 
 class Loggable:
-    def __init__(self, settings : LogSettings = LogSettings()):
-        self.logger = LoggerFactory.make_logger(name=self.__class__.__name__, settings=settings)
+    def __init__(self):
+        self.logger = LoggerFactory.make_logger(name=self.__class__.__name__)
 
     def log(self, msg : str, level : int = logging.INFO):
         self.logger.log(level=level, msg=msg)
@@ -106,3 +97,13 @@ class Loggable:
     def info(self, msg : str, *args, **kwargs):
         kwargs['level'] = logging.INFO
         self.logger.log(msg=msg, *args, **kwargs)
+
+
+class LogTarget(Enum):
+    FILE = "FILE"
+    CONSOLE = "CONSOLE"
+
+@dataclass
+class Formatting:
+    print_timestamp : bool
+    print_location : bool
