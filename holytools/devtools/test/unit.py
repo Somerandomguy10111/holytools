@@ -3,7 +3,7 @@ import unittest
 
 from typing import Optional, Callable
 import unittest.mock
-from holytools.logging import make_logger, LogSettings, CustomLogger, LogLevel
+from holytools.logging import LogSettings, LogLevel
 from .custom_testcase import CustomTestCase
 from .testrun_result import TestrunResult, DisplayOptions
 

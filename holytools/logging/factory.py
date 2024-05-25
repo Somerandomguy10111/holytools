@@ -1,52 +1,28 @@
 from __future__ import annotations
-import inspect
+
 import logging
 import sys
-from typing import Union
 from logging import Logger
+from typing import Optional
+
 from .log_settings import LogSettings, LogLevel, LogTarget
+
 # ---------------------------------------------------------
-
-
-class CustomLogger(logging.Logger):
-    def log(self, msg : str, level : Union[int, LogLevel] = LogLevel.INFO, with_traceback : bool = False , *args, **kwargs):
-        if isinstance(level, LogLevel):
-            level = level.value
-        frame = inspect.currentframe()
-        caller_frame = inspect.getouterframes(frame)[1]
-
-        file_name = caller_frame.filename
-        line_no = caller_frame.lineno
-
-        extra_info = {Formatter.custom_file_name: file_name, Formatter.custom_line_no: line_no}
-        super().log(msg=msg, level=level, extra=extra_info, exc_info = with_traceback, *args, **kwargs)
-
-
-    def setLevel(self, level : Union[int, LogLevel]):
-        if isinstance(level, LogLevel):
-            level = level.value
-        super().setLevel(level)
-
 
 class LoggerFactory:
     _default_settings : LogSettings = LogSettings()
-
 
     @classmethod
     def set_defaults(cls, settings : LogSettings):
         cls._default_settings = settings
 
     @classmethod
-    def make_logger(cls, name : str, settings : LogSettings) -> Logger:
+    def make_logger(cls, name : str, settings : Optional[LogSettings] = None) -> Logger:
         settings = settings or cls._default_settings
 
-        logging.setLoggerClass(CustomLogger)
-        # noinspection PyTypeChecker
-        logger : CustomLogger = logging.getLogger(name=name)
-        logging.setLoggerClass(Logger)
-        # logger = CustomLogger(name=name)
+        logger = logging.getLogger(name=name)
         logger.propagate = False
-        logger.setLevel(settings.threshold)
+        logger.setLevel(settings.threshold.value)
 
         stdout_handler = logging.StreamHandler(sys.stdout)
         stdout_handler.setFormatter(Formatter(settings=settings, log_target=LogTarget.CONSOLE))
@@ -63,6 +39,13 @@ class LoggerFactory:
 class Formatter(logging.Formatter):
     custom_file_name = 'custom_file_name'
     custom_line_no = 'custom_lineno'
+
+    #         file_name = caller_frame.filename
+    #         line_no = caller_frame.lineno
+    #
+    #         extra_info = {Formatter.custom_file_name: file_name, Formatter.custom_line_no: line_no}
+    #         super().log(msg=msg, level=level, extra=extra_info, exc_info = with_traceback, *args, **kwargs)
+    #
 
     colors: dict = {
         logging.DEBUG: '\033[20m',
@@ -87,10 +70,10 @@ class Formatter(logging.Formatter):
             timestamp = f"[{custom_time}{conditional_millis}]"
             log_fmt = f"{timestamp}: {log_fmt}"
 
-        if self.log_settings.include_call_location:
-            filename = getattr(record, Formatter.custom_file_name, record.filename)
-            lineno = getattr(record, Formatter.custom_line_no, record.lineno)
-            log_fmt += f" (\"{filename}:{lineno}\")"
+        # if self.log_settings.include_call_location:
+        #     filename = getattr(record, Formatter.custom_file_name, record.filename)
+        #     lineno = getattr(record, Formatter.custom_line_no, record.lineno)
+        #     log_fmt += f" (\"{filename}:{lineno}\")"
 
         if self.log_target == LogTarget.CONSOLE:
             color_prefix = Formatter.colors.get(record.levelno, "")
@@ -99,3 +82,28 @@ class Formatter(logging.Formatter):
 
         self._style._fmt = log_fmt
         return super().format(record)
+
+
+
+class Loggable:
+    _default_logger : Optional[Logger] = None
+
+    def __init__(self, settings : LogSettings = LogSettings()):
+        self.logger = LoggerFactory.make_logger(name=self.__class__.__name__, settings=settings)
+        self.log = self.logger.log
+
+    def warning(self, msg : str, *args, **kwargs):
+        kwargs['level'] = LogLevel.WARNING
+        self.logger.log(msg=msg, *args, **kwargs)
+
+    def error(self, msg : str, *args, **kwargs):
+        kwargs['level'] = LogLevel.ERROR
+        self.logger.log(msg=msg, *args, **kwargs)
+
+    def critical(self, msg : str, *args, **kwargs):
+        kwargs['level'] = LogLevel.CRITICAL
+        self.logger.log(msg=msg, *args, **kwargs)
+
+    def info(self, msg : str, *args, **kwargs):
+        kwargs['level'] = LogLevel.INFO
+        self.logger.log(msg=msg, *args, **kwargs)
