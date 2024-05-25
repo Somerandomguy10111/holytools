@@ -59,9 +59,9 @@ class Color(Enum):
     CYAN = '\033[36m'
     WHITE = '\033[37m'
 
+
 def add_color(msg : str, color : Color) -> str:
     return f"{color.value}{msg}\033[0m"
-
 
 
 import types

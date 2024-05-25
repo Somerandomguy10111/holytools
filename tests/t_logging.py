@@ -11,9 +11,14 @@ class TestLoggin(Unittest):
         logger_name = "basic_xyz_logger"
         _ = make_logger(name=logger_name)
 
+    def test_retrieve_logger(self):
+        logger_name = 'this_unique_logger'
+
+        expected_logger = make_logger(name=logger_name)
+        actual_logger = logging.getLogger(name=logger_name)
+        self.assertEqual(expected_logger, actual_logger)
         logger_is_registered = logger_name in logging.root.manager.loggerDict
         self.assertTrue(logger_is_registered)
-
 
 if __name__ == '__main__':
     TestLoggin.execute_all()

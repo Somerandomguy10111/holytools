@@ -44,6 +44,7 @@ class LoggerFactory:
         # noinspection PyTypeChecker
         logger : CustomLogger = logging.getLogger(name=name)
         logging.setLoggerClass(Logger)
+        # logger = CustomLogger(name=name)
         logger.propagate = False
         logger.setLevel(settings.threshold)
 
