@@ -86,11 +86,11 @@ class Formatter(logging.Formatter):
 
 
 class Loggable:
-    _default_logger : Optional[Logger] = None
-
     def __init__(self, settings : LogSettings = LogSettings()):
         self.logger = LoggerFactory.make_logger(name=self.__class__.__name__, settings=settings)
-        self.log = self.logger.log
+
+    def log(self, msg : str, level : int = logging.INFO):
+        self.logger.log(level=level, msg=msg)
 
     def warning(self, msg : str, *args, **kwargs):
         kwargs['level'] = logging.WARNING
