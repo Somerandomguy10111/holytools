@@ -54,6 +54,7 @@ class HiderClass:
                 simple_data: SimpleDataclass
                 float_list : list[float]
                 int_list : list[int]
+                dataclass_list: list[SimpleDataclass]
                 dictionary_data: dict[str, str] = field(default_factory=dict)
 
                 def __post_init__(self):
@@ -64,6 +65,7 @@ class HiderClass:
                 time_field=test_time,
                 float_list=[1.0, 2.0, 3.0],
                 int_list=[1, 2, 3],
+                dataclass_list=[simple_data_instance, simple_data_instance],
                 enum_field=ThisParticularEnum.OPTION_A,
                 simple_data=simple_data_instance
             )

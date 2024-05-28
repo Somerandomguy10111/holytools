@@ -4,7 +4,7 @@ import dataclasses
 from datetime import datetime, date, time
 from enum import Enum
 from types import NoneType
-from typing import get_type_hints, get_origin, get_args, Union
+from typing import get_type_hints, get_origin, get_args, Union, Optional
 
 import orjson
 
@@ -55,14 +55,17 @@ def from_json(cls : type, json_dict: dict):
 
         dtype = type_hints.get(key)
         dtype = strip_nonetype(dtype=dtype)
+        core_dtype = get_core_type(dtype=dtype)
         if dtype.__name__ in elementary_type_names:
             init_dict[key] = make_elementary(cls=dtype,value=value)
         elif issubclass(dtype, Enum):
             init_dict[key] = dtype(value)
         elif get_origin(dtype) == dict:
             init_dict[key] = value
-        elif get_origin(dtype) == list:
+        elif dtype == list[float] or dtype == list[int]:
             init_dict[key] = value
+        elif get_origin(dtype) == list and issubclass(core_dtype, JsonDataclass):
+            init_dict[key] = [core_dtype.from_json(x) for x in value]
         elif dataclasses.is_dataclass(obj=dtype):
             init_dict[key] = from_json(cls=dtype, json_dict=value)
         else:
@@ -97,6 +100,13 @@ def strip_nonetype(dtype : type) -> type:
         core_type = dtype
     return core_type
 
+def get_core_type(dtype : type) -> type:
+    try:
+        inner_dtype = get_args(dtype)
+        return inner_dtype[0]
+    except:
+        return dtype
+
 
 def make_elementary(cls, value : str):
     if cls in conversion_map:
@@ -111,3 +121,5 @@ def make_elementary(cls, value : str):
 if __name__ == "__main__":
     this_dtype = list[float]
     print(strip_nonetype(this_dtype))
+    print(get_core_type(this_dtype))
+    print(get_core_type(dtype=Optional[float]))
