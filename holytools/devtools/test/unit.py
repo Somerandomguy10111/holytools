@@ -124,7 +124,7 @@ class Unittest(CustomTestCase):
             # corresponds to "from [caller_module] import [original]
             _ = getattr(caller_module, qualified_name)
             full_path = f"{caller_module.__name__}.{qualified_name}"
-        except Exception as e:
+        except Exception:
             # corresponds to import [caller_module].[original]
             full_path = f"{module_path}.{qualified_name}"
 

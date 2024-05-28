@@ -4,7 +4,7 @@ from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.backends import default_backend
 from typing import Optional, Union
 
-from ..hash import SHA
+from holytools.crypto.hash import SHA
 from .algo import CryptoAlgo
 # -------------------------------------------
 

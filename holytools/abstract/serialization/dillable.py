@@ -31,4 +31,4 @@ if __name__ == "__main__":
     restored = Example.from_str(test_dill_str)
 
     print(f"Original: {original.data}")
-    print(f"Restored: {restored._execution_profiles}")
+    # print(f"Restored: {restored._execution_profiles}")

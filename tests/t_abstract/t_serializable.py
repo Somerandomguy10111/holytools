@@ -52,6 +52,8 @@ class HiderClass:
                 time_field: time
                 enum_field : ThisParticularEnum
                 simple_data: SimpleDataclass
+                float_list : list[float]
+                int_list : list[int]
                 dictionary_data: dict[str, str] = field(default_factory=dict)
 
                 def __post_init__(self):
@@ -60,6 +62,8 @@ class HiderClass:
             instance = ComplexDataclass(
                 date_field=test_date,
                 time_field=test_time,
+                float_list=[1.0, 2.0, 3.0],
+                int_list=[1, 2, 3],
                 enum_field=ThisParticularEnum.OPTION_A,
                 simple_data=simple_data_instance
             )
@@ -125,5 +129,5 @@ if __name__ == '__main__':
     # dill has a known issue that prevents it from serializing "Enums defined in __main__" in particular
     # see: https://github.com/uqfoundation/dill/issues/250
     # Hence if you execute it via __main__ rather than via unittest discovery you will see an error
-    TestDillable.execute_all()
+    # TestDillable.execute_all()
     TestPicklable.execute_all()

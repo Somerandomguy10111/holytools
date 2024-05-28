@@ -1,7 +1,7 @@
 import os
 import shutil
 import tempfile
-from ..types import PlaintextFile, ImageFile, BinaryFile
+from holytools.file.types import PlaintextFile, ImageFile, BinaryFile
 
 # ---------------------------------------------------------
 
