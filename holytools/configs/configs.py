@@ -26,8 +26,10 @@ class FileConfigs(BaseConfigs):
 
 class PassConfigs(BaseConfigs):
     def __init__(self, pass_dirpath : str = '~/.password-store' ):
-        self._pass_dirpath: str = as_absolute(path=pass_dirpath)
+        pass_dirpath = as_absolute(path=pass_dirpath)
+        print(f'Password store dir is : "{pass_dirpath}"')
         os.environ['PASSWORD_STORE_DIR'] = pass_dirpath
+        self._pass_dirpath : str = pass_dirpath
         super().__init__()
 
     def update_config_resouce(self, key : str, value : str, section : Optional[str] = None):
