@@ -42,8 +42,6 @@ class JsonDataclass(Serializable):
         for key, value in json_dict.items():
             dtype = type_hints.get(key)
 
-            print(f'Dtype = {dtype}')
-            print(f'dtype is optional = {TypeAnalzer.is_optional(dtype)}')
             if TypeAnalzer.is_optional(dtype) and value is None:
                 init_dict[key] = value
                 continue
@@ -51,7 +49,6 @@ class JsonDataclass(Serializable):
                 continue
 
             dtype = TypeAnalzer.strip_nonetype(dtype)
-            print(f'key, dtype, dtype origin = {key}, {dtype}, {get_origin(dtype)}')
             if get_origin(dtype) == list:
                 value = [make_instance(cls=TypeAnalzer.get_core_type(dtype), value=x) for x in value]
             else:

@@ -93,11 +93,17 @@ class SerializationTest(Unittest):
 
 
     def test_ser_deser_roundtrip(self):
+        if self.__class__ == SerializationTest:
+            self.skipTest(reason=f'Cannot test base class')
+
         serialized_str = self.instance.to_str()
         reloaded_data = self.cls.from_str(serialized_str)
         self.check_effectively_equal(obj1=self.instance, obj2=reloaded_data)
 
     def test_save_load_roundtrip(self):
+        if self.__class__ == SerializationTest:
+            self.skipTest(reason=f'Cannot test base class')
+
         with NamedTemporaryFile(delete=False) as temp_file:
             temp_file_path = temp_file.name
         self.instance.save(temp_file_path, force_overwrite=True)
@@ -108,7 +114,6 @@ class SerializationTest(Unittest):
 
     def check_effectively_equal(self, obj1 : object, obj2 : object):
         self.assertRecursivelyEqual(obj1.__dict__, obj2.__dict__)
-
 
     @classmethod
     @abstractmethod

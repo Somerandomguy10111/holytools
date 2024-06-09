@@ -37,3 +37,4 @@ if __name__ == '__main__':
     # Hence if you execute it via __main__ rather than via unittest discovery you will see an error
     # TestDillable.execute_all()
     TestPicklable.execute_all()
+    TestDillable.execute_all()
