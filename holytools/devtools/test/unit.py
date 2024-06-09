@@ -2,7 +2,7 @@ import inspect
 import logging
 import unittest
 
-from typing import Optional, Callable
+from typing import Optional, Callable, get_origin
 import unittest.mock
 from logging import Logger
 from holytools.logging import LoggerFactory
@@ -99,9 +99,6 @@ class Unittest(CustomTestCase):
             raise AssertionError(msg)
 
 
-    def assertStrEqual(self, first : object, second : object, msg : Optional[str] = None):
-        self.assertEqual(str(first), str(second), msg=msg)
-
 
     def assertRecursivelyEqual(self, first : dict, second : dict, msg : Optional[str] = None):
         for key in first:
@@ -110,8 +107,11 @@ class Unittest(CustomTestCase):
             self.assertEqual(type(first_obj), type(second_obj))
             if isinstance(first_obj, dict):
                 self.assertRecursivelyEqual(first_obj, second_obj, msg=msg)
+            if isinstance(first_obj, list):
+                for i in range(len(first_obj)):
+                    self.assertEqual(first_obj[i], second_obj[i])
             else:
-                self.assertStrEqual(first[key], second[key])
+                self.assertEqual(first[key], second[key])
 
     @staticmethod
     def patch_module(original: type | Callable, replacement: type | Callable):
