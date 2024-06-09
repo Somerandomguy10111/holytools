@@ -4,10 +4,10 @@ import dataclasses
 from datetime import datetime, date, time
 from enum import Enum
 from types import NoneType
-from typing import get_type_hints, get_origin, get_args, Union, Optional
+from typing import get_type_hints, get_origin, get_args, Union
 
 import orjson
-
+from dataclasses import dataclass
 from holytools.abstract.serialization.serializable import Serializable
 
 typecast_classes = ['Decimal', 'UUID', 'Path', 'Enum', 'str', 'int', 'float', 'bool']
@@ -20,14 +20,16 @@ elementary_type_names : list[str] = typecast_classes + [cls.__name__ for cls in 
 
 # -------------------------------------------
 
-
+@dataclass
 class JsonDataclass(Serializable):
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
+        _, __ = args, kwargs
         if not dataclasses.is_dataclass(self):
             raise TypeError(f'{self.__class__} must be a dataclass to be Jsonifyable')
 
     def to_str(self) -> str:
-        json_dict = {attr: get_entry(obj=value) for attr, value in self.__dict__.items()}
+        defined_fields = set([f.name for f in dataclasses.fields(self) if f.init])
+        json_dict = {attr: get_entry(obj=value) for attr, value in self.__dict__.items() if attr in defined_fields}
         return orjson.dumps(json_dict).decode("utf-8")
 
     @classmethod
@@ -40,16 +42,20 @@ class JsonDataclass(Serializable):
         for key, value in json_dict.items():
             dtype = type_hints.get(key)
 
+            print(f'Dtype = {dtype}')
+            print(f'dtype is optional = {TypeAnalzer.is_optional(dtype)}')
             if TypeAnalzer.is_optional(dtype) and value is None:
                 init_dict[key] = value
                 continue
+            if dtype is None:
+                continue
 
             dtype = TypeAnalzer.strip_nonetype(dtype)
+            print(f'key, dtype, dtype origin = {key}, {dtype}, {get_origin(dtype)}')
             if get_origin(dtype) == list:
-                print(f'Value : {value}')
-                value = [make(cls=TypeAnalzer.get_core_type(dtype), value=x) for x in value]
+                value = [make_instance(cls=TypeAnalzer.get_core_type(dtype), value=x) for x in value]
             else:
-                value = make(cls=TypeAnalzer.get_core_type(dtype), value=value)
+                value = make_instance(cls=TypeAnalzer.get_core_type(dtype), value=value)
             init_dict[key] = value
 
         return cls(**init_dict)
@@ -69,7 +75,7 @@ def get_entry(obj):
     return entry
 
 
-def make(cls, value : str):
+def make_instance(cls, value : str):
     if cls in conversion_map:
         return conversion_map[cls](value)
     elif cls.__name__ in typecast_classes:
@@ -90,8 +96,11 @@ class TypeAnalzer:
     @staticmethod
     def is_optional(dtype):
         origin = get_origin(dtype)
-        return origin == Optional
-    
+        if origin is Union:
+            return NoneType in get_args(dtype)
+        else:
+            return False
+
     # noinspection DuplicatedCode
     @staticmethod
     def strip_nonetype(dtype : type) -> type:
