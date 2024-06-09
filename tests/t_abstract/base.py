@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import random
+import unittest
 from uuid import UUID
 from enum import Enum
 from datetime import datetime, date, time
@@ -54,6 +55,8 @@ class SerializableInt(Serializable):
 
 class SerializationTest(Unittest):
     def setUp(self):
+        if self.__class__ is SerializationTest:
+            raise unittest.SkipTest("Skip BaseTest tests, it's a base class")
         self.instance, self.cls = self.get_instance_and_cls()
 
 
@@ -61,7 +64,7 @@ class SerializationTest(Unittest):
         test_date = date.today()
         test_time = time(12, 34, 56)
 
-        ClassType = self.get_serializable()
+        ClassType = self.get_serializable_type()
 
         @dataclass
         class ComplexDataclass(ClassType):
@@ -93,17 +96,11 @@ class SerializationTest(Unittest):
 
 
     def test_ser_deser_roundtrip(self):
-        if self.__class__ == SerializationTest:
-            self.skipTest(reason=f'Cannot test base class')
-
         serialized_str = self.instance.to_str()
         reloaded_data = self.cls.from_str(serialized_str)
         self.check_effectively_equal(obj1=self.instance, obj2=reloaded_data)
 
     def test_save_load_roundtrip(self):
-        if self.__class__ == SerializationTest:
-            self.skipTest(reason=f'Cannot test base class')
-
         with NamedTemporaryFile(delete=False) as temp_file:
             temp_file_path = temp_file.name
         self.instance.save(temp_file_path, force_overwrite=True)
@@ -117,6 +114,8 @@ class SerializationTest(Unittest):
 
     @classmethod
     @abstractmethod
-    def get_serializable(cls) -> SerializableType:
+    def get_serializable_type(cls) -> SerializableType:
         pass
 
+if __name__ == "__main__":
+    SerializationTest.execute_all()

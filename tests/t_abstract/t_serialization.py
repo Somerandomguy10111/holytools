@@ -1,12 +1,12 @@
 from __future__ import annotations
 
 from holytools.abstract import SerializableType
-from tests.t_abstract.basetest import SerializationTest, SimpleDataclass
+from tests.t_abstract.base import SerializationTest, SimpleDataclass
 
 
 class TestJsonDataclass(SerializationTest):
     @classmethod
-    def get_serializable(cls):
+    def get_serializable_type(cls):
         from holytools.abstract.serialization import JsonDataclass
         return JsonDataclass
 
@@ -14,14 +14,14 @@ class TestJsonDataclass(SerializationTest):
 # see: https://github.com/uqfoundation/dill/issues/250
 class TestDillable(SerializationTest):
     @classmethod
-    def get_serializable(cls):
+    def get_serializable_type(cls):
         print(f' Getting serializable for Dillable')
         from holytools.abstract.serialization import Dillable
         return Dillable
 
 class TestPicklable(SerializationTest):
     @classmethod
-    def get_serializable(cls):
+    def get_serializable_type(cls):
         from holytools.abstract.serialization import Picklable
         return Picklable
 
