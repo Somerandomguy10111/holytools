@@ -20,7 +20,7 @@ pip install holytools
 
 OR: Most recent commit from github:
 ```
-git clone https://github.com/Somerandomguy10111/holytools && pip install ./holytools
+pip install holytools @ git+https://git@github.com/Somerandomguy10111/holytools.git
 ```
 
 

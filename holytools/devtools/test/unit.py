@@ -2,7 +2,7 @@ import inspect
 import logging
 import unittest
 
-from typing import Optional, Callable, get_origin
+from typing import Optional, Callable
 import unittest.mock
 from logging import Logger
 from holytools.logging import LoggerFactory
