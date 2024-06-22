@@ -19,7 +19,6 @@ class LoggerFactory:
                     include_location : bool = False,
                     threshold : int = logging.INFO) -> Logger:
         logger = logging.getLogger(name=name)
-        logger.propagate = False
         logger.setLevel(threshold)
         formatting = Formatting(print_timestamp=include_timestamp, print_location=include_location)
 
