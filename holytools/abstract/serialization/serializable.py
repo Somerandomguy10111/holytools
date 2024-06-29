@@ -15,16 +15,22 @@ class Serializable:
     def from_str(cls, s: str):
         pass
 
-    def save(self, fpath : str, force_overwrite : bool = False):
+    def save(self, fpath : str, force_overwrite : bool = False) -> str:
         fpath = os.path.abspath(path=fpath)
         dirpath = os.path.dirname(fpath)
         os.makedirs(dirpath, exist_ok=True)
+        full_name = os.path.basename(fpath)
+        non_suffixname = full_name.split('.')[0]
+        suffix = get_suffix(fpath)
+
         if os.path.isfile(fpath) and not force_overwrite:
-            fpath = get_free_path(save_dirpath=dirpath, name=os.path.basename(fpath), start_index=1)
+            fpath = get_free_path(save_dirpath=dirpath, name=non_suffixname, suffix=suffix, start_index=1)
             print(f'Warning: File already exists at specified filepath. Saving to {fpath} instead.')
 
         with open(fpath, 'w') as f:
             f.write(self.to_str())
+
+        return fpath
 
     @classmethod
     def load(cls, fpath : str) -> SerializableType:
@@ -32,6 +38,13 @@ class Serializable:
             str_data = f.read()
         return cls.from_str(str_data)
 
+
+def get_suffix(fpath) -> Optional[str]:
+    parts = fpath.split('.')
+    if len(parts) == 1:
+        return None
+    else:
+        return parts[-1]
 
 
 def get_free_path(save_dirpath : str, name : str, suffix : Optional[str] = None, start_index : int = 0) -> str:
