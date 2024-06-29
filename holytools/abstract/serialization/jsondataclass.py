@@ -22,6 +22,9 @@ elementary_type_names : list[str] = typecast_classes + [cls.__name__ for cls in 
 
 @dataclass
 class JsonDataclass(Serializable):
+    """Can serialize following attributes:
+    - Basic serializable types: holytools.abstract.Serializable, int, float, bool, str, int, Path, UUID, Decimal, datetime, date, time
+    - Lists or dicts of basic serializable types"""
     def __init__(self, *args, **kwargs):
         _, __ = args, kwargs
         if not dataclasses.is_dataclass(self):
@@ -49,10 +52,17 @@ class JsonDataclass(Serializable):
                 continue
 
             dtype = TypeAnalzer.strip_nonetype(dtype)
-            if get_origin(dtype) == list:
-                value = [make_instance(cls=TypeAnalzer.get_core_type(dtype), value=x) for x in value]
+            origin = get_origin(dtype)
+            if origin == list:
+                item_type = TypeAnalzer.get_inner_types(dtype)[0]
+                value = [make_instance(cls=item_type, value=x) for x in value]
+            elif origin == dict:
+                key_type, value_type = TypeAnalzer.get_inner_types(dtype)
+                key_list = [make_instance(cls=key_type, value=x) for x in value[0]]
+                value_list = [make_instance(cls=value_type, value=x) for x in value[1]]
+                value = {key: value for key, value in zip(key_list, value_list)}
             else:
-                value = make_instance(cls=TypeAnalzer.get_core_type(dtype), value=value)
+                value = make_instance(cls=dtype, value=value)
             init_dict[key] = value
 
         return cls(**init_dict)
@@ -64,7 +74,9 @@ def get_entry(obj):
     elif isinstance(obj, Enum):
         entry = obj.value
     elif isinstance(obj, dict):
-        entry = orjson.dumps(obj).decode("utf-8")
+        key_list = [get_entry(k) for k in obj.keys()]
+        value_list = [get_entry(v) for v in obj.values()]
+        entry = (key_list, value_list)
     elif isinstance(obj, list):
         entry = [get_entry(x) for x in obj]
     else:
@@ -114,12 +126,9 @@ class TypeAnalzer:
         return core_type
     
     @staticmethod
-    def get_core_type(dtype : type) -> type:
-        try:
-            inner_dtype = get_args(dtype)
-            return inner_dtype[0]
-        except:
-            return dtype
+    def get_inner_types(dtype : type) -> tuple:
+        inner_dtypes = get_args(dtype)
+        return inner_dtypes
 
 
 if __name__ == "__main__":

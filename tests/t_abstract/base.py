@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+import json
 import random
 import unittest
+import uuid
 from uuid import UUID
 from enum import Enum
 from datetime import datetime, date, time
@@ -37,19 +39,27 @@ class SimpleDataclass(JsonDataclass):
 
 class SerializableInt(Serializable):
     def __init__(self):
-        self.the_int_val : int = random.randint(2, 10)
+        self.the_int_val : int = random.randint(2, 100)
+        self.uuid : int = uuid.uuid4().int
 
     def to_str(self) -> str:
-        return str(self.the_int_val)
+        the_dict = {'the_int_val': self.the_int_val, 'uuid': self.uuid}
+        return json.dumps(the_dict)
 
     @classmethod
     def from_str(cls, s: str) -> SerializableInt:
         this = cls()
-        this.the_int_val = int(s)
+        the_dict = json.loads(s)
+
+        this.the_int_val = the_dict['the_int_val']
+        this.uuid = the_dict['uuid']
         return this
 
     def __eq__(self, other):
         return self.the_int_val == other.the_int_val
+
+    def __hash__(self):
+        return self.uuid
 
 
 
@@ -76,6 +86,7 @@ class SerializationTest(Unittest):
             int_list : list[int]
             dataclass_list: list[SimpleDataclass]
             serializable_list : list[SerializableInt]
+            serializable_dict : dict[SerializableInt, SerializableInt]
             dictionary_data: dict[str, str] = field(default_factory=dict)
 
             def __post_init__(self):
@@ -88,6 +99,7 @@ class SerializationTest(Unittest):
             int_list=[1, 2, 3],
             dataclass_list=[SimpleDataclass.make_example(), SimpleDataclass.make_example()],
             serializable_list=[SerializableInt(), SerializableInt()],
+            serializable_dict={SerializableInt(): SerializableInt(), SerializableInt(): SerializableInt()},
             enum_field=ThisParticularEnum.OPTION_A,
             simple_data=SimpleDataclass.make_example()
         )
