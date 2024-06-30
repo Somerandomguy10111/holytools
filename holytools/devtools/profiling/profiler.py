@@ -43,11 +43,22 @@ class Profiler:
     def __init__(self):
         self._execution_profiles : dict[str, ExecutionProfile] = {}
 
-    def make_report(self) -> str:
-        headers = ["Section", "Total Time (s)", "Average Time (s)", "Calls"]
+    def make_report(self, section_name : str = f'Routine', print_average_times=True, print_num_calls=True):
+        headers = [section_name, "Total Time (s)"]
+        if print_average_times:
+            headers.append("Average Time (s)")
+        if print_num_calls:
+            headers.append("Calls")
+
         table = []
         for section, profile in self._execution_profiles.items():
-            table.append([section, f"{profile.total_time:.6f}", f"{profile.average_time:.6f}", profile.num_calls])
+            row = [section, f"{profile.total_time:.6f}"]
+            if print_average_times:
+                row.append(f"{profile.average_time:.6f}")
+            if print_num_calls:
+                row.append(profile.num_calls)
+            table.append(row)
+
         return tabulate(table, headers=headers, tablefmt="psql")
 
     def timed_scope(self, name : str) -> TimedScope:

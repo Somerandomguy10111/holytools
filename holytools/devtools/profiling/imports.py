@@ -2,6 +2,8 @@ import builtins
 
 from .profiler import Profiler
 
+
+
 class ProfiledImportScope:
     def __init__(self):
         self._original_importer = builtins.__import__
@@ -23,6 +25,6 @@ class ProfiledImportScope:
         builtins.__import__ = self._profiled_import
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        print(self.profiler.make_report())
+        print(self.profiler.make_report(section_name=f'Library', print_average_times=False, print_num_calls=False))
         builtins.__import__ = self._original_importer
 
