@@ -44,7 +44,6 @@ class JsonDataclass(Serializable):
         init_dict = {}
         for key, value in json_dict.items():
             dtype = type_hints.get(key)
-
             if TypeAnalzer.is_optional(dtype) and value is None:
                 init_dict[key] = value
                 continue
@@ -86,18 +85,18 @@ def get_entry(obj):
 
 def make_instance(cls, value : str):
     if cls in conversion_map:
-        return conversion_map[cls](value)
+        instance = conversion_map[cls](value)
     elif cls.__name__ in typecast_classes:
-        return cls(value)
+        instance = cls(value)
     elif issubclass(cls, Enum):
-        return cls(value)
+        instance =  cls(value)
     elif get_origin(cls) == dict:
-        value = orjson.loads(value)
+        instance = orjson.loads(value)
     elif issubclass(cls, Serializable):
-        value = cls.from_str(value)
+        instance = cls.from_str(value)
     else:
         raise TypeError(f'Unsupported type {cls}')
-    return value
+    return instance
         
 
 
