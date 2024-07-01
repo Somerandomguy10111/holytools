@@ -1,5 +1,6 @@
 import time
-from typing import Iterator
+from collections.abc import Collection
+from typing import Iterator, Iterable, Optional
 
 import progressbar
 from progressbar import ProgressBar
@@ -89,8 +90,23 @@ class TrackedInt:
     def __str__(self):
         return str(self._value)
 
+
+class TrackedCollection(Iterator):
+    def __init__(self, iterable : Collection):
+        self.inner : Iterator = iter(iterable)
+        self.tracking_int : TrackedInt = TrackedInt(start_value=0, finish_value=len(iterable))
+
+    def __next__(self):
+        next(self.inner)
+        self.tracking_int.increment(to_add=1)
+
+
 if __name__ == "__main__":
-    this = TrackedInt(start_value=10, finish_value=10)
+    this = TrackedInt(start_value=1, finish_value=10)
     for k in this.as_range():
         print(f'k = {k}')
         time.sleep(0.1)
+
+    for j in TrackedCollection(range(10)):
+        time.sleep(0.1)
+        print(f'j = {j}')

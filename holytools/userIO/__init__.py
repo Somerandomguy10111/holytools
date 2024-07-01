@@ -1,2 +1,2 @@
 from .cli import InteractiveCLI
-from .progr import TrackedInt
+from .progress import TrackedInt
