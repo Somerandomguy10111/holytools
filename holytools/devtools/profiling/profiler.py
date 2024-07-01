@@ -1,4 +1,6 @@
 import time
+from typing import Callable
+
 from tabulate import tabulate
 
 
@@ -22,9 +24,10 @@ class ExecutionProfile:
         return self.total_time / self.num_calls
 
 class TimedScope:
-    def __init__(self, name: str, storage : dict):
+    def __init__(self, name: str, storage : dict[str, ExecutionProfile], on_exit : Callable):
         self.name : str = name
         self.storage : dict[str, ExecutionProfile] = storage
+        self.on_exit : Callable = on_exit
 
     def __enter__(self):
         self.start_time = time.time()
@@ -38,6 +41,7 @@ class TimedScope:
             self.storage[self.name].register_time(elapsed)
         else:
             raise KeyError(f"Execution profile {self.name} not found in storage")
+        self.on_exit()
 
 class Profiler:
     def __init__(self):
@@ -61,8 +65,11 @@ class Profiler:
 
         return tabulate(table, headers=headers, tablefmt="psql")
 
-    def timed_scope(self, name : str) -> TimedScope:
-        return TimedScope(name, self._execution_profiles)
+    def timed_scope(self, name : str, print_on_exit : bool = False) -> TimedScope:
+        def print_report():
+            print(self.make_report())
+        on_exit = print_report if print_on_exit else lambda *args, **kwargs : None
+        return TimedScope(name=name,storage=self._execution_profiles,on_exit=on_exit)
 
 
     @staticmethod
