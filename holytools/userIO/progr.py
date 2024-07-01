@@ -21,10 +21,13 @@ class TrackedInt:
             return
 
         if self._value >= self.progressbar.max_value:
-            self.progressbar.finish()
+            self.finish()
             return
 
         self.progressbar.update(value=self._value)
+
+    def finish(self):
+        self.progressbar.finish()
 
     def get_value(self) -> int:
         return self._value

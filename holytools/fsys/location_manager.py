@@ -42,6 +42,8 @@ class LocationManager:
         fpath = cls._get_relative_path(relative_path=relative_path)
         return fpath
 
+    # -------------------------------------------
+
     @classmethod
     def _get_relative_path(cls, relative_path: str) -> str:
         root_dirpath = cls.get_root_dirpath()
