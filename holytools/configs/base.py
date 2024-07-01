@@ -22,7 +22,7 @@ class BaseConfigs(Loggable, ABC):
 
     # ---------------------------------------------------------
 
-    def get(self, key : str) -> ConfigValue:
+    def get(self, key : str, prompt_if_missing : bool = False) -> Optional[ConfigValue]:
         if len(key.split()) > 1:
             raise ValueError(f'Key must not contain whitespaces, got : \"{key}\"')
 
@@ -32,11 +32,14 @@ class BaseConfigs(Loggable, ABC):
             if config_value is None:
                 raise KeyError
         except:
-            self.log(f'Could not find key \"{key}\" in settings: Please set it manually', level=LogLevel.WARNING)
-            config_value = input()
-            self.set(key=key, value=config_value)
+            if prompt_if_missing:
+                self.log(f'Could not find key \"{key}\" in settings: Please set it manually', level=LogLevel.WARNING)
+                config_value = input()
+                self.set(key=key, value=config_value)
+            else:
+                self.log(msg=f'Could not find key \"{key}\" in settings', level=LogLevel.WARNING)
+                return None
 
-        # print(f'value = {config_value} of type {type(config_value)}')
         if isinstance(config_value, str):
             value = self.cast_string(config_value)
         elif isinstance(config_value, list):
@@ -68,7 +71,6 @@ class BaseConfigs(Loggable, ABC):
 
     @staticmethod
     def cast_string(value : list[str] | ConfigValue) -> ConfigValue:
-        # print(f'casting {value} of type {type(value)}')
         try:
             value = ast.literal_eval(value)
         except (ValueError, SyntaxError):
