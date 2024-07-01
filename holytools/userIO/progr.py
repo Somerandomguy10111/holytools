@@ -10,6 +10,8 @@ class TrackedInt:
     progressbar.streams.wrap_stdout()
 
     def __init__(self, start_value : int, finish_value : int):
+        if start_value >= finish_value:
+            raise ValueError(f'Start value {start_value} must be less than finish value {finish_value}')
         self._value : int = start_value
         self.progressbar = ProgressBar(min_value=start_value, max_value=finish_value)
         self.progressbar.update()
@@ -88,7 +90,7 @@ class TrackedInt:
         return str(self._value)
 
 if __name__ == "__main__":
-    this = TrackedInt(start_value=0, finish_value=10)
+    this = TrackedInt(start_value=10, finish_value=10)
     for k in this.as_range():
         print(f'k = {k}')
         time.sleep(0.1)
