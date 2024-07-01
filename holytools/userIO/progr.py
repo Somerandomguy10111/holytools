@@ -9,9 +9,9 @@ class TrackedInt:
     progressbar.streams.wrap_stderr()
     progressbar.streams.wrap_stdout()
 
-    def __init__(self, start_value : int, max_value : int):
+    def __init__(self, start_value : int, finish_value : int):
         self._value : int = start_value
-        self.progressbar = ProgressBar(min_value=start_value, max_value=max_value)
+        self.progressbar = ProgressBar(min_value=start_value, max_value=finish_value)
         self.progressbar.update()
 
     def increment(self, to_add : int):
@@ -85,7 +85,7 @@ class TrackedInt:
         return str(self._value)
 
 if __name__ == "__main__":
-    this = TrackedInt(start_value=0, max_value=10)
+    this = TrackedInt(start_value=0, finish_value=10)
     for k in this.as_range():
         print(f'k = {k}')
         time.sleep(0.1)
