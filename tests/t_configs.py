@@ -1,9 +1,10 @@
+import unittest
 import uuid
 from abc import abstractmethod
+from io import StringIO
 from unittest.mock import patch
 
 from holytools.configs import BaseConfigs, FileConfigs, PassConfigs
-from holytools.file import PlaintextFile
 from holytools.devtools import Unittest
 from holytools.fsys import SaveManager
 
@@ -23,7 +24,7 @@ class Hider:
         def test_get_nonexistent_key(self):
             non_existent_key = str(uuid.uuid4())
             self.configs.get(non_existent_key)
-            value = self.configs.get(non_existent_key)
+            value = self.configs.get(non_existent_key,prompt_if_missing=True)
             print(f'Value is {value}')
             self.assertEqual(value, 42)
 
@@ -87,17 +88,21 @@ class FileConfigsTests(Hider.ConfigTest):
     def get_configs(cls) -> BaseConfigs:
         return FileConfigs(fpath=cls.configs_fpath)
 
-    def tearDown(self):
-        print(f'State of configs file at {self.configs_fpath}: {PlaintextFile.get_text(fpath=self.configs_fpath)}')
-
-
 
 if __name__ == '__main__':
-    FileConfigsTests.execute_all()
-    Hider.PassConfigTests.execute_all()
+    # FileConfigsTests.execute_all()
+
     # confs = FileConfigs(f'test')
     # confs.set(key='newnew', value='asdf', section='!!!')
     # confs.get(key='newnew')
     # Hider.PassConfigTests.execute_all()
     # configs = FileConfigs()
     # configs2 = FileConfigs()
+    # import unittest
+
+    loader = unittest.TestLoader()
+    tests = loader.discover('/home/daniel/misc/holytools/tests', pattern='t_*.py')
+    str_io = StringIO()
+    testRunner = unittest.runner.TextTestRunner(stream=str_io)
+    testRunner.run(tests)
+    print(f'{str_io.getvalue()}')

@@ -51,7 +51,24 @@ class Unittest(CustomTestCase):
 
     @classmethod
     def log(cls, msg : str, level : int = logging.INFO):
-        cls.get_logger().log(msg=f'--> {msg}', level=level)
+        cls.get_logger().log(msg=f'{msg}', level=level)
+
+    def warning(self, msg : str, *args, **kwargs):
+        kwargs['level'] = logging.WARNING
+        self._logger.log(msg=msg, *args, **kwargs)
+
+    def error(self, msg : str, *args, **kwargs):
+        kwargs['level'] = logging.ERROR
+        self._logger.log(msg=msg, *args, **kwargs)
+
+    def critical(self, msg : str, *args, **kwargs):
+        kwargs['level'] = logging.CRITICAL
+        self._logger.log(msg=msg, *args, **kwargs)
+
+    def info(self, msg : str, *args, **kwargs):
+        kwargs['level'] = logging.INFO
+        self._logger.log(msg=msg, *args, **kwargs)
+
 
     # ---------------------------------------------------------
     # assertions

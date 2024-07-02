@@ -54,7 +54,7 @@ class VisitorTester(Unittest):
     def beaver_test(self):
         text = self.visitor.get_text(url=self.beavers_url)
         self.assertTrue(self.contains_beavers(text=text))
-        print(f'Beaver text: {text[:500]}')
+        self.log(f'Beaver text: {text[:500]}')
 
     @staticmethod
     def contains_beavers(text: str) -> bool:
