@@ -1,9 +1,11 @@
 import time
 from collections.abc import Collection
-from typing import Iterator, Iterable, Optional
+from typing import Iterator
 
 import progressbar
 from progressbar import ProgressBar
+
+
 # ---------------------------------------------------------
 
 class TrackedInt:
