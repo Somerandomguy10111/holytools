@@ -1,8 +1,10 @@
-import logging
+
 
 from .factory import Loggable, LoggerFactory
 from .modifier import LoggingModifier
 
+
+import logging
 class LogLevel:
     INFO = logging.INFO
     DEBUG = logging.DEBUG

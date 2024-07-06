@@ -1,6 +1,6 @@
 from __future__ import annotations
+
 import os
-from typing import Optional
 
 
 # -------------------------------------------
@@ -13,14 +13,14 @@ class LocationManager:
         self._subdir_paths: list[str] = []
         self._fpaths : list[str] = []
 
-    def relative_dir(self, relative_path: str) -> str:
+    def add_dir(self, relative_path: str) -> str:
         dirpath = self._get_relative_path(relative_path=relative_path)
         if not os.path.isdir(dirpath):
             os.makedirs(dirpath, exist_ok=True)
         self._subdir_paths.append(dirpath)
         return dirpath
 
-    def relative_file(self, relative_path: str) -> str:
+    def add_file(self, relative_path: str) -> str:
         fpath = self._get_relative_path(relative_path=relative_path)
         self._fpaths.append(fpath)
         return fpath

@@ -7,9 +7,7 @@ from enum import Enum
 from logging import Logger
 from typing import Optional
 
-
 # ---------------------------------------------------------
-
 
 class LoggerFactory:
     @classmethod
@@ -17,10 +15,13 @@ class LoggerFactory:
                     log_fpath : Optional[str] = None,
                     include_timestamp : bool = True,
                     include_location : bool = False,
+                    include_logger_name : bool = False,
                     threshold : int = logging.INFO) -> Logger:
         logger = logging.getLogger(name=name)
         logger.setLevel(threshold)
-        formatting = Formatting(print_timestamp=include_timestamp, print_location=include_location)
+        formatting = Formatting(print_timestamp=include_timestamp,
+                                print_location=include_location,
+                                print_logger_name=include_logger_name)
 
         console_handler = logging.StreamHandler(sys.stdout)
         console_formatter = Formatter(log_target=LogTarget.CONSOLE, formatting=formatting)
@@ -56,10 +57,14 @@ class Formatter(logging.Formatter):
     def format(self, record):
         log_fmt = "%(message)s"
 
-        if self.formatting.print_timestamp:
-            custom_time = self.formatTime(record, "%Y-%m-%d %H:%M:%S")
-            timestamp = f"[{custom_time}]"
-            log_fmt = f"{timestamp}: {log_fmt}"
+        custom_time = self.formatTime(record, "%Y-%m-%d %H:%M:%S")
+        conditional_timestamp = f"{custom_time}" if self.formatting.print_timestamp else ''
+        conditional_name = f"{record.name}" if self.formatting.print_logger_name else ''
+
+        if self.formatting.print_timestamp or self.formatting.print_logger_name:
+            if self.formatting.print_timestamp and self.formatting.print_logger_name:
+                conditional_timestamp = f'{conditional_timestamp} '
+            log_fmt = f"[{conditional_timestamp}{conditional_name}]: {log_fmt}"
 
         if self.formatting.print_location:
             log_fmt += f'\t\t| Location: File "{record.pathname}:{record.lineno}"'
@@ -105,4 +110,5 @@ class LogTarget(Enum):
 @dataclass
 class Formatting:
     print_timestamp : bool
+    print_logger_name : bool
     print_location : bool
