@@ -61,10 +61,16 @@ class Formatter(logging.Formatter):
         conditional_timestamp = f"{custom_time}" if self.formatting.print_timestamp else ''
         conditional_name = f"{record.name}" if self.formatting.print_logger_name else ''
 
-        if self.formatting.print_timestamp or self.formatting.print_logger_name:
-            if self.formatting.print_timestamp and self.formatting.print_logger_name:
-                conditional_timestamp = f'{conditional_timestamp} '
-            log_fmt = f"[{conditional_timestamp}{conditional_name}]: {log_fmt}"
+        extra_format = ''
+        if self.formatting.print_timestamp:
+            extra_format = conditional_timestamp
+
+        if self.formatting.print_logger_name:
+            conditional_space = ' ' if extra_format else ''
+            extra_format = f'{extra_format}{conditional_space}{conditional_name}'
+
+        if extra_format:
+            log_fmt = f"[{extra_format}]: {log_fmt}"
 
         if self.formatting.print_location:
             log_fmt += f'\t\t| Location: File "{record.pathname}:{record.lineno}"'
