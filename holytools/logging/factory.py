@@ -17,6 +17,9 @@ class LoggerFactory:
                     include_location : bool = False,
                     include_logger_name : bool = False,
                     threshold : int = logging.INFO) -> Logger:
+        while cls.logger_exists(name=name):
+            raise ValueError(f'Logger with name \"{name}\" already exists!')
+
         logger = logging.getLogger(name=name)
         logger.setLevel(threshold)
         formatting = Formatting(print_timestamp=include_timestamp,
@@ -36,6 +39,10 @@ class LoggerFactory:
 
         return logger
 
+    @staticmethod
+    def logger_exists(name : str) -> bool:
+        logger_names = [name for name in logging.root.manager.loggerDict]
+        return name in logger_names
 
 class Formatter(logging.Formatter):
     custom_file_name = 'custom_file_name'
