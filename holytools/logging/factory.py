@@ -10,6 +10,12 @@ from typing import Optional
 # ---------------------------------------------------------
 
 class LoggerFactory:
+    @classmethod    
+    def get_or_make(cls, name : str, **kwargs) -> Logger:
+        if cls.logger_exists(name=name):
+            return logging.getLogger(name=name)
+        return cls.make_logger(name=name, **kwargs)
+    
     @classmethod
     def make_logger(cls, name : str,
                     log_fpath : Optional[str] = None,
@@ -39,10 +45,13 @@ class LoggerFactory:
 
         return logger
 
+    # ---------------------------------------------------------
+
     @staticmethod
     def logger_exists(name : str) -> bool:
         logger_names = [name for name in logging.root.manager.loggerDict]
         return name in logger_names
+
 
 class Formatter(logging.Formatter):
     custom_file_name = 'custom_file_name'
