@@ -10,21 +10,15 @@ from typing import Optional
 # ---------------------------------------------------------
 
 class LoggerFactory:
-    @classmethod    
-    def get_or_make(cls, name : str, **kwargs) -> Logger:
-        if cls.logger_exists(name=name):
-            return logging.getLogger(name=name)
-        return cls.make_logger(name=name, **kwargs)
-    
     @classmethod
-    def make_logger(cls, name : str,
-                    log_fpath : Optional[str] = None,
-                    include_timestamp : bool = True,
-                    include_location : bool = False,
-                    include_logger_name : bool = False,
-                    threshold : int = logging.INFO) -> Logger:
+    def get_logger(cls, name : str,
+                   log_fpath : Optional[str] = None,
+                   include_timestamp : bool = True,
+                   include_location : bool = False,
+                   include_logger_name : bool = False,
+                   threshold : int = logging.INFO) -> Logger:
         while cls.logger_exists(name=name):
-            raise ValueError(f'Logger with name \"{name}\" already exists!')
+            return logging.getLogger(name)
 
         logger = logging.getLogger(name=name)
         logger.setLevel(threshold)
@@ -103,7 +97,7 @@ class Formatter(logging.Formatter):
 
 class Loggable:
     def __init__(self):
-        self.logger = LoggerFactory.make_logger(name=self.__class__.__name__)
+        self.logger = LoggerFactory.get_logger(name=self.__class__.__name__)
 
     def log(self, msg : str, level : int = logging.INFO):
         self.logger.log(level=level, msg=msg)

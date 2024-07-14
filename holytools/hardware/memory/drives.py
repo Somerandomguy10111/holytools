@@ -5,7 +5,7 @@ import psutil
 from holytools.logging import LoggerFactory
 # -------------------------------------------
 
-drive_logger = LoggerFactory.make_logger(name=__name__, include_location=False)
+drive_logger = LoggerFactory.get_logger(name=__name__, include_location=False)
 def log(msg : str, level : int = logging.INFO):
     drive_logger.log(msg=msg, level=level)
     print(drive_logger.name)
