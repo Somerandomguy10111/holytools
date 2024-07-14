@@ -98,9 +98,9 @@ class TrackedCollection(Iterator):
         self.inner : Iterator = iter(iterable)
         self.tracking_int : TrackedInt = TrackedInt(start_value=0, finish_value=len(iterable))
 
-    def __next__(self):
-        next(self.inner)
+    def __next__(self) -> object:
         self.tracking_int.increment(to_add=1)
+        return next(self.inner)
 
 
 if __name__ == "__main__":
