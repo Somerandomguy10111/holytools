@@ -22,7 +22,7 @@ class BaseConfigs(Loggable, ABC):
 
     # ---------------------------------------------------------
 
-    def get(self, key : str, prompt_if_missing : bool = False) -> Optional[ConfigValue]:
+    def get(self, key : str, required_dtype : Optional[type]  = None, prompt_if_missing : bool = False) -> Optional[ConfigValue]:
         if len(key.split()) > 1:
             raise ValueError(f'Key must not contain whitespaces, got : \"{key}\"')
 
@@ -47,6 +47,11 @@ class BaseConfigs(Loggable, ABC):
             value = [self.cast_string(v) for v in config_value]
         else:
             value =  config_value
+
+        if not required_dtype is None:
+            if not isinstance(value, required_dtype):
+                raise ValueError(f'Value must be of type {required_dtype} got : \"{value}\"')
+
         return value
 
 
