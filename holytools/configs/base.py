@@ -49,7 +49,7 @@ class BaseConfigs(Loggable, ABC):
             value =  config_value
 
         if not required_dtype is None:
-            dtype_confirmity = check_dtype(obj=value, dtype=required_dtype)
+            dtype_confirmity = check_dtype_confirmity(obj=value, dtype=required_dtype)
             if not dtype_confirmity:
                 raise ValueError(f'Value for key \"{key}\" must be of type {required_dtype} got : \"{value}\" of type {type(value)}')
 
@@ -116,14 +116,14 @@ def flatten(obj : dict) -> dict:
     return flat_dict
 
 
-def check_dtype(obj : object, dtype : type):
+def check_dtype_confirmity(obj : object, dtype : type) -> bool:
     if get_origin(dtype) is list:
         if not isinstance(obj, list):
-            obj_conforms = False
-        else:
-            obj : list
-            element_type = get_args(dtype)[0]
-            obj_conforms = all([isinstance(x, element_type) for x in obj])
+            return False
+        if not get_args(dtype):
+            return False
+        element_type = get_args(dtype)[0]
+        return all([isinstance(x, element_type) for x in obj])
     else:
         obj_conforms = isinstance(obj, dtype)
     return obj_conforms
