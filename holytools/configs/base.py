@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import ast
 from abc import abstractmethod, ABC
-from typing import TypeVar, Union, Optional
+from typing import TypeVar, Union, Optional, get_origin, get_args
 from holytools.logging import Loggable, LogLevel
 
 DictType = TypeVar(name='DictType', bound=dict)
@@ -49,8 +49,9 @@ class BaseConfigs(Loggable, ABC):
             value =  config_value
 
         if not required_dtype is None:
-            if not isinstance(value, required_dtype):
-                raise ValueError(f'Value must be of type {required_dtype} got : \"{value}\"')
+            dtype_confirmity = check_dtype(obj=value, dtype=required_dtype)
+            if not dtype_confirmity:
+                raise ValueError(f'Value for key \"{key}\" must be of type {required_dtype} got : \"{value}\" of type {type(value)}')
 
         return value
 
@@ -115,16 +116,14 @@ def flatten(obj : dict) -> dict:
     return flat_dict
 
 
-if __name__ == '__main__':
-    nested_dict = {
-        'key1': 'value1',
-        'key2': {
-            'key3': 'value2',
-            'key4': {
-                'key5': 'value3'
-            }
-        }
-    }
-
-    flattend = flatten(nested_dict)
-    print(flattend)
+def check_dtype(obj : object, dtype : type):
+    if get_origin(dtype) is list:
+        if not isinstance(obj, list):
+            obj_conforms = False
+        else:
+            obj : list
+            element_type = get_args(dtype)[0]
+            obj_conforms = all([isinstance(x, element_type) for x in obj])
+    else:
+        obj_conforms = isinstance(obj, dtype)
+    return obj_conforms
