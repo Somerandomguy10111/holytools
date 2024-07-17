@@ -50,7 +50,11 @@ class BaseConfigs(Loggable, ABC):
         if not required_dtype is None:
             dtype_confirmity = check_dtype_confirmity(obj=value, dtype=required_dtype)
             if not dtype_confirmity:
-                raise ValueError(f'Value for key \"{key}\" must be of type {required_dtype} got : \"{value}\" of type {type(value)}')
+                if not type(value) is list:
+                    raise ValueError(f'Value for key \"{key}\" must be of type {required_dtype} got : \"{value}\" of type {type(value)}')
+                else:
+                    type_list = [type(x) for x in value]
+                    raise ValueError(f'List values for key \"{key}\" must be of type {required_dtype} got : \"{value}\" of types {type_list}')
 
         return value
 
@@ -78,6 +82,8 @@ class BaseConfigs(Loggable, ABC):
     def cast_string(value : list[str] | ConfigValue) -> ConfigValue:
         try:
             value = ast.literal_eval(value)
+            if isinstance(value,tuple):
+                value = list(value)
         except (ValueError, SyntaxError):
             pass
         return value
