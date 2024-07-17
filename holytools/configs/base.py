@@ -48,14 +48,10 @@ class BaseConfigs(Loggable, ABC):
             value =  config_value
 
         if not required_dtype is None:
-            dtype_confirmity = check_dtype_confirmity(obj=value, dtype=required_dtype)
-            if not dtype_confirmity:
-                if not type(value) is list:
-                    raise ValueError(f'Value for key \"{key}\" must be of type {required_dtype} got : \"{value}\" of type {type(value)}')
-                else:
-                    type_list = [type(x) for x in value]
-                    raise ValueError(f'List values for key \"{key}\" must be of type {required_dtype} got : \"{value}\" of types {type_list}')
-
+            if not check_dtype_confirmity(obj=value, dtype=required_dtype):
+                base_msg = f'Value for key \"{key}\" must be of type {required_dtype} got : \"{value}\"'
+                type_spec = f'of type {type(value)}' if not type(value) is list else f'with types {[type(x) for x in value]}'
+                raise ValueError(f'{base_msg} {type_spec}')
         return value
 
 
