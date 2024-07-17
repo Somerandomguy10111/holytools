@@ -31,19 +31,18 @@ class BaseConfigs(Loggable, ABC):
             config_value = flatten_dict.get(key)
             if config_value is None:
                 raise KeyError
-        except:
+        except KeyError:
             if prompt_if_missing:
                 self.log(f'Could not find key \"{key}\" in settings: Please set it manually', level=LogLevel.WARNING)
                 config_value = input()
                 self.set(key=key, value=config_value)
             else:
                 self.log(msg=f'Could not find key \"{key}\" in settings', level=LogLevel.WARNING)
-                return None
+                config_value = None
 
         if isinstance(config_value, str):
             value = self.cast_string(config_value)
         elif isinstance(config_value, list):
-
             value = [self.cast_string(v) for v in config_value]
         else:
             value =  config_value
@@ -103,7 +102,7 @@ def flatten(obj : dict) -> dict:
 
     def add(key : str, value : object):
         if key in flat_dict:
-            raise ValueError(f'Key {key} already exists in flattened dictionary')
+            raise KeyError(f'Key {key} already exists in flattened dictionary')
         flat_dict[key] = value
 
     for k1, v1 in obj.items():
