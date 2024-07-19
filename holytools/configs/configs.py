@@ -38,6 +38,7 @@ class FileConfigs(BaseConfigs):
             key, value = parts
             if len(key.split(f' ')) > 1:
                 raise ValueError(f'Key must not contain whitespaces, got : \"{key}\"')
+            value = value.strip()
             if current_section:
                 map_dict[current_section][key] = value
             else:
@@ -109,5 +110,4 @@ def as_absolute(path : str) -> str:
 
 if __name__ == "__main__":
     configs = FileConfigs(fpath='/home/daniel/aimat/ada/configs.txt')
-    # configs.set(key=f'test_key2', value='2')
     configs.set(key=f'LAMBDA', value='10', section=f'e7')
