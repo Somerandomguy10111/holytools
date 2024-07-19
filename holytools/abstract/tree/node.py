@@ -109,3 +109,4 @@ def get_total_elements(nested_dict : dict) -> int:
         if isinstance(value, dict):
             count += get_total_elements(value)
     return count
+

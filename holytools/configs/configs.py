@@ -94,4 +94,3 @@ def as_absolute(path : str) -> str:
 
 if __name__ == "__main__":
     configs = FileConfigs(fpath='/home/daniel/aimat/ada/configs.txt')
-    print(f'configs map = {configs._map}')
