@@ -13,6 +13,5 @@ mss
 screeninfo
 pynput
 pillow
-configobj
 progressbar2
 tabulate

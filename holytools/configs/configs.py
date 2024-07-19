@@ -1,10 +1,10 @@
 import os.path
-from configobj import ConfigObj
-
 import subprocess
 from typing import Optional
-from holytools.logging import LogLevel
+
 from holytools.configs.base import BaseConfigs, DictType
+from holytools.logging import LogLevel
+
 
 # ---------------------------------------------------------
 
@@ -16,9 +16,34 @@ class FileConfigs(BaseConfigs):
         os.makedirs(config_dirpath, exist_ok=True)
         super().__init__()
 
-    def _retrieve_map(self) -> ConfigObj:
-        self.log(f'Initialized {self.__class__.__name__} with config file at \"{self._config_fpath}\"')
-        return ConfigObj(self._config_fpath)
+    def _retrieve_map(self) -> dict:
+        with open(self._config_fpath, 'r') as f:
+            content = f.read()
+
+        lines = content.split(f'\n')
+        current_section = None
+        map_dict = {}
+        for line in lines:
+            if line.startswith('[') and line.endswith(']'):
+                current_section = line[1:-1]
+                map_dict[current_section] = {}
+                continue
+
+            parts = line.split(f' = ')
+            if len(parts) < 2:
+                continue
+            if len(parts) > 2:
+                raise ValueError(f'Invalid line in config file: \"{line}\"')
+
+            key, value = parts
+            if len(key.split(f' ')) > 1:
+                raise ValueError(f'Key must not contain whitespaces, got : \"{key}\"')
+            if current_section:
+                map_dict[current_section][key] = value
+            else:
+                map_dict[key] = value
+        return map_dict
+
 
     def update_config_resouce(self, key : str, value : str, section : Optional[str] = None):
         self._map.write()
@@ -68,10 +93,5 @@ def as_absolute(path : str) -> str:
 
 
 if __name__ == "__main__":
-    pass_config = PassConfigs(pass_dirpath='/home/daniel/Drive/.password-store')
-    pypi_key = pass_config.get(key='pypi')
-    # pass_config.set(key='this', value='that')
-    print(pypi_key)
-    pass_config.set(key='newnew', value='asdf')
-    print(pass_config.get(key='newnew'))
-
+    configs = FileConfigs(fpath='/home/daniel/aimat/ada/configs.txt')
+    print(f'configs map = {configs._map}')
