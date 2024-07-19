@@ -45,8 +45,23 @@ class FileConfigs(BaseConfigs):
         return map_dict
 
 
-    def update_config_resouce(self, key : str, value : str, section : Optional[str] = None):
-        self._map.write()
+    def update_config_resouce(self, key : str, value: str, section : Optional[str] = None):
+        _, __ , ___ = key, value, section
+
+        general_dict = {k:v for k,v in self._map.items() if not isinstance(v, dict)}
+        sub_dicts = {k:v for k,v in self._map.items() if isinstance(v, dict)}
+
+        config_content = ''
+        for k,v in general_dict.items():
+            config_content += f'{k} = {v}\n'
+
+        for k,v in sub_dicts.items():
+            config_content += f'\n[{k}]\n'
+            for subkey, subval in v.items():
+                config_content += f'{subkey} = {subval}\n'
+
+        with open(self._config_fpath, 'w') as f:
+            f.write(config_content)
 
 
 class PassConfigs(BaseConfigs):
@@ -94,3 +109,5 @@ def as_absolute(path : str) -> str:
 
 if __name__ == "__main__":
     configs = FileConfigs(fpath='/home/daniel/aimat/ada/configs.txt')
+    # configs.set(key=f'test_key2', value='2')
+    configs.set(key=f'LAMBDA', value='10', section=f'e7')
