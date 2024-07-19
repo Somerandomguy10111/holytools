@@ -30,7 +30,7 @@ class BaseConfigs(Loggable, ABC):
                 the_dict = the_dict[section]
             config_value = the_dict[key]
         except KeyError:
-            self.log(msg=f'Could not find key \"{key}\" in settings', level=LogLevel.WARNING)
+            self.log(msg=f'Could not find key \"{key}\" under section {section} in configs', level=LogLevel.WARNING)
             config_value = None
 
         return config_value
