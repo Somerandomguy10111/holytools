@@ -40,3 +40,16 @@ class TypeInspector:
             return any([t for t in types if t is NoneType])
 
         return False
+
+    @staticmethod
+    def check_dtype_confirmity(obj : object, dtype : type) -> bool:
+        if get_origin(dtype) is list:
+            if not isinstance(obj, list):
+                return False
+            if not get_args(dtype):
+                return False
+            element_type = get_args(dtype)[0]
+            return all([isinstance(x, element_type) for x in obj])
+        else:
+            obj_conforms = isinstance(obj, dtype)
+        return obj_conforms

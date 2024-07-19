@@ -1,4 +1,4 @@
-from holytools.crypto import RSA
+from holytools.cryptography import RSA
 
 
 if __name__ == "__main__":

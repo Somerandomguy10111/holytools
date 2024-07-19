@@ -22,7 +22,7 @@ class BaseConfigs(Loggable, ABC):
 
     # ---------------------------------------------------------
 
-    def get(self, key : str, required_dtype : Optional[type]  = None) -> Optional[ConfigValue]:
+    def get(self, key : str, required_dtype : Optional[type]  = None) -> str:
         if len(key.split()) > 1:
             raise ValueError(f'Key must not contain whitespaces, got : \"{key}\"')
 
@@ -113,14 +113,3 @@ def flatten(obj : dict) -> dict:
     return flat_dict
 
 
-def check_dtype_confirmity(obj : object, dtype : type) -> bool:
-    if get_origin(dtype) is list:
-        if not isinstance(obj, list):
-            return False
-        if not get_args(dtype):
-            return False
-        element_type = get_args(dtype)[0]
-        return all([isinstance(x, element_type) for x in obj])
-    else:
-        obj_conforms = isinstance(obj, dtype)
-    return obj_conforms
