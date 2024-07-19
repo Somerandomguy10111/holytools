@@ -22,23 +22,19 @@ class BaseConfigs(Loggable, ABC):
 
     # ---------------------------------------------------------
 
-    def get(self, key : str, required_dtype : Optional[type]  = None, prompt_if_missing : bool = False) -> Optional[ConfigValue]:
+    def get(self, key : str, required_dtype : Optional[type]  = None) -> Optional[ConfigValue]:
         if len(key.split()) > 1:
             raise ValueError(f'Key must not contain whitespaces, got : \"{key}\"')
 
         try:
             flatten_dict = flatten(self._map)
+
             config_value = flatten_dict.get(key)
             if config_value is None:
                 raise KeyError
         except KeyError:
-            if prompt_if_missing:
-                self.log(f'Could not find key \"{key}\" in settings: Please set it manually', level=LogLevel.WARNING)
-                config_value = input()
-                self.set(key=key, value=config_value)
-            else:
-                self.log(msg=f'Could not find key \"{key}\" in settings', level=LogLevel.WARNING)
-                config_value = None
+            self.log(msg=f'Could not find key \"{key}\" in settings', level=LogLevel.WARNING)
+            config_value = None
 
         if isinstance(config_value, str):
             value = self.cast_string(config_value)
