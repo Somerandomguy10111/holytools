@@ -1,6 +1,6 @@
 import time
 
-from holytools.events import InputWaiter, Countdown
+from holytools.events import InputWaiter
 from pynput.keyboard import Key as PynputKey
 from pynput.keyboard import KeyCode
 from pynput.keyboard import Controller as KeyboardController

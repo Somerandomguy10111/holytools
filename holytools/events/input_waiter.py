@@ -1,24 +1,17 @@
-from typing import Any
+from typing import Any, Optional
 from queue import Queue
 
 
-class MatchesAny:
-    def __eq__(self, other):
-        return True
-
-
 class InputWaiter:
-    _any = MatchesAny()
-
-    def __init__(self, target_value : Any = _any):
+    def __init__(self, target_value : Optional[Any] = None):
         self.q = Queue()
-        self.target_value : Any = target_value
+        self.target_value : Optional[Any] = target_value
         self.is_done : bool = False
 
     def clear(self):
         self.q = Queue()
 
-    def write(self, value):
+    def write(self, value : Optional[Any] = None):
         self.q.put(value)
 
     def get(self) -> Any:
