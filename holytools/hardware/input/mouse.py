@@ -6,6 +6,8 @@ from holytools.hardware.display import Display, LatticePoint, Vector
 from holytools.hardware.display import Grid
 from typing import Optional
 
+# ----------------------------------------------
+
 class Mouse:
     def __init__(self):
         self._mouse : MouseController = MouseController()

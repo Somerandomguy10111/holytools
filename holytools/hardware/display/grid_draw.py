@@ -7,6 +7,9 @@ from PIL import ImageDraw, Image, ImageFont
 from PIL.Image import Image as PILImage
 from .types import Grid, LatticePoint, Vector
 
+
+# ----------------------------------------------
+
 class Orientation(Enum):
     HORIZONTAL = 0
     VERTICAL = 1

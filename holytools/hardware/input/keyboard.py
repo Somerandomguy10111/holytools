@@ -1,12 +1,37 @@
 import time
+from queue import Queue
 
-from holytools.events import InputWaiter
 from pynput.keyboard import Key as PynputKey
 from pynput.keyboard import KeyCode
 from pynput.keyboard import Controller as KeyboardController
 from pynput import keyboard
-from typing import Union
+from typing import Union, Any, Optional
 import atexit
+
+Key = Union[PynputKey, KeyCode]
+
+# ----------------------------------------------
+
+
+class InputWaiter:
+    def __init__(self, target_value : Optional[Any] = None):
+        self.q = Queue()
+        self.target_value : Optional[Any] = target_value
+        self.is_done : bool = False
+
+    def clear(self):
+        self.q = Queue()
+
+    def write(self, value : Optional[Any] = None):
+        self.q.put(value)
+
+    def get(self) -> Any:
+        while True:
+            value = self.q.get()
+            if self.target_value == value:
+                self.is_done = True
+                return value
+
 
 class Keyboard:
     def __init__(self):
@@ -21,8 +46,6 @@ class Keyboard:
             self._keyboard.type(char)  # Type the character
             time.sleep(0.02)  # Interval between keys
 
-
-Key = Union[PynputKey, KeyCode]
 
 
 class KeyboardListener:
