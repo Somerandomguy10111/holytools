@@ -25,10 +25,7 @@ class BaseConfigs(Loggable, ABC):
             raise ValueError(f'Key must not contain whitespaces, got : \"{key}\"')
 
         try:
-            the_dict = self._map
-            if section:
-                the_dict = the_dict[section]
-            config_value = the_dict[key]
+            config_value = self._map[section][key]
         except KeyError:
             self.log(msg=f'Could not find key \"{key}\" under section \"{section}\" in configs', level=LogLevel.WARNING)
             config_value = None

@@ -8,7 +8,6 @@ from holytools.logging import LogLevel
 
 # ---------------------------------------------------------
 
-
 class FileConfigs(BaseConfigs):
     def __init__(self, fpath : str = '~/.pyconfig'):
         self._config_fpath: str = as_absolute(path=fpath)
@@ -22,29 +21,31 @@ class FileConfigs(BaseConfigs):
 
         lines = content.split(f'\n')
         current_section = None
-        map_dict = {}
-        for line in lines:
+        category_dict = {current_section : {}}
+
+
+        print(lines)
+        for num, line in enumerate(lines):
+            parts = line.split(f' = ')
+
             if line.startswith('[') and line.endswith(']'):
                 current_section = line[1:-1]
-                map_dict[current_section] = {}
+                category_dict[current_section] = {}
+                continue
+            if len(parts) == 2:
+                key, value = parts
+                if ' ' in key:
+                    raise ValueError(f'Key must not contain whitespaces, got key \"{key}\" in line {num+1}')
+                if ' ' in value:
+                    raise ValueError(f'Value must not contain whitespaces, got value \"{value}\" in line {num+1}')
+                category_dict[current_section][key] = value
+                continue
+            if not line:
                 continue
 
-            parts = line.split(f' = ')
-            if len(parts) < 2:
-                continue
-            if len(parts) > 2:
-                raise ValueError(f'Invalid line in config file: \"{line}\"')
+            raise ValueError(f'Line {num+1} in config file is invalid: \"{line}\"')
 
-            key, value = parts
-            if len(key.split(f' ')) > 1:
-                raise ValueError(f'Key must not contain whitespaces, got : \"{key}\"')
-            value = value.strip()
-            if current_section:
-                map_dict[current_section][key] = value
-            else:
-                map_dict[key] = value
-        return map_dict
-
+        return category_dict
 
     def update_config_resouce(self, key : str, value: str, section : Optional[str] = None):
         _, __ , ___ = key, value, section
@@ -109,5 +110,5 @@ def as_absolute(path : str) -> str:
 
 
 if __name__ == "__main__":
-    configs = FileConfigs(fpath='/home/daniel/aimat/ada/configs.txt')
-    configs.set(key=f'LAMBDA', value='10', section=f'e7')
+    configs = FileConfigs(fpath='/tmp/testconfigs.txt')
+    print(configs.get(key='c'))
