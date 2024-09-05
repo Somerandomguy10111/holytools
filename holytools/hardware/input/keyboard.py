@@ -36,19 +36,19 @@ class KeyboardListener:
         self.release_waiters : list[InputWaiter] = []
 
     def wait_on_hold(self, key : Key, duration : float):
-        def check_key_pressed():
-            return key in self.pressed_buttons
-
         while True:
             press_waiter = self._register_press_waiter(target_value=key)
             press_waiter.get()
             if self.verbose:
                 print(f'Press of key \"{key}\" registered. Hold for {duration} to finsh')
-            countdown = Countdown(duration=duration, on_expiration=check_key_pressed)
-            countdown.start()
-            still_held = countdown.finish()
+
+            time.sleep(duration)
+            still_held  = self.check_key_pressed(key=key)
             if still_held:
                 break
+
+    def check_key_pressed(self, key : Key):
+        return key in self.pressed_buttons
 
     def wait_on_press(self, key : Key):
         waiter = self._register_press_waiter(target_value=key)
@@ -72,7 +72,7 @@ class KeyboardListener:
 
     def _on_release(self, key : Key):
         if self.verbose:
-            print(f'key release registe2red {key}')
+            print(f'key release registered {key}')
         if key in self.pressed_buttons:
             self.pressed_buttons.remove(key)
         for waiter in self.release_waiters:
@@ -97,6 +97,5 @@ class KeyboardListener:
 if __name__ == "__main__":
     # listener = KeyboardListener(verbose=True)
     test_keyboard = Keyboard()
-
-    time.sleep(0.1)
-    # listener.wait_on_hold(key=KeyCode(char='a'),duration=2)
+    listener = KeyboardListener(verbose=True)
+    listener.wait_on_hold(key=KeyCode.from_char(char='a'), duration=20)
