@@ -44,10 +44,10 @@ class Hider:
             pass
 
 
-class PassConfigTests(Hider.ConfigTest):
-    @classmethod
-    def get_configs(cls) -> BaseConfigs:
-        return PassConfigs(pass_dirpath=cls.pass_dirpath)
+    class PassConfigTests(ConfigTest):
+        @classmethod
+        def get_configs(cls) -> BaseConfigs:
+            return PassConfigs(pass_dirpath=cls.pass_dirpath)
 
 
 class FileConfigsTests(Hider.ConfigTest):
@@ -57,20 +57,4 @@ class FileConfigsTests(Hider.ConfigTest):
 
 
 if __name__ == '__main__':
-    # FileConfigsTests.execute_all()
-    PassConfigTests.execute_all()
-
-    # confs = FileConfigs(f'test')
-    # confs.set(key='newnew', value='asdf', section='!!!')
-    # confs.get(key='newnew')
-    # Hider.PassConfigTests.execute_all()
-    # configs = FileConfigs()
-    # configs2 = FileConfigs()
-    # import unittest
-
-    # loader = unittest.TestLoader()
-    # tests = loader.discover('/home/daniel/misc/holytools/tests', pattern='t_*.py')
-    # str_io = StringIO()
-    # testRunner = unittest.runner.TextTestRunner(stream=str_io)
-    # testRunner.run(tests)
-    # print(f'{str_io.getvalue()}')
+    FileConfigsTests.execute_all()
