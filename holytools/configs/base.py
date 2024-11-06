@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 from abc import abstractmethod, ABC
 from typing import TypeVar, Optional
 
@@ -18,7 +19,14 @@ class BaseConfigs(Loggable, ABC):
     def _retrieve_map(self) -> DictType:
         pass
 
+    @staticmethod
+    def _as_abspath(path: str) -> str:
+        path = os.path.expanduser(path=path)
+        path = os.path.abspath(path)
+        return path
+
     # ---------------------------------------------------------
+    # interface
 
     def get(self, key : str, section : Optional[str] = None) -> Optional[str]:
         if len(key.split()) > 1:
@@ -39,11 +47,11 @@ class BaseConfigs(Loggable, ABC):
             self._map[section] = {}
         the_dict = self._map if section is None else self._map[section]
         the_dict[key] = value
-        self.update_config_resouce(key=key, value=str(value), section=section)
+        self._update_resource(key=key, value=str(value), section=section)
 
 
     @abstractmethod
-    def update_config_resouce(self, key : str, value : str, section : Optional[str] = None):
+    def _update_resource(self, key : str, value : str, section : Optional[str] = None):
         pass
 
 

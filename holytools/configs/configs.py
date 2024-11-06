@@ -5,17 +5,20 @@ from typing import Optional
 from holytools.configs.base import BaseConfigs, DictType
 from holytools.logging import LogLevel
 
-
 # ---------------------------------------------------------
 
 class FileConfigs(BaseConfigs):
     def __init__(self, fpath : str = '~/.pyconfig'):
-        self._config_fpath: str = as_absolute(path=fpath)
+        self._config_fpath: str = self._as_abspath(path=fpath)
         config_dirpath = os.path.dirname(self._config_fpath)
         os.makedirs(config_dirpath, exist_ok=True)
         super().__init__()
 
     def _retrieve_map(self) -> dict:
+        if not os.path.isfile(self._config_fpath):
+            self.log(msg=f'File {self._config_fpath} could not be found', level=LogLevel.WARNING)
+            return {}
+
         with open(self._config_fpath, 'r') as f:
             content = f.read()
 
@@ -23,8 +26,6 @@ class FileConfigs(BaseConfigs):
         current_section = None
         category_dict = {current_section : {}}
 
-
-        print(lines)
         for num, line in enumerate(lines):
             parts = line.split(f' = ')
 
@@ -47,7 +48,7 @@ class FileConfigs(BaseConfigs):
 
         return category_dict
 
-    def update_config_resouce(self, key : str, value: str, section : Optional[str] = None):
+    def _update_resource(self, key : str, value: str, section : Optional[str] = None):
         _, __ , ___ = key, value, section
 
         general_dict = {k:v for k,v in self._map.items() if not isinstance(v, dict)}
@@ -68,13 +69,13 @@ class FileConfigs(BaseConfigs):
 
 class PassConfigs(BaseConfigs):
     def __init__(self, pass_dirpath : str = '~/.password-store' ):
-        pass_dirpath = as_absolute(path=pass_dirpath)
+        pass_dirpath = self._as_abspath(path=pass_dirpath)
         print(f'Password store dir is : "{pass_dirpath}"')
         os.environ['PASSWORD_STORE_DIR'] = pass_dirpath
         self._pass_dirpath : str = pass_dirpath
         super().__init__()
 
-    def update_config_resouce(self, key : str, value : str, section : Optional[str] = None):
+    def _update_resource(self, key : str, value : str, section : Optional[str] = None):
         insert_command = f"echo \"{value}\" | pass insert --echo {key}"
         self.try_run_cmd(cmd=insert_command)
 
@@ -103,12 +104,7 @@ class PassConfigs(BaseConfigs):
         return keys
 
 
-def as_absolute(path : str) -> str:
-    path = os.path.expanduser(path=path)
-    path = os.path.abspath(path)
-    return path
-
-
 if __name__ == "__main__":
     configs = FileConfigs(fpath='/tmp/testconfigs.txt')
-    print(configs.get(key='c'))
+    pin_value = configs.get(key='pin')
+    print(f'Pinvalue = {pin_value}')

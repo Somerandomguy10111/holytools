@@ -27,7 +27,7 @@ class Countdown:
 
     def _release(self):
         self.one_time_lock.unlock()
-        out = self.on_expiration()
+        self.on_expiration()
 
 
 class Lock:
