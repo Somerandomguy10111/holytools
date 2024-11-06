@@ -43,10 +43,9 @@ class BaseConfigs(Loggable, ABC):
     def set(self, key : str, value : str, section : Optional[str] = None):
         if key in self._map:
             raise ValueError(f'Key \"{key}\" already exists in settings')
-        if not section is None:
+        if not section in self._map:
             self._map[section] = {}
-        the_dict = self._map if section is None else self._map[section]
-        the_dict[key] = value
+        self._map[section][key] = value
         self._update_resource(key=key, value=str(value), section=section)
 
 

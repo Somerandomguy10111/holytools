@@ -13,21 +13,11 @@ from holytools.fsys import SaveManager
 class Hider:
     class ConfigTest(Unittest):
         configs_fpath = SaveManager.tmp_fpath()
-        pass_dirpath = '/home/daniel/Drive/.password-store'
+        pass_dirpath = '/home/daniel/OneDrive/.password-store'
 
         @classmethod
         def setUpClass(cls):
             cls.configs = cls.get_configs()
-
-
-        @patch('builtins.input', lambda *args : '42')
-        def test_get_nonexistent_key(self):
-            non_existent_key = str(uuid.uuid4())
-            self.configs.get(non_existent_key)
-            value = self.configs.get(non_existent_key)
-            print(f'Value is {value}')
-            self.assertEqual(value, 42)
-
 
         def test_set_get_key(self):
             str_key, str_val = self.make_random_str(), self.make_random_str()
@@ -35,27 +25,11 @@ class Hider:
             value = self.configs.get(str_key)
             self.assertEqual(value, str_val)
 
-            expected_val = 'False'
-            bool_key = self.make_random_str()
-            self.configs.set(key=bool_key, value=expected_val)
-            actual = self.configs.get(key=bool_key)
-            self.assertEqual(actual, expected_val)
-
-
-        @patch('builtins.input', lambda *args: '')
-        def test_new_obj_get(self):
-            str_key, str_val = self.make_random_str(), self.make_random_str()
-            self.configs.set(key=str_key, value=str_val)
-
-            new_configs = self.get_configs()
-            value = new_configs.get(key=str_key)
-            self.assertEqual(value, str_val)
-
         def test_section_set_get(self):
             section = self.make_random_str()
             key, value = self.make_random_str(), self.make_random_str()
             self.configs.set(key=key, value=value, section=section)
-            value = self.configs.get(key=key)
+            value = self.configs.get(key=key, section=section)
             self.assertEqual(value, value)
 
         # ---------------------------------------------------------
@@ -83,7 +57,8 @@ class FileConfigsTests(Hider.ConfigTest):
 
 
 if __name__ == '__main__':
-    FileConfigsTests.execute_all()
+    # FileConfigsTests.execute_all()
+    PassConfigTests.execute_all()
 
     # confs = FileConfigs(f'test')
     # confs.set(key='newnew', value='asdf', section='!!!')

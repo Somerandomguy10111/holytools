@@ -16,7 +16,7 @@ class FileConfigs(BaseConfigs):
 
     def _retrieve_map(self) -> dict:
         if not os.path.isfile(self._config_fpath):
-            self.log(msg=f'File {self._config_fpath} could not be found', level=LogLevel.WARNING)
+            self.log(msg=f'File {self._config_fpath} could not be found, configs are empty', level=LogLevel.WARNING)
             return {}
 
         with open(self._config_fpath, 'r') as f:
