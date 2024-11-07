@@ -17,7 +17,7 @@ class LoggerFactory:
                    include_location : bool = False,
                    include_logger_name : bool = False,
                    threshold : int = logging.INFO) -> Logger:
-        while cls.logger_exists(name=name):
+        if cls.logger_exists(name=name):
             return logging.getLogger(name)
 
         logger = logging.getLogger(name=name)

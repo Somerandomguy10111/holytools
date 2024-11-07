@@ -1,5 +1,5 @@
 from threading import Event
-from typing import Callable, Any
+from typing import Callable
 from .task_scheduler import TaskScheduler
 
 
