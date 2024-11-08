@@ -1,12 +1,10 @@
-import unittest
 import uuid
 from abc import abstractmethod
-from io import StringIO
-from unittest.mock import patch
 
 from holytools.configs import BaseConfigs, FileConfigs, PassConfigs
 from holytools.devtools import Unittest
 from holytools.fsys import SaveManager
+
 
 # ---------------------------------------------------------
 
@@ -47,7 +45,7 @@ class Hider:
     class PassConfigTests(ConfigTest):
         @classmethod
         def get_configs(cls) -> BaseConfigs:
-            return PassConfigs(pass_dirpath=cls.pass_dirpath)
+            return PassConfigs()
 
 
 class FileConfigsTests(Hider.ConfigTest):
@@ -57,4 +55,5 @@ class FileConfigsTests(Hider.ConfigTest):
 
 
 if __name__ == '__main__':
-    FileConfigsTests.execute_all()
+    # FileConfigsTests.execute_all()
+    Hider.PassConfigTests.execute_all()

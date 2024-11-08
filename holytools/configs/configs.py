@@ -68,7 +68,8 @@ class FileConfigs(BaseConfigs):
 
 
 class PassConfigs(BaseConfigs):
-    def __init__(self, pass_dirpath : str = '~/.password-store' ):
+    def __init__(self):
+        pass_dirpath = os.environ['PASSWORD_STORE_DIR']
         pass_dirpath = self._as_abspath(path=pass_dirpath)
         print(f'Password store dir is : "{pass_dirpath}"')
         os.environ['PASSWORD_STORE_DIR'] = pass_dirpath
