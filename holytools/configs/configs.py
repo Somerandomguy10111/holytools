@@ -81,10 +81,10 @@ class PassConfigs(BaseConfigs):
         self.try_run_cmd(cmd=insert_command)
 
     def _retrieve_map(self) -> DictType:
-        keys = self.get_keys()
-        config_map = {}
+        keys = self.get_toplevel_keys()
+        config_map = {None : {}}
         for k in keys:
-            config_map[k] = self.try_run_cmd(f'pass {k}')
+            config_map[None][k] = self.try_run_cmd(f'pass {k}')
         return config_map
 
     # ---------------------------------------------------------
@@ -99,7 +99,7 @@ class PassConfigs(BaseConfigs):
             result = None
         return result
 
-    def get_keys(self) -> list[str]:
+    def get_toplevel_keys(self) -> list[str]:
         filenames = os.listdir(path=self._pass_dirpath)
         keys = [os.path.splitext(f)[0] for f in filenames if f.endswith('.gpg')]
         return keys
