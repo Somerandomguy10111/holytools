@@ -6,7 +6,7 @@ import tempfile
 
 class SaveManager:
     @staticmethod
-    def tmp_fpath(suffix : str = '') -> str:
+    def get_tmp_fpath(suffix : str = '') -> str:
         return tempfile.mktemp(suffix=suffix)
 
     @staticmethod
