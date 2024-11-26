@@ -17,7 +17,14 @@ class SaveManager:
     
         return name
 
-    
+    @staticmethod
+    def prune_suffix(fpath : str) -> str:
+        parts = fpath.split('.')
+        if len(parts) > 1:
+            return '.'.join(parts[:-1])
+        else:
+            return fpath
+
     @staticmethod
     def ensure_suffix(fpath: str, suffix : str) -> str:
         parts = fpath.split('.')
