@@ -19,7 +19,7 @@ class TrackedInt:
         self.progressbar = ProgressBar(min_value=start_value, max_value=finish_value)
         self.progressbar.update()
 
-    def increment(self, to_add : int):
+    def increment(self, to_add : int = 1):
         self._value += to_add
 
         if self.progressbar.finished():
