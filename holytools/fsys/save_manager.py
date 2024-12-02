@@ -1,7 +1,7 @@
-from typing import Optional
 import os
+from typing import Optional
+
 from pathvalidate import sanitize_filename
-import tempfile
 
 
 class SaveManager:

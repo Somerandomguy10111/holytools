@@ -34,6 +34,9 @@ class TrackedInt:
     def finish(self):
         self.progressbar.finish()
 
+    def is_finished(self) -> bool:
+        return self.progressbar.finished()
+
     def get_value(self) -> int:
         return self._value
 
