@@ -6,7 +6,7 @@ import tempfile
 
 class SaveManager:
     @staticmethod
-    def as_valid_filename(name : str) -> str:
+    def to_valid_filename(name : str) -> str:
         name = name.strip()
         name = name.replace(' ', '_')
         name = sanitize_filename(name)

@@ -1,16 +1,16 @@
+import tempfile
 import uuid
 from abc import abstractmethod
 
 from holytools.configs import BaseConfigs, FileConfigs, PassConfigs
 from holytools.devtools import Unittest
-from holytools.fsys import SaveManager
 
 
 # ---------------------------------------------------------
 
 class Hider:
     class ConfigTest(Unittest):
-        configs_fpath = SaveManager.tmp_fpath()
+        configs_fpath = tempfile.mktemp()
 
         @classmethod
         def setUpClass(cls):
