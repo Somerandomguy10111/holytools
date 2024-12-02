@@ -20,7 +20,7 @@ class Hider:
             str_key, str_val = self.make_random_str(), self.make_random_str()
             self.configs.set(key=str_key, value=str_val)
 
-            new = PassConfigs()
+            new = self.get_configs()
             value = new.get(str_key)
             self.assertEqual(value, str_val)
 
