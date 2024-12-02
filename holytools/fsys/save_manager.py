@@ -6,10 +6,6 @@ import tempfile
 
 class SaveManager:
     @staticmethod
-    def get_tmp_fpath(suffix : str = '') -> str:
-        return tempfile.mktemp(suffix=suffix)
-
-    @staticmethod
     def as_valid_filename(name : str) -> str:
         name = name.strip()
         name = name.replace(' ', '_')
