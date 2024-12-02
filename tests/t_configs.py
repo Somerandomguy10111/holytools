@@ -10,10 +10,10 @@ from holytools.devtools import Unittest
 
 class Hider:
     class ConfigTest(Unittest):
-        configs_fpath = tempfile.mktemp()
 
         @classmethod
         def setUpClass(cls):
+            cls.configs_fpath : str = tempfile.mktemp()
             cls.configs = cls.get_configs()
 
         def test_set_get_key(self):
@@ -56,5 +56,5 @@ class FileConfigsTests(Hider.ConfigTest):
 
 
 if __name__ == '__main__':
-    # FileConfigsTests.execute_all()
-    Hider.PassConfigTests.execute_all()
+    FileConfigsTests.execute_all()
+    # Hider.PassConfigTests.execute_all()

@@ -71,12 +71,15 @@ class TestrunResult(TestResult):
         self.log_report(test, CaseStatus.SKIPPED)
 
     def log_report(self, test : CustomTestCase, status: CaseStatus, err : Optional[tuple] = None):
-        report = test.make_report(runtime=self.get_runtime(test), status=status)
-        self.case_reports.append(report)
+        if isinstance(test, CustomTestCase):
+            report = test.make_report(runtime=self.get_runtime(test), status=status)
+            self.case_reports.append(report)
 
-        conditional_err_msg = f'\n{self.get_err_details(err)}' if err and self.test_settings.show_details else ''
-        finish_log_msg = f'Status: {status.value}{conditional_err_msg}\n'
-        self.log(msg=finish_log_msg, level=status.get_log_level())
+            conditional_err_msg = f'\n{self.get_err_details(err)}' if err and self.test_settings.show_details else ''
+            finish_log_msg = f'Status: {status.value}{conditional_err_msg}\n'
+            self.log(msg=finish_log_msg, level=status.get_log_level())
+        else:
+            raise ValueError(f'Expected CustomTestCase, got {type(test)}')
 
 
     @staticmethod

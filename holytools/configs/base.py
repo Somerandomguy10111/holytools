@@ -28,7 +28,7 @@ class BaseConfigs(Loggable, ABC):
     # ---------------------------------------------------------
     # interface
 
-    def get(self, key : str, section : Optional[str] = None) -> Optional[str]:
+    def get(self, key : str, section : str = 'General') -> Optional[str]:
         if len(key.split()) > 1:
             raise ValueError(f'Key must not contain whitespaces, got : \"{key}\"')
 
@@ -40,7 +40,7 @@ class BaseConfigs(Loggable, ABC):
 
         return config_value
 
-    def set(self, key : str, value : str, section : Optional[str] = None):
+    def set(self, key : str, value : str, section : str = 'General'):
         if key in self._map:
             raise ValueError(f'Key \"{key}\" already exists in settings')
         if not section in self._map:
