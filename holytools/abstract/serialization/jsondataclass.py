@@ -54,19 +54,19 @@ class JsonDataclass(Serializable):
             origin = get_origin(dtype)
             if origin == list:
                 item_type = TypeAnalzer.get_inner_types(dtype)[0]
-                value = [make_instance(cls=item_type, s=x) for x in value]
+                restored_value = [make_instance(cls=item_type, s=x) for x in value]
             elif origin == tuple:
                 item_types = TypeAnalzer.get_inner_types(dtype)
                 print(f'item types = {item_types}')
-                value = tuple([make_instance(cls=item_type, s=x) for item_type, x in zip(item_types, value)])
+                restored_value = tuple([make_instance(cls=item_type, s=s) for item_type, s in zip(item_types, value)])
             elif origin == dict:
                 key_type, value_type = TypeAnalzer.get_inner_types(dtype)
                 key_list = [make_instance(cls=key_type, s=x) for x in value[0]]
                 value_list = [make_instance(cls=value_type, s=x) for x in value[1]]
-                value = {key: value for key, value in zip(key_list, value_list)}
+                restored_value = {key: value for key, value in zip(key_list, value_list)}
             else:
-                value = make_instance(cls=dtype, s=value)
-            init_dict[key] = value
+                restored_value = make_instance(cls=dtype, s=value)
+            init_dict[key] = restored_value
 
         return cls(**init_dict)
 
