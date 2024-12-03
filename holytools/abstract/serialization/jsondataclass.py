@@ -10,21 +10,21 @@ import orjson
 from dataclasses import dataclass
 from holytools.abstract.serialization.serializable import Serializable
 
-typecast_classes = ['Decimal', 'UUID', 'Path', 'Enum', 'str', 'int', 'float', 'bool']
-conversion_map = {
+castable_classes = ['Decimal', 'UUID', 'Path', 'Enum', 'str', 'int', 'float', 'bool']
+converters = {
     datetime: datetime.fromisoformat,
     date: date.fromisoformat,
     time: time.fromisoformat,
 }
-elementary_type_names : list[str] = typecast_classes + [cls.__name__ for cls in conversion_map.keys()]
+elementary_type_names : list[str] = castable_classes + [cls.__name__ for cls in converters.keys()]
 
 # -------------------------------------------
 
 @dataclass
 class JsonDataclass(Serializable):
-    """Can serialize following attributes:
+    """Can serialize dataclasses with following attributes:
     - Basic serializable types: holytools.abstract.Serializable, int, float, bool, str, int, Path, UUID, Decimal, datetime, date, time
-    - Lists or dicts of basic serializable types"""
+    - Lists, tuples or dicts of basic serializable types"""
     def __init__(self, *args, **kwargs):
         _, __ = args, kwargs
         if not dataclasses.is_dataclass(self):
@@ -54,14 +54,18 @@ class JsonDataclass(Serializable):
             origin = get_origin(dtype)
             if origin == list:
                 item_type = TypeAnalzer.get_inner_types(dtype)[0]
-                value = [make_instance(cls=item_type, value=x) for x in value]
+                value = [make_instance(cls=item_type, s=x) for x in value]
+            elif origin == tuple:
+                item_types = TypeAnalzer.get_inner_types(dtype)
+                print(f'item types = {item_types}')
+                value = tuple([make_instance(cls=item_type, s=x) for item_type, x in zip(item_types, value)])
             elif origin == dict:
                 key_type, value_type = TypeAnalzer.get_inner_types(dtype)
-                key_list = [make_instance(cls=key_type, value=x) for x in value[0]]
-                value_list = [make_instance(cls=value_type, value=x) for x in value[1]]
+                key_list = [make_instance(cls=key_type, s=x) for x in value[0]]
+                value_list = [make_instance(cls=value_type, s=x) for x in value[1]]
                 value = {key: value for key, value in zip(key_list, value_list)}
             else:
-                value = make_instance(cls=dtype, value=value)
+                value = make_instance(cls=dtype, s=value)
             init_dict[key] = value
 
         return cls(**init_dict)
@@ -78,22 +82,24 @@ def get_entry(obj):
         entry = (key_list, value_list)
     elif isinstance(obj, list):
         entry = [get_entry(x) for x in obj]
+    elif isinstance(obj, tuple):
+        entry = tuple([get_entry(x) for x in obj])
     else:
         entry = obj
     return entry
 
 
-def make_instance(cls, value : str):
-    if cls in conversion_map:
-        instance = conversion_map[cls](value)
-    elif cls.__name__ in typecast_classes:
-        instance = cls(value)
+def make_instance(cls, s : str):
+    if cls in converters:
+        instance = converters[cls](s)
+    elif cls.__name__ in castable_classes:
+        instance = cls(s)
     elif issubclass(cls, Enum):
-        instance =  cls(value)
+        instance =  cls(s)
     elif get_origin(cls) == dict:
-        instance = orjson.loads(value)
+        instance = orjson.loads(s)
     elif issubclass(cls, Serializable):
-        instance = cls.from_str(value)
+        instance = cls.from_str(s)
     else:
         raise TypeError(f'Unsupported type {cls}')
     return instance
