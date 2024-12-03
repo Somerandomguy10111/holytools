@@ -57,7 +57,6 @@ class JsonDataclass(Serializable):
                 restored_value = [make(cls=item_type, s=x) for x in value]
             elif origin == tuple:
                 item_types = TypeAnalzer.get_inner_types(dtype)
-                print(f'item types = {item_types}')
                 restored_value = tuple([make(cls=item_type, s=s) for item_type, s in zip(item_types, value)])
             elif origin == dict:
                 key_type, value_type = TypeAnalzer.get_inner_types(dtype)
