@@ -45,7 +45,7 @@ class JsonDataclass(Serializable):
         for key, value in json_dict.items():
             dtype = type_hints.get(key)
             if TypeAnalzer.is_optional(dtype) and value is None:
-                init_dict[key] = value
+                init_dict[key] = None
                 continue
             if dtype is None:
                 continue
@@ -54,18 +54,18 @@ class JsonDataclass(Serializable):
             origin = get_origin(dtype)
             if origin == list:
                 item_type = TypeAnalzer.get_inner_types(dtype)[0]
-                restored_value = [make_instance(cls=item_type, s=x) for x in value]
+                restored_value = [make(cls=item_type, s=x) for x in value]
             elif origin == tuple:
                 item_types = TypeAnalzer.get_inner_types(dtype)
                 print(f'item types = {item_types}')
-                restored_value = tuple([make_instance(cls=item_type, s=s) for item_type, s in zip(item_types, value)])
+                restored_value = tuple([make(cls=item_type, s=s) for item_type, s in zip(item_types, value)])
             elif origin == dict:
                 key_type, value_type = TypeAnalzer.get_inner_types(dtype)
-                key_list = [make_instance(cls=key_type, s=x) for x in value[0]]
-                value_list = [make_instance(cls=value_type, s=x) for x in value[1]]
+                key_list = [make(cls=key_type, s=x) for x in value[0]]
+                value_list = [make(cls=value_type, s=x) for x in value[1]]
                 restored_value = {key: value for key, value in zip(key_list, value_list)}
             else:
-                restored_value = make_instance(cls=dtype, s=value)
+                restored_value = make(cls=dtype, s=value)
             init_dict[key] = restored_value
 
         return cls(**init_dict)
@@ -89,7 +89,7 @@ def get_entry(obj):
     return entry
 
 
-def make_instance(cls, s : str):
+def make(cls, s : str):
     if cls in converters:
         instance = converters[cls](s)
     elif cls.__name__ in castable_classes:
@@ -137,4 +137,5 @@ class TypeAnalzer:
 
 
 if __name__ == "__main__":
-    pass
+    a = make(cls=float, s='4')
+    print(a)

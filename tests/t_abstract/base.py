@@ -83,6 +83,7 @@ class SerializationTest(Unittest):
             enum_field : ThisParticularEnum
             simple_data: SimpleDataclass
             float_list : list[float]
+            float_tuple: tuple[float, float, float]
             int_list : list[int]
             dataclass_list: list[SimpleDataclass]
             serializable_list : list[SerializableInt]
@@ -96,6 +97,7 @@ class SerializationTest(Unittest):
             date_field=test_date,
             time_field=test_time,
             float_list=[1.0, 2.0, 3.0],
+            float_tuple=(1.0, 2.0, 3.0),
             int_list=[1, 2, 3],
             dataclass_list=[SimpleDataclass.make_example(), SimpleDataclass.make_example()],
             serializable_list=[SerializableInt(), SerializableInt()],
