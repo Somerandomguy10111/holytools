@@ -83,6 +83,8 @@ def get_entry(obj):
         entry = [get_entry(x) for x in obj]
     elif isinstance(obj, tuple):
         entry = tuple([get_entry(x) for x in obj])
+    elif isinstance(obj, float) and obj != obj:
+        entry = 'nan'
     else:
         entry = obj
     return entry

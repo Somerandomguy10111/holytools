@@ -27,8 +27,9 @@ class TestPicklable(base.SerializationTest):
         from holytools.abstract.serialization import Picklable
         return Picklable
 
-      # pickle is unable to serialize the complex datacalss
+      # pickle is unable to serialize the complex dataclass
     def get_instance_and_cls(self) -> (SerializableType, type[SerializableType]):
+        print(f'Using simple dataclass for pickle serialization test')
         instance = base.SimpleDataclass.make_example()
         cls = base.SimpleDataclass
         return instance, cls

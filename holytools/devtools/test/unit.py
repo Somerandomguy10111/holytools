@@ -79,8 +79,30 @@ class Unittest(CustomTestCase):
             second_str = str(second).__repr__()
             if msg is None:
                 msg = (f'Tested expressions should match:'
-                       f'\nFirst : {first_str}'
-                       f'\nSecond: {second_str}')
+                       f'\nFirst : {first_str} ({type(first)})'
+                       f'\nSecond: {second_str} ({type(second)})')
+            raise AssertionError(msg)
+
+    def assertSame(self, first : object, second : object):
+        if isinstance(first, float) and isinstance(second, float):
+            self.assertSameFloat(first, second)
+        else:
+            self.assertEqual(first, second)
+
+
+    @staticmethod
+    def assertSameFloat(first : float, second : float, msg : Optional[str] = None):
+        if first != first:
+            same_float = second != second
+        else:
+            same_float = first == second
+        if not same_float:
+            first_str = str(first).__repr__()
+            second_str = str(second).__repr__()
+            if msg is None:
+                msg = (f'Tested floats should match:'
+                       f'\nFirst : {first_str} ({type(first)})'
+                       f'\nSecond: {second_str} ({type(second)})')
             raise AssertionError(msg)
 
 
@@ -117,18 +139,18 @@ class Unittest(CustomTestCase):
 
 
 
-    def assertRecursivelyEqual(self, first : dict, second : dict, msg : Optional[str] = None):
+    def assert_recursively_same(self, first : dict, second : dict, msg : Optional[str] = None):
         for key in first:
             first_obj = first[key]
             second_obj = second[key]
-            self.assertEqual(type(first_obj), type(second_obj))
+            self.assertSame(type(first_obj), type(second_obj))
             if isinstance(first_obj, dict):
-                self.assertRecursivelyEqual(first_obj, second_obj, msg=msg)
-            if isinstance(first_obj, list):
+                self.assert_recursively_same(first_obj, second_obj, msg=msg)
+            elif isinstance(first_obj, list):
                 for i in range(len(first_obj)):
-                    self.assertEqual(first_obj[i], second_obj[i])
+                    self.assertSame(first_obj[i], second_obj[i])
             else:
-                self.assertEqual(first[key], second[key])
+                self.assertSame(first_obj, second_obj)
 
     @staticmethod
     def patch_module(original: type | Callable, replacement: type | Callable):

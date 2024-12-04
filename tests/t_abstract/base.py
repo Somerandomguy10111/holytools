@@ -83,6 +83,7 @@ class SerializationTest(Unittest):
             enum_field : ThisParticularEnum
             simple_data: SimpleDataclass
             float_list : list[float]
+            nan_float_list : list[float]
             float_tuple: tuple[float, float, float]
             int_list : list[int]
             dataclass_list: list[SimpleDataclass]
@@ -98,6 +99,7 @@ class SerializationTest(Unittest):
             time_field=test_time,
             float_list=[1.0, 2.0, 3.0],
             float_tuple=(1.0, 2.0, 3.0),
+            nan_float_list=[float('nan'), float('nan')],
             int_list=[1, 2, 3],
             dataclass_list=[SimpleDataclass.make_example(), SimpleDataclass.make_example()],
             serializable_list=[SerializableInt(), SerializableInt()],
@@ -124,7 +126,7 @@ class SerializationTest(Unittest):
 
 
     def check_effectively_equal(self, obj1 : object, obj2 : object):
-        self.assertRecursivelyEqual(obj1.__dict__, obj2.__dict__)
+        self.assert_recursively_same(obj1.__dict__, obj2.__dict__)
 
     @classmethod
     @abstractmethod
