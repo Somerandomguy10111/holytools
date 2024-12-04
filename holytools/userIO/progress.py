@@ -9,9 +9,6 @@ from progressbar import ProgressBar
 # ---------------------------------------------------------
 
 class TrackedInt:
-    progressbar.streams.wrap_stderr()
-    progressbar.streams.wrap_stdout()
-
     def __init__(self, start_value : int, finish_value : int):
         if start_value >= finish_value:
             raise ValueError(f'Start value {start_value} must be less than finish value {finish_value}')
@@ -39,6 +36,14 @@ class TrackedInt:
 
     def get_value(self) -> int:
         return self._value
+
+    @classmethod
+    def wrap_output(cls):
+        progressbar.streams.wrap_stderr()
+        progressbar.streams.wrap_stdout()
+
+    # ------------------
+    # int operators
 
     def __iadd__(self, other):
         if not isinstance(other, int):
@@ -94,6 +99,8 @@ class TrackedInt:
 
     def __str__(self):
         return str(self._value)
+
+
 
 
 class TrackedCollection(Iterator):
