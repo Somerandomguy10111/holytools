@@ -1,6 +1,6 @@
 [project]
 name = "holytools"
-version = "0.9.7"
+version = "0.9.8"
 authors = [{name = "Daniel Hollarek", email = "daniel.hollarek@googlemail.com"}]
 description = "Collection of very general python utilities "
 readme = "readme.md"
