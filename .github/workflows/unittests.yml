@@ -6,6 +6,27 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
+      - name: Install pass
+        run: |
+          sudo apt-get update && sudo apt-get install pass -y
+          export PASSWORD_STORE_DIR=/tmp
+      - name: Install pass and initialize with GPG
+        run: |
+          cat > gen-key-script << EOF
+          Key-Type: 1
+          Key-Length: 2048
+          Subkey-Type: 1
+          Subkey-Length: 2048
+          Name-Real: Root Superuser
+          Name-Email: root@githubactions.com
+          Expire-Date: 0
+          %no-protection
+          EOF
+          
+          gpg_id=$(gpg --batch --generate-key gen-key-script 2>&1 | grep -oP 'key \K[A-F0-9]{16}')
+          echo "Generated GPG Key ID: $gpg_id"
+          pass init $gpg_id
+
       - uses: Somerandomguy10111/actions/toxtests@main
         with:
           python-version: '3.11'
