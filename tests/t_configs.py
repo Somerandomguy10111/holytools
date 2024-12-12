@@ -57,4 +57,4 @@ class FileConfigsTests(Hider.ConfigTest):
 
 if __name__ == '__main__':
     FileConfigsTests.execute_all()
-    # Hider.PassConfigTests.execute_all()
+    Hider.PassConfigTests.execute_all()
