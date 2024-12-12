@@ -27,7 +27,7 @@ jobs:
           echo "Generated key script"
       - name: Initialize pass
         run: |
-          gpg --batch --generate-key gen-key-script 2>&1 | grep -oP 'key \K[A-F0-9]{16}'
+          gpg --batch --generate-key gen-key-script
           gpg_id=$(gpg --list-keys --with-colons | awk -F: '/pub/{print $5}')
           echo "Gpg id = $gpg_id"
           echo "Generated GPG Key ID: $gpg_id"
