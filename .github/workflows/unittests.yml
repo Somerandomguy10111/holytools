@@ -11,8 +11,7 @@ jobs:
           echo "set man-db/auto-update false" | sudo debconf-communicate; sudo dpkg-reconfigure man-db
           sudo apt-get install pass -y
           sudo apt-get install gnupg -y
-          PASSWORD_STORE_DIR="/tmp"
-          export PASSWORD_STORE_DIR
+          echo "PASSWORD_STORE_DIR=/tmp" | sudo tee -a /etc/environment > /dev/null
       - name: Generate key script
         run: |
           cat > gen-key-script << EOF
@@ -33,6 +32,7 @@ jobs:
           echo "Gpg id = $gpg_id"
           echo "Generated GPG Key ID: $gpg_id"
           pass init $gpg_id
+          echo "Password store dir = $PASSWORD_STORE_DIR"
 
       - uses: Somerandomguy10111/actions/toxtests@main
         with:
