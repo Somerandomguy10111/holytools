@@ -6,10 +6,11 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - name: Install pass
+      - name: Install pass and gpg
         run: |
           echo "set man-db/auto-update false" | sudo debconf-communicate; sudo dpkg-reconfigure man-db
           sudo apt-get install pass -y
+          sudo apt-get install gnupg -y
           export PASSWORD_STORE_DIR=/tmp
       - name: Generate key script
         run: |
