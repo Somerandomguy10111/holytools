@@ -14,6 +14,10 @@ class Hider:
             self.configs_fpath : str = tempfile.mktemp()
             self.configs = self.get_configs()
 
+            if isinstance(self.configs, PassConfigs):
+                if not self.is_manual_mode:
+                    self.skipTest(reason=f'PassConfigs requires pass to be setup and installed')
+
         def test_set_get(self):
             key, value = self.make_random_str(), self.make_random_str()
             self.configs.set(key=key, value=value)

@@ -5,11 +5,7 @@ on: [push]
 jobs:
   test:
     runs-on: ubuntu-latest
-    env:
-      PASSWORD_STORE_DIR: /tmp
     steps:
-      - name: Install pass
-        run: sudo apt-get update && sudo apt-get install pass -y
       - uses: Somerandomguy10111/actions/toxtests@main
         with:
           python-version: '3.11'
