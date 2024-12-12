@@ -10,7 +10,7 @@ jobs:
         run: |
           sudo apt-get update && sudo apt-get install pass -y
           export PASSWORD_STORE_DIR=/tmp
-      - name: Install pass and initialize with GPG
+      - name: Generate key script
         run: |
           cat > gen-key-script << EOF
           Key-Type: 1
@@ -22,10 +22,12 @@ jobs:
           Expire-Date: 0
           %no-protection
           EOF
-          
+          echo "Generated key script"
+      - name: Initialize pass
+        run: |
           gpg_id=$(gpg --batch --generate-key gen-key-script 2>&1 | grep -oP 'key \K[A-F0-9]{16}')
-          echo "Generated GPG Key ID: $gpg_id"
-          pass init $gpg_id
+                    echo "Generated GPG Key ID: $gpg_id"
+                    pass init $gpg_id
 
       - uses: Somerandomguy10111/actions/toxtests@main
         with:
