@@ -8,7 +8,7 @@ jobs:
     steps:
       - name: Install pass
         run: |
-          sudo apt-get update && sudo apt-get install pass -y
+          sudo apt-get install pass -y
           export PASSWORD_STORE_DIR=/tmp
       - name: Generate key script
         run: |
