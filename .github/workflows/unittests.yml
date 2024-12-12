@@ -8,8 +8,7 @@ jobs:
     steps:
       - name: Install pass
         run: |
-          sudo debconf-set man-db/auto-update false
-          sudo rm /var/lib/man-db/auto-update
+          echo "set man-db/auto-update false" | debconf-communicate; dpkg-reconfigure man-db
           sudo apt-get install pass -y
           export PASSWORD_STORE_DIR=/tmp
       - name: Generate key script
