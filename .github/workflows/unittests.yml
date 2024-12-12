@@ -6,7 +6,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     env:
-      PASSWORD_STORE_DIR: ${{ runner.temp }}/pass-store
+      PASSWORD_STORE_DIR: /tmp
     steps:
       - name: Install pass
         run: sudo apt-get update && sudo apt-get install pass -y
