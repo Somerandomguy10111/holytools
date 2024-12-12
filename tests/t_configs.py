@@ -10,26 +10,26 @@ from holytools.devtools import Unittest
 
 class Hider:
     class ConfigTest(Unittest):
+        def setUp(self):
+            self.configs_fpath : str = tempfile.mktemp()
+            self.configs = self.get_configs()
 
-        @classmethod
-        def setUpClass(cls):
-            cls.configs_fpath : str = tempfile.mktemp()
-            cls.configs = cls.get_configs()
+        def test_set_get(self):
+            key, value = self.make_random_str(), self.make_random_str()
+            self.configs.set(key=key, value=value)
 
-        def test_set_get_key(self):
-            str_key, str_val = self.make_random_str(), self.make_random_str()
-            self.configs.set(key=str_key, value=str_val)
+            new_configs = self.get_configs()
+            new_value = new_configs.get(key)
+            self.assertEqual(new_value, value)
 
-            new = self.get_configs()
-            value = new.get(str_key)
-            self.assertEqual(value, str_val)
-
-        def test_section_set_get(self):
+        def test_set_get_section(self):
             section = self.make_random_str()
             key, value = self.make_random_str(), self.make_random_str()
             self.configs.set(key=key, value=value, section=section)
-            value = self.configs.get(key=key, section=section)
-            self.assertEqual(value, value)
+
+            new_configs = self.get_configs()
+            new_value = new_configs.get(key)
+            self.assertEqual(new_value, value)
 
         # ---------------------------------------------------------
 
@@ -37,24 +37,20 @@ class Hider:
         def make_random_str() -> str:
             return str(uuid.uuid4())
 
-        @classmethod
         @abstractmethod
-        def get_configs(cls) -> BaseConfigs:
+        def get_configs(self) -> BaseConfigs:
             pass
 
 
-    class PassConfigTests(ConfigTest):
-        @classmethod
-        def get_configs(cls) -> BaseConfigs:
-            return PassConfigs()
-
+class PassConfigTests(Hider.ConfigTest):
+    def get_configs(self) -> BaseConfigs:
+        return PassConfigs()
 
 class FileConfigsTests(Hider.ConfigTest):
-    @classmethod
-    def get_configs(cls) -> BaseConfigs:
-        return FileConfigs(fpath=cls.configs_fpath)
+    def get_configs(self) -> BaseConfigs:
+        return FileConfigs(fpath=self.configs_fpath)
 
 
 if __name__ == '__main__':
     FileConfigsTests.execute_all()
-    Hider.PassConfigTests.execute_all()
+    PassConfigTests.execute_all()

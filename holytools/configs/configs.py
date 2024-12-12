@@ -78,18 +78,18 @@ class PassConfigs(BaseConfigs):
 
     def _update_resource(self, key : str, value : str, section : Optional[str] = None):
         insert_command = f"echo \"{value}\" | pass insert --echo {key}"
-        self.try_run_cmd(cmd=insert_command)
+        self._try_run_cmd(cmd=insert_command)
 
     def _retrieve_map(self) -> DictType:
         keys = self.get_toplevel_keys()
         config_map = {None : {}}
         for k in keys:
-            config_map[None][k] = self.try_run_cmd(f'pass {k}')
+            config_map[None][k] = self._try_run_cmd(f'pass {k}')
         return config_map
 
     # ---------------------------------------------------------
 
-    def try_run_cmd(self, cmd : str) -> Optional[str]:
+    def _try_run_cmd(self, cmd : str) -> Optional[str]:
         try:
             result = subprocess.run(cmd, text=True, capture_output=True, check=True, shell=True)
             return result.stdout.strip()
