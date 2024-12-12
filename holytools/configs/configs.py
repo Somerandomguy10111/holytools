@@ -63,7 +63,10 @@ class FileConfigs(BaseConfigs):
 
 class PassConfigs(BaseConfigs):
     def __init__(self):
-        self._pass_dirpath : str = self._as_abspath(path=os.environ['PASSWORD_STORE_DIR'])
+        if 'PASSWORD_STORE_DIR' in os.environ:
+            self._pass_dirpath: str = self._as_abspath(path=os.environ['PASSWORD_STORE_DIR'])
+        else:
+            self._pass_dirpath = os.path.expanduser(f'~/.password-store')
         super().__init__()
 
     def _populate_map(self) -> DictType:

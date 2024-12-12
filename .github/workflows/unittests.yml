@@ -11,7 +11,6 @@ jobs:
           echo "set man-db/auto-update false" | sudo debconf-communicate; sudo dpkg-reconfigure man-db
           sudo apt-get install pass -y
           sudo apt-get install gnupg -y
-          echo 'export PASSWORD_STORE_DIR=/tmp' >> ~/.bashrc
       - name: Generate key script
         run: |
           cat > gen-key-script << EOF
