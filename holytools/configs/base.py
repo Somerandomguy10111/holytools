@@ -13,10 +13,11 @@ DictType = TypeVar(name='DictType', bound=dict)
 class BaseConfigs(Loggable, ABC):
     def __init__(self, *args, **kwargs):
         super().__init__()
-        self._map : DictType = self._retrieve_map()
+        self._map = {None : {}}
+        self._populate_map()
 
     @abstractmethod
-    def _retrieve_map(self) -> DictType:
+    def _populate_map(self):
         pass
 
     @staticmethod
@@ -31,7 +32,6 @@ class BaseConfigs(Loggable, ABC):
     def get(self, key : str, section : Optional[str] = None) -> Optional[str]:
         if len(key.split()) > 1:
             raise ValueError(f'Key must not contain whitespaces, got : \"{key}\"')
-
         try:
             config_value = self._map[section][key]
         except KeyError:
@@ -47,11 +47,13 @@ class BaseConfigs(Loggable, ABC):
         if key in section:
             raise ValueError(f'Key \"{key}\" already exists in settings')
         section[key] = value
-        self._update_resource(key=key, value=str(value), section=section)
+        self._update_resource()
 
+    def get_sectionless_map(self) -> dict[str, str]:
+        return self._map[None]
 
     @abstractmethod
-    def _update_resource(self, key : str, value : str, section : Optional[str] = None):
+    def _update_resource(self):
         pass
 
 

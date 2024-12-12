@@ -28,7 +28,7 @@ class Hider:
             self.configs.set(key=key, value=value, section=section)
 
             new_configs = self.get_configs()
-            new_value = new_configs.get(key)
+            new_value = new_configs.get(key, section=section)
             self.assertEqual(new_value, value)
 
         # ---------------------------------------------------------
