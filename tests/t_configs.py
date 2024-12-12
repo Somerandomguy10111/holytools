@@ -23,6 +23,9 @@ class Hider:
             self.assertEqual(new_value, value)
 
         def test_set_get_section(self):
+            if isinstance(self.configs, PassConfigs):
+                self.skipTest(reason=f'PassConfigs doesnt support sections')
+
             section = self.make_random_str()
             key, value = self.make_random_str(), self.make_random_str()
             self.configs.set(key=key, value=value, section=section)
