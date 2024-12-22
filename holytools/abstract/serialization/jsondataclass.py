@@ -37,9 +37,10 @@ class JsonDataclass(Serializable):
 
     @classmethod
     def from_str(cls, json_str: str):
-        json_dict = orjson.loads(json_str)
         if not dataclasses.is_dataclass(cls):
             raise TypeError(f'{cls} is not a dataclass. from_json can only be used with dataclasses')
+
+        json_dict = orjson.loads(json_str)
         type_hints = get_type_hints(cls)
         init_dict = {}
         for key, value in json_dict.items():

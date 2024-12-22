@@ -33,7 +33,7 @@ def log_execution(func):
         end_time = time.time()
         timestamp_end = get_timestamp(time_only=True)
         elapsed_time_ms = (end_time - start_time) * 1000
-        print(f"-[{timestamp_end}]: Finished \"{func.__name__}\" (Time taken: {elapsed_time_ms:.2f} ms)\n")
+        print(f"-[{timestamp_end}]: Finished \"{func.__name__}\" (Time taken: {elapsed_time_ms:.2f} ms)")
 
         return result
 
