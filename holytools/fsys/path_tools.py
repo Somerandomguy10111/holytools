@@ -4,7 +4,7 @@ from typing import Optional
 from pathvalidate import sanitize_filename
 
 
-class SaveManager:
+class PathTools:
     @staticmethod
     def to_valid_filename(name : str) -> str:
         name = name.strip()
@@ -37,21 +37,3 @@ class SaveManager:
             return parts[-1]
         else:
             return None
-
-    @staticmethod
-    def get_free_path(save_dirpath: str, name: str, suffix: Optional[str] = None, start_index: int = 1) -> str:
-        if suffix:
-            if not suffix.startswith('.'):
-                suffix = f'.{suffix}'
-
-        def get_path(index: int = start_index):
-            conditional_suffix = '' if suffix is None else f'{suffix}'
-            conditional_index = f'_{index}' if not index is None else ''
-            return os.path.join(save_dirpath, f'{name}{conditional_index}{conditional_suffix}')
-
-        fpath = get_path()
-        current_index = 0
-        while os.path.isfile(path=fpath) or os.path.isdir(fpath):
-            current_index += 1
-            fpath = get_path(index=current_index)
-        return fpath

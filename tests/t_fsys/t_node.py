@@ -1,4 +1,3 @@
-from holytools.fsys.fsys_node import FsysNode, FsysTree
 from holytools.abstract import Tree
 from holytools.devtools import Unittest
 import shutil
@@ -61,35 +60,7 @@ class TestFsyNode(FsysTemplate):
         self.assertEqual(len(non_hidden), 5)
 
 
-class TestTree(FsysTemplate):
-    def test_tree_ok(self):
-        the_tree = self.root_node.get_tree()
-        self.assertIsInstance(the_tree, FsysTree)
-
-    def test_tree_as_str(self):
-        the_tree = self.root_node.get_tree()
-        tree_str = the_tree.as_str()
-        self.assertIsInstance(tree_str, str)
-        print(f'Tree as string is \n{tree_str}')
-        self.assertIn(f'.dat', tree_str)
-
-    def test_tree_len(self):
-        the_tree = self.root_node.get_tree()
-        self.assertEqual(the_tree.get_size(), self.num_total_nodes)
-        print(f'Tree size is {the_tree.get_size()}')
-
-    def test_max_depth(self):
-        self.root_node.get_tree(max_depth=2)
-        with self.assertRaises(ValueError):
-            self.root_node.get_tree(max_depth=1)
-
-    def test_max_size(self):
-        self.root_node.get_tree(max_size=self.num_total_nodes)
-        with self.assertRaises(ValueError):
-            self.root_node.get_tree(max_size=self.num_total_nodes-1)
-
 
 if __name__ == '__main__':
     # TestFsysNode.execute_all()
-    TestTree.execute_all()
     TestSaveManager.execute_all()

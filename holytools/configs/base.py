@@ -2,11 +2,10 @@ from __future__ import annotations
 
 import os
 from abc import abstractmethod, ABC
-from typing import TypeVar, Optional
+from typing import Optional
 
 from holytools.logging import Loggable, LogLevel
 
-DictType = TypeVar(name='DictType', bound=dict)
 
 # ---------------------------------------------------------
 
@@ -30,8 +29,6 @@ class BaseConfigs(Loggable, ABC):
     # interface
 
     def get(self, key : str, section : Optional[str] = None) -> Optional[str]:
-        if len(key.split()) > 1:
-            raise ValueError(f'Key must not contain whitespaces, got : \"{key}\"')
         try:
             config_value = self._map[section][key]
         except KeyError:
@@ -43,13 +40,13 @@ class BaseConfigs(Loggable, ABC):
     def set(self, key : str, value : str, section : Optional[str] = None):
         if not section in self._map:
             self._map[section] = {}
-        section = self._map[section]
-        if key in section:
+        if key in self._map[section]:
             raise ValueError(f'Key \"{key}\" already exists in settings')
-        section[key] = value
+
+        self._map[section][key] = value
         self._update_resource()
 
-    def get_sectionless_map(self) -> dict[str, str]:
+    def get_general_section(self) -> dict[str, str]:
         return self._map[None]
 
     @abstractmethod

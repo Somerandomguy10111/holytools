@@ -2,7 +2,7 @@ import os.path
 import subprocess
 from typing import Optional
 
-from holytools.configs.base import BaseConfigs, DictType
+from holytools.configs.base import BaseConfigs
 from holytools.logging import LogLevel
 
 # ---------------------------------------------------------
@@ -44,16 +44,16 @@ class FileConfigs(BaseConfigs):
         self._map[current_section][key] = value
 
     def _update_resource(self):
-        general_dict = {k:v for k,v in self._map[None].items()}
-        other_dicts = {k:v for k,v in self._map.items() if not k is None}
+        general_section = {k:v for k,v in self._map[None].items()}
+        other_sections = {k:v for k,v in self._map.items() if not k is None}
 
         config_content = ''
-        for k,v in general_dict.items():
+        for k,v in general_section.items():
             config_content += f'{k} = {v}\n'
 
-        for k,v in other_dicts.items():
-            config_content += f'\n[{k}]\n'
-            for subkey, subval in v.items():
+        for section_name, section_map  in other_sections.items():
+            config_content += f'\n[{section_name}]\n'
+            for subkey, subval in section_map.items():
                 config_content += f'{subkey} = {subval}\n'
 
         print(f'Writing to file: {self._config_fpath}')
@@ -69,14 +69,14 @@ class PassConfigs(BaseConfigs):
             self._pass_dirpath = os.path.expanduser(f'~/.password-store')
         super().__init__()
 
-    def _populate_map(self) -> DictType:
+    def _populate_map(self):
         keys = self._get_toplevel_keys()
         for k in keys:
             self._map[None][k] = self._try_run_cmd(f'pass {k}')
 
     def _update_resource(self):
         existing_keys = os.listdir(path=self._pass_dirpath)
-        sectionless_map = self.get_sectionless_map()
+        sectionless_map = self.get_general_section()
         missing_keys = [k for k in sectionless_map if k not in existing_keys]
         for k in missing_keys:
             value = sectionless_map[k]
