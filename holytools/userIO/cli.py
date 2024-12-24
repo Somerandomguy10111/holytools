@@ -4,7 +4,7 @@ from holytools.logging import Loggable, LogLevel
 # ---------------------------------------------------------
 
 
-class InteractiveCLI(Loggable):
+class CLI(Loggable):
     _exit_str = 'q'
 
     def __init__(self, cls : type, description : str = ''):
@@ -30,8 +30,7 @@ class InteractiveCLI(Loggable):
     def _create_object(self):
         self.log(f'Initializing object {self.cls.__name__}:')
         try:
-            init_method = self.__init__
-            init_kwargs = self._get_args_dict(mthd=init_method)
+            init_kwargs = self._get_args_dict(mthd=self.cls.__init__)
             return self.cls(**init_kwargs)
         except Exception as e:
             self.log(f"Error initializing {self.cls.__name__}: {e}. Please try again\n")
@@ -92,6 +91,7 @@ class InteractiveCLI(Loggable):
         spec = inspect.getfullargspec(mthd)
         annotations = spec.annotations
         for arg_name in spec.args[1:]:
+            print(f'argname = {arg_name}')
             arg_type = annotations.get(arg_name, str)
             self.log(f"Enter value for \"{mthd.__name__}\" argument \"{arg_name}\" ({arg_type.__name__}): ")
             user_input = input()
@@ -111,3 +111,8 @@ class InteractiveCLI(Loggable):
             except ValueError:
                 raise ValueError(f"Invalid input type for '{arg_name}'. Expected a value of type {arg_type.__name__}.")
         return val
+
+
+
+if __name__ == "__main__":
+    pass
