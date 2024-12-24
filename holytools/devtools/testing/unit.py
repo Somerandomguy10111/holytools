@@ -6,8 +6,8 @@ from typing import Optional, Callable
 import unittest.mock
 from logging import Logger
 from holytools.logging import LoggerFactory
-from .custom_testcase import CustomTestCase
-from .testrun_result import TestrunResult, DisplayOptions
+from .testcase import CustomTestCase
+from .testrun import TestrunResult, DisplayOptions
 
 # ---------------------------------------------------------
 

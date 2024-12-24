@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from typing import Optional
 from unittest import TestCase, TestResult
 import logging
-from .custom_testcase import CaseReport, CaseStatus, CustomTestCase
+from .testcase import CaseReport, CaseStatus, CustomTestCase
 
 # ---------------------------------------------------------
 

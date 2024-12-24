@@ -95,12 +95,12 @@ class CLI(Loggable):
             arg_type = annotations.get(arg_name, str)
             self.log(f"Enter value for \"{mthd.__name__}\" argument \"{arg_name}\" ({arg_type.__name__}): ")
             user_input = input()
-            args_dict[arg_name] = self.get_value(user_input=user_input, arg_type=arg_type, arg_name=arg_name)
+            args_dict[arg_name] = self._get_value(user_input=user_input, arg_type=arg_type, arg_name=arg_name)
         return args_dict
 
 
     @staticmethod
-    def get_value(user_input : str, arg_type : type, arg_name : str):
+    def _get_value(user_input : str, arg_type : type, arg_name : str):
         if arg_type == bool:
             if user_input not in ['0', '1']:
                 raise ValueError(f"For argument '{arg_name}', please enter '0' for False or '1' for True.")
