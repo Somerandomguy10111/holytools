@@ -44,8 +44,9 @@ class TimedScope:
         self.on_exit()
 
 class Profiler:
-    def __init__(self):
+    def __init__(self, print_on_exit : bool = False):
         self._execution_profiles : dict[str, ExecutionProfile] = {}
+        self.print_on_exit : bool = print_on_exit
 
     def make_report(self, section_name : str = f'Routine', print_average_times=True, print_num_calls=True):
         headers = [section_name, "Total Time (s)"]
@@ -71,6 +72,10 @@ class Profiler:
         on_exit = print_report if print_on_exit else lambda *args, **kwargs : None
         return TimedScope(name=name,storage=self._execution_profiles,on_exit=on_exit)
 
+
+    def __del__(self):
+        if self.print_on_exit:
+            print(self.make_report())
 
     @staticmethod
     def measure(self, func):
