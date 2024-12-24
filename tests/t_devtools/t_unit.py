@@ -1,6 +1,6 @@
 from holytools.devtools import Unittest
 from tests.t_devtools.t_inspection import TestOptionalTyping
-from holytools.file import File
+from holytools.fileIO import File
 import os
 
 # -------------------------------------------

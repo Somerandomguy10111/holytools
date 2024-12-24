@@ -1,4 +1,4 @@
-from holytools.file import BinaryFile, PlaintextFile, ImageFile, ImageConverter, ImageFormat, FileMock, ImageSerializer
+from holytools.fileIO import BinaryFile, PlaintextFile, ImageFile, ImageConverter, ImageFormat, FileMock, ImageSerializer
 from holytools.devtools import Unittest
 from holytools.fsys import FsysNode
 from PIL.Image import Image

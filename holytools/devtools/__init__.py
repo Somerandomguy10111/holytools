@@ -1,3 +1,3 @@
-from .test import *
+from .testing import *
 from .inspection import *
 from .profiling import *
