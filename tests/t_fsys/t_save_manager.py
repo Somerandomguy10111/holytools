@@ -1,4 +1,3 @@
-import os
 import tempfile
 
 from holytools.devtools import Unittest
