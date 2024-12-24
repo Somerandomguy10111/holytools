@@ -9,6 +9,6 @@ dependencies = ["requests", "func_timeout", "selenium", "pathvalidate", "psutil"
 urls = { "repository" = "https://github.com/Somerandomguy10111/holytools" }
 
 [tool.setuptools.package-data]
-"holytools.file.mock" = ["*"]
+"holytools.fileIO.mock" = ["*"]
 
 
