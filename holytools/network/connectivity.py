@@ -60,5 +60,13 @@ class ConnectivityTester:
         return subprocess.call(command, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, shell=True) == 0
 
 if __name__ == "__main__":
-    tester = ConnectivityTester(remote_name=f'music.youtube.com')
-    tester.check_connectivity(max_duration=3600)
+    tester = ConnectivityTester(remote_name=f'music.youtube.com', remote_ip_addr='216.58.212.174')
+    tester.check_connectivity(max_duration=60)
+
+    geeksforgeeks = ('www.geeksforgeeks.com', '199.59.243.227')
+    tester2 = ConnectivityTester(remote_name=geeksforgeeks[0], remote_ip_addr=geeksforgeeks[1])
+    tester2.check_connectivity(max_duration=60)
+
+    ibm = ('www.ibm.com', '23.37.59.85')
+    tester3 = ConnectivityTester(remote_name=ibm[0], remote_ip_addr=ibm[1])
+    tester3.check_connectivity(max_duration=60)
