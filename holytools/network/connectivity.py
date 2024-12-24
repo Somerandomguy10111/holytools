@@ -1,6 +1,5 @@
 import subprocess  # For executing a shell command
 import time
-
 import tabulate
 
 
