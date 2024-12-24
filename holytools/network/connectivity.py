@@ -11,7 +11,7 @@ class ConnectivityTester:
         self.remote_ip_addr : str = remote_ip_addr
         self.remote_name : str = remote_name
 
-    def check_connectivity(self, max_duration : int = 30):
+    def check_connectivity(self, max_duration : int = 30, verbose : bool = False):
         hosts = [self.remote_ip_addr, self.remote_name]
         ping_timeout = 1
         poll_duration = ping_timeout*len(hosts)
@@ -22,6 +22,7 @@ class ConnectivityTester:
             ping_results[h] = []
             latencies[h] = []
 
+        print(f'Launching connectivity tests for {self.remote_name} = {self.remote_ip_addr}...')
         start_time = time.time()
         while time.time() - start_time < max_duration:
             for h in hosts:
@@ -33,13 +34,16 @@ class ConnectivityTester:
                 if remaining_time > 0:
                     time.sleep(remaining_time)
 
+            if not verbose:
+                continue
+
             print(f'\nConnectivity results on {int(time.time() - start_time)}/{max_duration} seconds:')
             for h in hosts:
                 ip_reachibility, latency = ping_results[h][-1], latencies[h][-1]
                 msg = f'✓ (Latency: {latency*1000} ms)' if ip_reachibility else f'✗ (Timeout after {ping_timeout*1000}ms)'
                 print(f'    - Connection to {h:<20} {msg}')
 
-        print(f'\nSummary of connectivity results:')
+        print(f'Summary of connectivity results:')
         table_data = []
         for h in hosts:
             polled_duration = poll_duration*len(ping_results[h])
@@ -50,6 +54,7 @@ class ConnectivityTester:
             table_data.append(row)
         col_headers = ['Host', 'Uptime', 'Average latency']
         print(tabulate.tabulate(tabular_data=table_data, headers=col_headers, tablefmt='psql'))
+        print()
 
     @staticmethod
     def is_ping_reachable(timeout : int, host : str) -> bool:
@@ -60,7 +65,7 @@ class ConnectivityTester:
         return subprocess.call(command, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, shell=True) == 0
 
 if __name__ == "__main__":
-    tester = ConnectivityTester(remote_name=f'music.youtube.com', remote_ip_addr='216.58.212.174')
+    tester = ConnectivityTester(remote_name=f'music.youtube.com', remote_ip_addr='142.250.184.238')
     tester.check_connectivity(max_duration=60)
 
     geeksforgeeks = ('www.geeksforgeeks.com', '199.59.243.227')
