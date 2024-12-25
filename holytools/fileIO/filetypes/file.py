@@ -20,12 +20,12 @@ class File(ABC):
         if require_executable:
             required_permissions.add(Access.EXECUTABLE)
 
-        actual_permissions = {access for access in required_permissions if self.has_permission(access=access)}
-        missing_permissions = required_permissions - actual_permissions
+        missing_permissions = [access for access in required_permissions if not self.has_permission(access=access)]
         if missing_permissions:
             raise PermissionError(f'File {fpath} does not have required permissions: {missing_permissions}')
 
-        self.check_format_ok()
+        if self.exists_on_disk():
+            self.check_is_ok()
 
     def has_permission(self, access : Access) -> bool:
         if os.path.isdir(self.fpath):
@@ -36,7 +36,8 @@ class File(ABC):
             parent_directory = os.path.dirname(self.fpath)
             return os.access(parent_directory, access.value) if parent_directory else False
 
-    def check_format_ok(self):
+    @abstractmethod
+    def check_is_ok(self):
         pass
 
     @abstractmethod
@@ -49,13 +50,7 @@ class File(ABC):
 
     @abstractmethod
     def view(self):
-        print(f'Displaying content of file \"{self.fpath}\":')
-        print('-'*20)
-
-    def get_suffix(self) -> Optional[str]:
-        parts = self.fpath.split('.')
-        suffix = parts[-1] if len(parts) > 1 else None
-        return suffix
+        pass
 
     def as_bytes(self):
         with open(self.fpath, 'rb') as file:
@@ -68,3 +63,10 @@ class File(ABC):
 
     def exists_on_disk(self) -> bool:
         return os.path.isfile(self.fpath)
+
+    # ------------------------------------------------------
+
+    def _get_suffix(self) -> Optional[str]:
+        parts = self.fpath.split('.')
+        suffix = parts[-1] if len(parts) > 1 else None
+        return suffix

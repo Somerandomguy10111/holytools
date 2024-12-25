@@ -1,13 +1,13 @@
 from __future__ import annotations
-from PIL.Image import Image
-import PIL.Image as ImgHandler
-import base64
 
+import base64
 from enum import Enum
 from io import BytesIO
 from typing import Optional
-from .file import File
-# ---------------------------------------------------------
+
+from PIL import Image
+import PIL.Image as ImgHandler
+
 
 class ImageFormat(Enum):
     PNG = 'PNG'
@@ -29,7 +29,7 @@ class ImageFormat(Enum):
     def __str__(self):
         return self.value
 
-class ImageConverter:
+class ImageFormatConverter:
     @classmethod
     def convert(cls, image: Image, target_format : ImageFormat) -> Image:
         if not image.format:
@@ -90,7 +90,7 @@ class ImageConverter:
         return ImageFormat.as_list()
 
 
-class ImageSerializer:
+class ImageSerialization:
     @classmethod
     def as_bytes(cls, image: Image, img_format : Optional[ImageFormat] = None) -> bytes:
         if not img_format:
@@ -122,23 +122,3 @@ class ImageSerializer:
         byte_content = cls.as_bytes(image=image, img_format=img_format)
         base64_content = base64.b64encode(byte_content).decode('utf-8')
         return base64_content
-
-
-class ImageFile(File):
-    def check_format_ok(self) -> bool:
-        if not self.get_suffix() in ImageFormat.as_list():
-            if self.get_suffix():
-                raise TypeError(f'Path \"{self.fpath}\" indicates unsupported image format: \"{self.get_suffix()}\"')
-            else:
-                raise TypeError(f'Path \"{self.fpath}\" must end in image suffix: {ImageFormat.as_list()}')
-        return True
-
-    def read(self) -> Image:
-        return ImgHandler.open(self.fpath)
-
-    def write(self, image: Image):
-        image.save(self.fpath)
-
-    def view(self):
-        with self.read() as image:
-            image.show()
