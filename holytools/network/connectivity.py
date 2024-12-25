@@ -1,3 +1,4 @@
+import datetime
 import subprocess  # For executing a shell command
 import time
 import tabulate
@@ -21,7 +22,9 @@ class ConnectivityTester:
             ping_results[h] = []
             latencies[h] = []
 
-        print(f'Launching connectivity tests for {self.remote_name} = {self.remote_ip_addr}...')
+        print(f'Launching connectivity tests for {self.remote_name} = {self.remote_ip_addr}. '
+              f'\n  - Duration = {max_duration}s'
+              f'\n  - Timeout = {ping_timeout}s')
         start_time = time.time()
         while time.time() - start_time < max_duration:
             for h in hosts:
@@ -36,11 +39,14 @@ class ConnectivityTester:
             if not verbose:
                 continue
 
-            print(f'\nConnectivity results on {int(time.time() - start_time)}/{max_duration} seconds:')
+            timestamp = datetime.datetime.now()
+            timestamp = timestamp.replace(microsecond=0)
+            result_msg = f'Success' if all(ping_results[h][-1] for h in hosts) else 'Failure'
+            print(f'\nConnectivity results on {timestamp}: {result_msg}')
             for h in hosts:
                 ip_reachibility, latency = ping_results[h][-1], latencies[h][-1]
-                msg = f'✓ (Latency: {latency*1000} ms)' if ip_reachibility else f'✗ (Timeout after {ping_timeout*1000}ms)'
-                print(f'    - Connection to {h:<20} {msg}')
+                msg = f'✓ | Latency: {round(latency*1000)} ms' if ip_reachibility else f'✗ (Timeout after {ping_timeout*1000}ms)'
+                print(f'    - Connection to {h:<16} {msg}')
 
         print(f'Summary of connectivity results:')
         table_data = []
@@ -64,14 +70,23 @@ class ConnectivityTester:
         return subprocess.call(command, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, shell=True) == 0
 
 if __name__ == "__main__":
-    duration = 10
-    tester = ConnectivityTester(remote_name=f'music.youtube.com', remote_ip_addr='142.250.184.238')
-    tester.check_connectivity(max_duration=duration)
+    import argparse
 
-    geeksforgeeks = ('www.geeksforgeeks.com', '199.59.243.227')
-    tester2 = ConnectivityTester(remote_name=geeksforgeeks[0], remote_ip_addr=geeksforgeeks[1])
-    tester2.check_connectivity(max_duration=duration)
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--duration', type=int)
+    args = parser.parse_args()
 
-    ibm = ('www.ibm.com', '23.37.59.85')
-    tester3 = ConnectivityTester(remote_name=ibm[0], remote_ip_addr=ibm[1])
-    tester3.check_connectivity(max_duration=duration)
+    tester0 = ConnectivityTester()
+    tester0.check_connectivity(max_duration=args.duration, verbose=True)
+
+    # duration = 10
+    # tester = ConnectivityTester(remote_name=f'music.youtube.com', remote_ip_addr='142.250.184.238')
+    # tester.check_connectivity(max_duration=duration)
+    #
+    # geeksforgeeks = ('www.geeksforgeeks.com', '199.59.243.227')
+    # tester2 = ConnectivityTester(remote_name=geeksforgeeks[0], remote_ip_addr=geeksforgeeks[1])
+    # tester2.check_connectivity(max_duration=duration)
+    #
+    # ibm = ('www.ibm.com', '23.37.59.85')
+    # tester3 = ConnectivityTester(remote_name=ibm[0], remote_ip_addr=ibm[1])
+    # tester3.check_connectivity(max_duration=duration)

@@ -3,7 +3,6 @@ from threading import Event
 from typing import Callable
 from .scheduler import TaskScheduler
 
-
 class Countdown:
     def __init__(self, duration: float, on_expiration: Callable = lambda *args, **kwargs: None):
         self.duration : float = duration
