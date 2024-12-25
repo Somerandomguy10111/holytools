@@ -1,3 +1,3 @@
-from .countdown import Countdown
+from .clocks import Countdown
 from .timer import Timer
-from .task_scheduler import TaskScheduler, Task, InvalidCallableException
+from .scheduler import TaskScheduler, Task, InvalidCallableException
