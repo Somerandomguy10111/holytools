@@ -17,8 +17,8 @@ class RealCar:
         return "Driving the Real Car"
 
 class FakeCar:
-    @staticmethod
-    def drive():
+    def drive(self):
+        _ = self
         return "Driving the Fake Car"
 
 class CustomFile:
@@ -33,14 +33,13 @@ class CustomFile:
 
 
 class TestPatchMechanism(Unittest):
-    # noinspection PyNoneFunctionAssignment
     @Unittest.patch_module(File, CustomFile)
     def test_imported_cls(self):
         file_instance = File(fpath='any')
         output = file_instance.write(content='this content')
         self.assertEqual(output, "Pranked!")
 
-    @Unittest.patch_module(RealCar.drive,FakeCar.drive)
+    @Unittest.patch_module(RealCar.drive, FakeCar().drive)
     def test_main_file_cls(self):
         car = RealCar()
         result = car.drive()

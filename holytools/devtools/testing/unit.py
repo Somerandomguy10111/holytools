@@ -167,7 +167,7 @@ class Unittest(CustomTestCase):
             # corresponds to import [caller_module].[original]
             full_path = f"{module_path}.{qualified_name}"
 
-        print(f'Full path = {full_path}')
+        # print(f'Full path = {full_path}')
         def decorator(func):
             return unittest.mock.patch(full_path, replacement)(func)
 
