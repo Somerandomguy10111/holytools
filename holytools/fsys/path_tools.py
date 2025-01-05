@@ -1,4 +1,3 @@
-import os
 from typing import Optional
 
 from pathvalidate import sanitize_filename
