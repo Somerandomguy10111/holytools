@@ -1,5 +1,5 @@
 from .file import File
-import base64
+
 
 class BinaryFile(File):
     def read(self) -> bytes:

@@ -12,18 +12,23 @@ class TestUnitTest(Unittest):
         self.assertIn(f'tests ran successfully!',results.get_final_status())
 
 class RealCar:
-    def drive(self):
+    @staticmethod
+    def drive():
         return "Driving the Real Car"
 
 class FakeCar:
-    def drive(self):
+    @staticmethod
+    def drive():
         return "Driving the Fake Car"
 
 class CustomFile:
     def __init__(self, fpath : str):
+        _ = fpath
         print(f'This is just a *fake* CustomFile you fool!')
 
-    def write(self, content : str):
+    @staticmethod
+    def write(content : str):
+        _ = content
         return f'Pranked!'
 
 
@@ -35,7 +40,7 @@ class TestPatchMechanism(Unittest):
         output = file_instance.write(content='this content')
         self.assertEqual(output, "Pranked!")
 
-    @Unittest.patch_module(RealCar.drive, FakeCar().drive)
+    @Unittest.patch_module(RealCar.drive,FakeCar.drive)
     def test_main_file_cls(self):
         car = RealCar()
         result = car.drive()

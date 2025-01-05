@@ -1,4 +1,3 @@
-from holytools.abstract import Tree
 from holytools.devtools import Unittest
 import shutil
 import os
@@ -43,7 +42,7 @@ class TestFsyNode(FsysTemplate):
         shutil.rmtree(self.test_dir)
 
     def test_get_subnodes(self):
-        subnodes = self.root_node.get_subnodes()
+        subnodes = self.root_node.get_subfile_paths()
         self.assertEqual(len(subnodes), self.num_total_nodes)
 
     def test_select_dat_files(self):

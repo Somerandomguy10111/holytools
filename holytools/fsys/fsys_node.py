@@ -4,12 +4,11 @@ import os, stat
 from typing import Optional
 
 
-class FsysResource:
+class FsysNode:
     def __init__(self, path : str):
         self._path_wrapper : PathWrapper = PathWrapper(path)
         if not (self.is_dir() or self.is_file()):
             raise FileNotFoundError(f'Path {path} is not a file/folder')
-
 
     def get_zip(self) -> bytes:
         with tempfile.TemporaryDirectory() as write_dir:
@@ -31,14 +30,26 @@ class FsysResource:
 
         return zip_bytes
 
+    def get_subfile_paths(self) -> list[str]:
+        subfile_paths = []
+        for root, dirs, files in os.walk(self.get_path()):
+            for file in files:
+                fpath = os.path.join(root, file)
+                subfile_paths.append(fpath)
+        return subfile_paths
+
     # -------------------------------------------
     # path and naming
 
-    def get_name(self) -> str:
-        return self._path_wrapper.name
 
     def get_path(self) -> str:
         return str(self._path_wrapper.absolute())
+
+    def get_dirpath(self) -> str:
+        return str(self._path_wrapper.parent.absolute())
+
+    def get_name(self) -> str:
+        return self._path_wrapper.name
 
     def get_suffix(self) -> Optional[str]:
         parts = self.get_name().split('.')
@@ -47,11 +58,8 @@ class FsysResource:
         else:
             return parts[-1]
 
-    def get_dirpath(self) -> str:
-        return str(self._path_wrapper.parent.absolute())
-
     # -------------------------------------------
-    # type
+    # attributes
 
     def is_file(self) -> bool:
         return self._path_wrapper.is_file()
@@ -59,25 +67,21 @@ class FsysResource:
     def is_dir(self) -> bool:
         return self._path_wrapper.is_dir()
 
-    # -------------------------------------------
-    # attributes
-
     def is_hidden(self) -> bool:
-        return is_hidden(self.get_path())
+        if os.name == 'posix':
+            return os.path.basename(self.get_path()).startswith('.')
+        elif os.name == 'nt':
+            return bool(os.stat(self.get_path()).st_file_attributes & stat.FILE_ATTRIBUTE_HIDDEN)
+        else:
+            raise NotImplementedError(f'Unsupported OS: {os.name}, {FsysNode.is_hidden.__name__} is only supported '
+                                      f'on Windows and Unix systems')
 
-    def get_epochtime_last_modified(self) -> float:
+    def get_last_modified_epochtime(self) -> float:
         return os.path.getmtime(self.get_path())
 
     def get_size_in_MB(self) -> float:
         return os.path.getsize(self.get_path()) / (1024 * 1024)
 
-
-def is_hidden(filepath: str) -> bool:
-    if os.name == 'posix':
-        return os.path.basename(filepath).startswith('.')
-    elif os.name == 'nt':
-        return bool(os.stat(filepath).st_file_attributes & stat.FILE_ATTRIBUTE_HIDDEN)
-    else:
-        raise NotImplementedError(f'Unsupported OS: {os.name}, {FsysResource.is_hidden.__name__} is only supported '
-                                  f'on Windows and Unix systems')
-
+if __name__ == "__main__":
+    a = FsysNode(path='/home/daniel/sciai/')
+    a.get_subfile_paths()

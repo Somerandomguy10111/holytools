@@ -7,7 +7,7 @@ import tabulate
 # ----------------------------
 
 class ConnectivityTester:
-    def __init__(self, remote_ip_addr : str = '172.217.12.131', remote_name : str = 'google.de', package_size : int = 256):
+    def __init__(self, remote_ip_addr : str = '172.217.164.99', remote_name : str = 'google.de', package_size : int = 256):
         self.remote_ip_addr : str = remote_ip_addr
         self.remote_name : str = remote_name
         self.package_size_bytes : int = package_size
@@ -83,16 +83,3 @@ if __name__ == "__main__":
         raise ValueError('Please provide a duration for the connectivity test')
 
     tester0 = ConnectivityTester(remote_name='chatgpt.com', package_size=512)
-    tester0.check_connectivity(max_duration=args.duration, verbose=True)
-
-    # duration = 10
-    # tester = ConnectivityTester(remote_name=f'music.youtube.com', remote_ip_addr='142.250.184.238')
-    # tester.check_connectivity(max_duration=duration)
-    #
-    # geeksforgeeks = ('www.geeksforgeeks.com', '199.59.243.227')
-    # tester2 = ConnectivityTester(remote_name=geeksforgeeks[0], remote_ip_addr=geeksforgeeks[1])
-    # tester2.check_connectivity(max_duration=duration)
-    #
-    # ibm = ('www.ibm.com', '23.37.59.85')
-    # tester3 = ConnectivityTester(remote_name=ibm[0], remote_ip_addr=ibm[1])
-    # tester3.check_connectivity(max_duration=duration)
