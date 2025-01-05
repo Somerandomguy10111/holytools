@@ -29,7 +29,7 @@ class ImageFormat(Enum):
     def __str__(self):
         return self.value
 
-class ImageFormatConverter:
+class ImageConverter:
     @classmethod
     def convert(cls, image: Image, target_format : ImageFormat) -> Image:
         if not image.format:
@@ -89,8 +89,9 @@ class ImageFormatConverter:
     def get_supported_formats(cls) -> list[ImageFormat]:
         return ImageFormat.as_list()
 
+    # --------------------------------------------------------------
+    # serialization
 
-class ImageSerialization:
     @classmethod
     def as_bytes(cls, image: Image, img_format : Optional[ImageFormat] = None) -> bytes:
         if not img_format:

@@ -16,7 +16,7 @@ class BinaryFile(File):
             line = ' '.join(hex_content[j:j + 2] for j in range(i, min(i + 20, len(hex_content)), 2))
             print(line)
 
-    def check_is_ok(self):
+    def check_content_ok(self):
         pass
 
 

@@ -25,7 +25,7 @@ class File(ABC):
             raise PermissionError(f'File {fpath} does not have required permissions: {missing_permissions}')
 
         if self.exists_on_disk():
-            self.check_is_ok()
+            self.check_content_ok()
 
     def has_permission(self, access : Access) -> bool:
         if os.path.isdir(self.fpath):
@@ -37,7 +37,7 @@ class File(ABC):
             return os.access(parent_directory, access.value) if parent_directory else False
 
     @abstractmethod
-    def check_is_ok(self):
+    def check_content_ok(self):
         pass
 
     @abstractmethod

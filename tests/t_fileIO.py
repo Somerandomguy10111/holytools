@@ -1,5 +1,6 @@
-from holytools.fileIO import BinaryFile, PlaintextFile, ImageFile, ImageConverter, ImageFormat, FileMock, ImageSerializer
+from holytools.fileIO import BinaryFile, PlaintextFile, ImageFile, FileMock
 from holytools.devtools import Unittest
+from holytools.fileIO.converters import ImageFormat, ImageConverter
 from holytools.fsys import FsysNode
 from PIL.Image import Image
 from unittest.mock import patch
@@ -16,7 +17,6 @@ class TestFile(Unittest):
         self.text_fpath = FileMock.lend_txt().fpath
         self.jpg_fpath = FileMock.lend_jpg().fpath
         self.png_fpath = FileMock.lend_png().fpath
-
 
     def test_binary_size(self):
         bio = BinaryFile(self.text_fpath)
@@ -36,10 +36,6 @@ class TestFile(Unittest):
         with self.assertRaises(FileNotFoundError):
             with image_io.read() as _:
                 pass
-
-    def test_invalid_image_write(self):
-        with self.assertRaises(TypeError):
-            ImageFile(fpath=f'/tmp/test')
 
     def test_text_read(self):
         tio = PlaintextFile(fpath=self.text_fpath)
@@ -70,23 +66,25 @@ class TestFile(Unittest):
 class TestImageConverter(Unittest):
     def setUp(self):
         spoofer = FileMock()
-        self.jpg_file = spoofer.lend_jpg().fpath
-        self.png_file = spoofer.lend_png().fpath
+        self.jpg_fpath = spoofer.lend_jpg().fpath
+        self.png_fpath = spoofer.lend_png().fpath
+        self.jpg_file = spoofer.lend_jpg()
+        self.png_file = spoofer.lend_jpg()
 
     def test_png_to_jpeg(self):
-        image_io = ImageFile(fpath=self.png_file)
+        image_io = ImageFile(fpath=self.png_fpath)
         image = image_io.read()
         new = ImageConverter.convert(image=image, target_format=ImageFormat.JPEG)
         self.assertTrue(new.format == 'JPEG')
 
     def test_jpg_to_png(self):
-        image_io = ImageFile(fpath=self.jpg_file)
+        image_io = ImageFile(fpath=self.jpg_fpath)
         image = image_io.read()
         new = ImageConverter.convert(image=image, target_format=ImageFormat.PNG)
         self.assertTrue(new.format == 'PNG')
 
     def test_no_format_attempt(self):
-        image_io = ImageFile(fpath=self.jpg_file)
+        image_io = ImageFile(fpath=self.jpg_fpath)
         image = image_io.read()
         no_format_img = ImageConverter.to_rgb(image=image)
         with self.assertRaises(TypeError):
@@ -94,40 +92,29 @@ class TestImageConverter(Unittest):
 
     # noinspection PyClassVar
     def test_invalid_format_attempt(self):
-        image_io = ImageFile(fpath=self.jpg_file)
+        image_io = ImageFile(fpath=self.jpg_fpath)
         image = image_io.read()
         image.format = 'xyz'
         self.log(f'just a test')
         with self.assertRaises(TypeError):
             ImageConverter.convert(image=image, target_format=ImageFormat.PNG)
 
-
-class TestImageSerializer(Unittest):
-    def setUp(self):
-        spoofer = FileMock()
-        self.jpg_file = spoofer.lend_jpg()
-        self.png_file = spoofer.lend_jpg()
-
     def test_base64_roundtrip(self):
         if not self.is_manual_mode:
             self.skipTest(f'manual only')
-        base64_str = ImageSerializer.as_base64_str(image=self.jpg_file.read())
-        image = ImageSerializer.from_base64_str(base64_str=base64_str)
+        base64_str = ImageConverter.as_base64_str(image=self.jpg_file.read())
+        image = ImageConverter.from_base64_str(base64_str=base64_str)
         image.show()
         image.close()
 
     def test_binary_roundtrip(self):
         if not self.is_manual_mode:
             self.skipTest(f'manual only')
-        bio = ImageSerializer.as_bytes(image=self.jpg_file.read())
-        image = ImageSerializer.from_bytes(img_bytes=bio)
+        bio = ImageConverter.as_bytes(image=self.jpg_file.read())
+        image = ImageConverter.from_bytes(img_bytes=bio)
         image.show()
         image.close()
 
 
-
 if __name__ == '__main__':
-    TestFile.execute_all(manual_mode=True)
-    # TestImageConverter.execute_all()
-    # TestImageConverter.execute_all()
-    # TestImageSerializer.execute_all(is_manual=False)
+    TestImageConverter.execute_all()

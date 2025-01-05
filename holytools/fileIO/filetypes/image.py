@@ -10,13 +10,8 @@ from .file import File
 
 
 class ImageFile(File):
-    def check_is_ok(self) -> bool:
-        if not self._get_suffix() in ['png', 'jpg', 'jpeg']:
-            if self._get_suffix():
-                raise TypeError(f'Path \"{self.fpath}\" indicates unsupported image format: \"{self._get_suffix()}\"')
-            else:
-                raise TypeError(f'Path \"{self.fpath}\" does not indicate file type through suffix')
-        return True
+    def check_content_ok(self) -> bool:
+        pass
 
     def read(self) -> Image:
         return ImgHandler.open(self.fpath)

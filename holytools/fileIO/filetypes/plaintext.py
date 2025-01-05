@@ -14,7 +14,7 @@ class PlaintextFile(File):
         content = self.read()
         print(content)
 
-    def check_is_ok(self):
+    def check_content_ok(self):
         try:
             with open(self.fpath, 'rb') as file:
                 bytes_content = file.read()
