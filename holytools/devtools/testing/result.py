@@ -3,35 +3,25 @@ import os
 import time
 import traceback
 import unittest
-from dataclasses import dataclass
 from typing import Optional
 from unittest import TestCase, TestResult
 import logging
-from .testcase import CaseReport, CaseStatus, CustomTestCase
+from .case import CaseReport, CaseStatus, Case
 
 # ---------------------------------------------------------
 
-@dataclass
-class DisplayOptions:
-    show_details : bool = True
-
-
-class TestrunResult(TestResult):
+class SuiteRunResult(TestResult):
     test_spaces = 50
     status_spaces = 10
     runtime_space = 10
 
-    def __init__(self, logger : logging.Logger,
-                 settings : DisplayOptions,
-                 manual_mode : bool = False,
-                 *args, **kwargs):
+    def __init__(self, logger : logging.Logger, testsuite_name: str, manual_mode : bool = False, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.logger = logger
-        self.test_settings : DisplayOptions = settings
         self.case_reports : list[CaseReport] = []
         self.start_times : dict[str, float] = {}
         self.is_manual : bool = manual_mode
-        self.print_header(f'  Test suite for \"{self.__class__.__name__}\"  ')
+        self.print_header(f'  Test suite: \"{testsuite_name}\"  ')
 
     def log(self, msg : str, level : int = logging.INFO):
         self.logger.log(msg=msg, level=level)
@@ -40,47 +30,56 @@ class TestrunResult(TestResult):
         super().stopTestRun()
         self.print_summary()
 
-    def startTest(self, test : CustomTestCase):
+    def startTest(self, case : Case):
         if self.is_manual:
-            test.set_manual()
-        self.log(msg=f'------> {test.get_name()[:self.test_spaces]} ', level=logging.INFO)
-        self.start_times[test.id()] = time.time()
-        super().startTest(test)
+            case.set_is_manual()
+        self.log(msg=f'------> {case.get_name()[:self.test_spaces]} ', level=logging.INFO)
+        self.start_times[case.id()] = time.time()
+        super().startTest(case)
 
     # ---------------------------------------------------------
     # case logging
 
     # noinspection PyTypeChecker
-    def addSuccess(self, test):
-        super().addSuccess(test)
-        self.log_report(test, CaseStatus.SUCCESS)
+    def addSuccess(self, case : Case):
+        super().addSuccess(case)
+        self.make_report(case, CaseStatus.SUCCESS)
 
     # noinspection PyTypeChecker
-    def addError(self, test, err):
-        super().addError(test, err)
-        self.log_report(test, CaseStatus.ERROR, err)
+    def addError(self, case : Case, err):
+        super().addError(case, err)
+        self.make_report(case, CaseStatus.ERROR, err)
 
     # noinspection PyTypeChecker
-    def addFailure(self, test, err):
-        super().addFailure(test, err)
-        self.log_report(test, CaseStatus.FAIL, err)
+    def addFailure(self, case : Case, err):
+        super().addFailure(case, err)
+        self.make_report(case, CaseStatus.FAIL, err)
 
     # noinspection PyTypeChecker
-    def addSkip(self, test, reason):
-        super().addSkip(test, reason)
-        self.log_report(test, CaseStatus.SKIPPED)
+    def addSkip(self, case : Case, reason):
+        super().addSkip(case, reason)
+        self.make_report(case, CaseStatus.SKIPPED)
 
-    def log_report(self, test : CustomTestCase, status: CaseStatus, err : Optional[tuple] = None):
-        if isinstance(test, CustomTestCase):
-            report = test.make_report(runtime=self.get_runtime(test), status=status)
+    def make_report(self, case : Case, status: CaseStatus, err : Optional[tuple] = None):
+        if isinstance(case, Case):
+            report = CaseReport(name=case.get_name(), status=status, runtime=self.get_runtime(case))
             self.case_reports.append(report)
 
-            conditional_err_msg = f'\n{self.get_err_details(err)}' if err and self.test_settings.show_details else ''
+            conditional_err_msg = f'\n{self.get_err_details(err)}' if err else ''
             finish_log_msg = f'Status: {status.value}{conditional_err_msg}\n'
             self.log(msg=finish_log_msg, level=status.get_log_level())
         else:
-            raise ValueError(f'Expected CustomTestCase, got {type(test)}')
+            raise ValueError(f'Expected CustomTestCase, got {type(case)}')
 
+
+    def get_runtime(self, test : TestCase) -> Optional[float]:
+        test_id = test.id()
+        if test_id in self.start_times:
+            time_in_sec =  time.time() - self.start_times[test_id]
+            return round(time_in_sec, 3)
+        else:
+            self.log(msg=f'Couldnt find start time of test {test_id}. Current start_times : {self.start_times}',
+                     level=logging.ERROR)
 
     @staticmethod
     def get_err_details(err) -> str:
@@ -104,15 +103,6 @@ class TestrunResult(TestResult):
             result += f'{err_class.__name__}: {err_instance}\n{tb_str}'
         return result
 
-
-    def get_runtime(self, test : TestCase) -> Optional[float]:
-        test_id = test.id()
-        if test_id in self.start_times:
-            time_in_sec =  time.time() - self.start_times[test_id]
-            return round(time_in_sec, 3)
-        else:
-            self.log(msg=f'Couldnt find start time of test {test_id}. Current start_times : {self.start_times}',
-                     level=logging.ERROR)
 
     # ---------------------------------------------------------
     # summary logging

@@ -5,41 +5,22 @@ import unittest
 from typing import Optional, Callable
 import unittest.mock
 from logging import Logger
+from unittest import TestSuite
+
 from holytools.logging import LoggerFactory
-from .testcase import CustomTestCase
-from .testrun import TestrunResult, DisplayOptions
+from .case import Case
+from .result import SuiteRunResult
 
 # ---------------------------------------------------------
 
-
-class Runner(unittest.TextTestRunner):
-    def __init__(self, logger : Logger, settings : DisplayOptions, is_manual : bool = False):
-        super().__init__(resultclass=None)
-        self.logger : Logger = logger
-        self.display_options : DisplayOptions = settings
-        self.manual_mode : bool = is_manual
-
-    def run(self, test) -> TestrunResult:
-        result = TestrunResult(logger=self.logger,
-                               stream=self.stream,
-                               settings=self.display_options,
-                               descriptions=self.descriptions,
-                               verbosity=2,
-                               manual_mode=self.manual_mode)
-        test(result)
-        result.printErrors()
-
-        return result
-
-
-class Unittest(CustomTestCase):
+class Unittest(Case):
     _logger : Logger = None
 
     @classmethod
-    def execute_all(cls, manual_mode : bool = True, settings : DisplayOptions = DisplayOptions()):
+    def execute_all(cls, manual_mode : bool = True):
         suite = unittest.TestLoader().loadTestsFromTestCase(cls)
-        runner = Runner(logger=cls.get_logger(), settings=settings, is_manual=manual_mode)
-        results =  runner.run(suite)
+        runner = Runner(logger=cls.get_logger(), is_manual=manual_mode,test_name=cls.__name__)
+        results =  runner.run(testsuite=suite)
         results.print_summary()
         return results
 
@@ -172,3 +153,23 @@ class Unittest(CustomTestCase):
             return unittest.mock.patch(full_path, replacement)(func)
 
         return decorator
+
+
+class Runner(unittest.TextTestRunner):
+    def __init__(self, logger : Logger, test_name : str, is_manual : bool = False):
+        super().__init__(resultclass=None)
+        self.logger : Logger = logger
+        self.manual_mode : bool = is_manual
+        self.test_name : str = test_name
+
+    def run(self, testsuite : TestSuite) -> SuiteRunResult:
+        result = SuiteRunResult(logger=self.logger,
+                                testsuite_name=self.test_name,
+                                stream=self.stream,
+                                descriptions=self.descriptions,
+                                verbosity=2,
+                                manual_mode=self.manual_mode)
+        testsuite(result)
+        result.printErrors()
+
+        return result

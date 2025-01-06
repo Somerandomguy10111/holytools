@@ -59,4 +59,5 @@ class TestPatchMechanism(Unittest):
 
 
 if __name__ == "__main__":
-    TestPatchMechanism.execute_all()
+    # TestPatchMechanism.execute_all()
+    TestUnitTest.execute_all()
