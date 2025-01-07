@@ -1,4 +1,5 @@
 import random
+from abc import ABC
 
 
 def valid_function(arg1: int, arg2: int = 42):
@@ -34,3 +35,6 @@ class InheritedClass(SampleClass):
 
     def new(self):
         pass
+
+class MultiInheritedClass(InheritedClass, ABC):
+    pass

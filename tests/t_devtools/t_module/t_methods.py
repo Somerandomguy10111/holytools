@@ -1,7 +1,7 @@
 from typing import Callable
 
 from holytools.devtools import ModuleInspector, Unittest
-from tests.t_devtools.t_module.modules import SampleClass, InheritedClass
+from tests.t_devtools.t_module.modules import SampleClass, InheritedClass, MultiInheritedClass
 
 
 # ----------------------------------------------------------------------------------------
@@ -36,7 +36,7 @@ class TestGetMethods(Unittest):
             self.assertIn(SampleClass.__magic_method__.__name__, method_names)
 
     def test_inheritance_flag(self):
-        for obj in [InheritedClass(), InheritedClass]:
+        for obj in [InheritedClass(), InheritedClass, MultiInheritedClass]:
             methods = ModuleInspector.get_methods(obj, include_inherited=True)
             method_names = self.get_mthd_names(methods)
             self.assertIn(InheritedClass.method_with_args.__name__, method_names)

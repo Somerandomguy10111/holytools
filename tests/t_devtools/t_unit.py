@@ -59,7 +59,6 @@ class TestPatchMechanism(Unittest):
         self.assertEqual(result, "/fake/path")
 
 
-
 if __name__ == "__main__":
     # TestPatchMechanism.execute_all()
     TestUnitTest.execute_all()
