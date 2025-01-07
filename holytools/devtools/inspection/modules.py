@@ -27,12 +27,15 @@ class Argument:
 
 class ModuleInspector:
     @staticmethod
-    def get_methods(obj : Union[object, type], public_only= False, include_operators : bool = False, include_inherited : bool = True) -> list[Callable]:
+    def get_methods(obj : Union[object, type],
+                    include_inherited: bool = True,
+                    include_private = False,
+                    include_magic_methods : bool = False) -> list[Callable]:
         def attr_filter(attr_name : str) -> bool:
             is_ok = True
-            if public_only and attr_name.startswith('_'):
+            if attr_name.startswith('_') and not include_private:
                 is_ok = False
-            if not include_operators and attr_name.startswith('__') and attr_name.endswith('__'):
+            if attr_name.startswith('__') and attr_name.endswith('__') and not include_magic_methods:
                 is_ok = False
             attr_value = getattr(obj, attr_name)
             is_callable = callable(attr_value)
@@ -48,6 +51,7 @@ class ModuleInspector:
         type_hints = get_type_hints(func)
         if not spec.args:
             return []
+
         start_index = 1 if exclude_self and spec.args[0] in ['self', 'cls'] else 0
         relevant_arg_names = spec.args[start_index:]
         defaults_mapping = ModuleInspector._get_defaults_mapping(spec=spec)

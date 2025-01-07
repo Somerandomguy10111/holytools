@@ -1,5 +1,4 @@
 from holytools.devtools import Unittest
-from tests.t_devtools.t_inspection import TestOptionalTyping
 from holytools.fileIO import File
 import os
 
@@ -8,7 +7,7 @@ import os
 
 class TestUnitTest(Unittest):
     def test_summary(self):
-        results = TestOptionalTyping.execute_all()
+        results = TestTypeInspector.execute_all()
         self.assertIn(f'tests ran successfully!',results.get_final_status())
 
 class RealCar:
