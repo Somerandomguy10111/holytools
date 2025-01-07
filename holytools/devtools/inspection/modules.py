@@ -26,24 +26,29 @@ class Argument:
 
 
 class ModuleInspector:
-    @staticmethod
-    def get_methods(obj : Union[object, type],
+    @classmethod
+    def get_methods(cls, obj : Union[object, type],
                     include_inherited: bool = True,
                     include_private = False,
                     include_magic_methods : bool = False) -> list[Callable]:
-        def attr_filter(attr_name : str) -> bool:
-            is_ok = True
-            if attr_name.startswith('_') and not include_private:
-                is_ok = False
-            if attr_name.startswith('__') and attr_name.endswith('__') and not include_magic_methods:
-                is_ok = False
-            attr_value = getattr(obj, attr_name)
-            is_callable = callable(attr_value)
-            return is_ok and is_callable
-        attrs = dir(obj) if include_inherited else list(obj.__dict__.keys())
-        methods = [getattr(obj, name) for name in attrs if attr_filter(name)]
-        return methods
 
+        def mthd_ok(mthd_name : str) -> bool:
+            if cls.is_magical(mthd_name):
+                return include_magic_methods
+            elif cls.is_private(mthd_name):
+                return include_private
+            else:
+                return True
+
+        attrs = dir(obj) if include_inherited else list(obj.__dict__.keys())
+        attr_values = [getattr(obj, name) for name in attrs]
+
+        targeted_methods = []
+        for attr_name, value in zip(attrs, attr_values):
+            if callable(value) and mthd_ok(attr_name):
+                targeted_methods.append(value)
+
+        return targeted_methods
 
     @staticmethod
     def get_args(func: Union[Callable, BoundFunction], exclude_self : bool = True) -> list[Argument]:
@@ -80,3 +85,11 @@ class ModuleInspector:
 
         zipped = zip(reversed_args, reversed_defaults)
         return dict(zipped)
+
+    @staticmethod
+    def is_magical(name : str):
+        return name.startswith('__') and name.endswith('__')
+
+    @staticmethod
+    def is_private(name : str):
+        return name.startswith('_')
