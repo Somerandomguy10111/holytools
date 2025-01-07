@@ -40,7 +40,11 @@ class ModuleInspector:
             else:
                 return True
 
-        attrs = dir(obj) if include_inherited else list(obj.__dict__.keys())
+        attrs = dir(obj)
+        if not include_inherited:
+            obj_cls = obj if isinstance(obj, type) else obj.__class__
+            super_attrs = dir(obj_cls.__bases__[0])
+            attrs = [name for name in attrs if not name in super_attrs]
         attr_values = [getattr(obj, name) for name in attrs]
 
         targeted_methods = []
