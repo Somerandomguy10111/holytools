@@ -2,6 +2,9 @@ from holytools.devtools import Unittest
 from holytools.fileIO import File
 import os
 
+from tests.t_devtools.t_type import TestTypeInspector
+
+
 # -------------------------------------------
 
 
