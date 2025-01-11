@@ -1,9 +1,11 @@
+from __future__ import annotations
 import time
 
-from holytools.userIO import TrackedInt
+from holytools.userIO import TrackedInt, CLI
 from holytools.devtools import Unittest
 
-class Person:
+
+class Account:
     def __init__(self, name: str, active: bool = True):
         self.name = name
         self.active = active
@@ -29,6 +31,7 @@ class Person:
         self.active = False
         return "Account deactivated"
 
+
 class TestTrackedInt(Unittest):
     def test_incrementation(self):
         ti = TrackedInt(start_value=0, finish_value=10)
@@ -52,6 +55,6 @@ class TestTrackedInt(Unittest):
 
 if __name__ == "__main__":
     # Assuming InteractiveCLI and TestClass are defined
-    # cli = InteractiveCLI(Person, "This is a test class with various types of methods.")
-    # cli.loop()
-    TestTrackedInt.execute_all()
+    cli = CLI(Account, "This is a test class with various types of methods.")
+    cli.command_loop()
+    # TestTrackedInt.execute_all()

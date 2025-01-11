@@ -1,3 +1,4 @@
+
 from typing import Callable
 import inspect
 from holytools.logging import Loggable, LogLevel
@@ -90,11 +91,12 @@ class CLI(Loggable):
         args_dict = {}
         spec = inspect.getfullargspec(mthd)
         annotations = spec.annotations
-        for arg_name in spec.args[1:]:
-            print(f'argname = {arg_name}')
-            arg_type = annotations.get(arg_name, str)
-            user_input = input(f"Enter value for \"{mthd.__name__}\" argument \"{arg_name}\" ({arg_type.__name__}): ")
-            args_dict[arg_name] = self._get_value(user_input=user_input, arg_type=arg_type, arg_name=arg_name)
+        for argname in spec.args[1:]:
+            typ = annotations.get(argname, str)
+            if isinstance(typ, str):
+                typ = type(typ)
+            user_input = input(f"Enter value for \"{mthd.__name__}\" argument \"{argname}\" ({typ.__name__}): ")
+            args_dict[argname] = self._get_value(user_input=user_input, arg_type=typ, arg_name=argname)
         return args_dict
 
 
