@@ -12,7 +12,7 @@ class InputSimulator:
 
     def redirect_input(self):
         builtins.input = self.simulated_input
-        
+
     def restore_input(self):
         builtins.input = self.original_input
 
