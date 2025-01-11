@@ -18,7 +18,10 @@ class InputSimulator:
 
     def simulated_input(self, *args, **kwargs):
         _ = kwargs
-        response = next(self.gen)
+        try:
+            response = next(self.gen)
+        except:
+            response = self.original_input()
         combined = f'{args[0]} {response}' if args else response
         print(combined)
         return response
