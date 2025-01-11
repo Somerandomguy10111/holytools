@@ -9,8 +9,8 @@ class CLI(Loggable):
 
     def __init__(self, cls : type, description : str = ''):
         super().__init__()
-        self.cls : type = cls
-        self.desc : str = description
+        self._cls : type = cls
+        self._desc : str = description
 
         self._log_header()
         self.obj : object = self._create_object()
@@ -19,21 +19,21 @@ class CLI(Loggable):
 
     def _log_header(self):
         header_size = 40
-        cls_name = self.cls.__name__
+        cls_name = self._cls.__name__
         hash_count = int(max(header_size-len(cls_name), 0)/2)
         hashes = '-' * hash_count
         self.log(f'{hashes} {cls_name.upper()} CLI {hashes}')
-        desc_str = self.desc if self.desc else 'No description found'
+        desc_str = self._desc if self._desc else 'No description found'
         self.log(f"Description: {desc_str} \n")
 
 
     def _create_object(self):
-        self.log(f'Initializing object {self.cls.__name__}:')
+        self.log(f'Initializing object {self._cls.__name__}:')
         try:
-            init_kwargs = self._get_args_dict(mthd=self.cls.__init__)
-            return self.cls(**init_kwargs)
+            init_kwargs = self._get_args_dict(mthd=self._cls.__init__)
+            return self._cls(**init_kwargs)
         except Exception as e:
-            self.log(f"Error initializing {self.cls.__name__}: {e}. Please try again\n")
+            self.log(f"Error initializing {self._cls.__name__}: {e}. Please try again\n")
             return self._create_object()
 
 
@@ -51,7 +51,7 @@ class CLI(Loggable):
     # ---------------------------------------------------------
     # loop
 
-    def loop(self):
+    def command_loop(self):
         while True:
             self.print_info()
             user_input = input()
@@ -86,15 +86,14 @@ class CLI(Loggable):
         return result
 
 
-    def _get_args_dict(self, mthd: callable) -> dict:
+    def _get_args_dict(self, mthd: Callable) -> dict:
         args_dict = {}
         spec = inspect.getfullargspec(mthd)
         annotations = spec.annotations
         for arg_name in spec.args[1:]:
             print(f'argname = {arg_name}')
             arg_type = annotations.get(arg_name, str)
-            self.log(f"Enter value for \"{mthd.__name__}\" argument \"{arg_name}\" ({arg_type.__name__}): ")
-            user_input = input()
+            user_input = input(f"Enter value for \"{mthd.__name__}\" argument \"{arg_name}\" ({arg_type.__name__}): ")
             args_dict[arg_name] = self._get_value(user_input=user_input, arg_type=arg_type, arg_name=arg_name)
         return args_dict
 
