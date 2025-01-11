@@ -8,9 +8,13 @@ class InputSimulator:
                 yield inp
 
         self.gen = generator()
+        self.original_input = input
 
     def redirect_input(self):
         builtins.input = self.simulated_input
+        
+    def restore_input(self):
+        builtins.input = self.original_input
 
     def simulated_input(self, *args, **kwargs):
         _ = kwargs
