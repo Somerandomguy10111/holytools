@@ -1,8 +1,12 @@
 from __future__ import annotations
 
 import atexit
+import tempfile
 import time
+import webbrowser
 
+from pycallgraph import PyCallGraph
+from pycallgraph.output import GraphvizOutput
 from tabulate import tabulate
 
 
@@ -11,7 +15,7 @@ from tabulate import tabulate
 class Profiler:
     def __init__(self, print_on_exit : bool = False):
         self.print_on_exit : bool = print_on_exit
-        self.scopes : dict[str, TimedScope] = {}
+        self.scopes : dict[str, TrackedScope] = {}
 
         if self.print_on_exit:
             def print_report():
@@ -37,29 +41,38 @@ class Profiler:
 
         return tabulate(table, headers=headers, tablefmt="psql")
 
-    def call_report(self):
-        pass
+    def show_call_graphs(self):
+        for sc in self.scopes.values():
+            sc.display()
 
-    def profiled_scope(self, name : str) -> TimedScope:
+    def tracked_scope(self, name : str) -> TrackedScope:
         if name in self.scopes:
             ts = self.scopes[name]
         else:
-            ts = TimedScope()
+            ts = TrackedScope()
             self.scopes[name] = ts
         return ts
 
 
-class TimedScope:
+class TrackedScope(PyCallGraph):
     def __init__(self):
+        tmp_fpath = tempfile.mktemp(suffix='.png')
+        super().__init__(output=GraphvizOutput(output_file=tmp_fpath))
         self.execution_times : list[float] = []
+        self.fpath = tmp_fpath
 
     def __enter__(self):
+        super().__enter__()
         self.start_time = time.time()
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def __exit__(self, *args):
+        super().__exit__(*args)
         end_time = time.time()
         elapsed = end_time - self.start_time
         self.execution_times.append(elapsed)
+
+    def display(self):
+        webbrowser.open('file://' + self.fpath)
 
     @property
     def num_calls(self):
@@ -76,4 +89,3 @@ class TimedScope:
 
 if __name__ == "__main__":
     pass
-

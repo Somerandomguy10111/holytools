@@ -10,7 +10,7 @@ class TestProfiler(Unittest):
     def test_timed_scope(self):
         profiler = Profiler()
 
-        with profiler.profiled_scope(name=f'Test Scope'):
+        with profiler.tracked_scope(name=f'Test Scope'):
             time.sleep(1)
 
         report = profiler.scope_report()
@@ -22,26 +22,30 @@ class TestProfiler(Unittest):
 
 class ExampleClass:
     def some_method(self):
-        with p.profiled_scope(name='phase1'):
+        with p.tracked_scope(name='phase1'):
             time.sleep(0.1)
 
-        with p.profiled_scope(name='phase2'):
+        with p.tracked_scope(name='phase2'):
             time.sleep(0.1)
             self.subroutine()
-        with p.profiled_scope(name='phase3'):
+            do_stuff()
+        with p.tracked_scope(name='phase3'):
             time.sleep(0.1)
+            do_stuff()
 
     @staticmethod
     def subroutine():
-        with p.profiled_scope(name='phase2_subroutine'):
+        with p.tracked_scope(name='phase2_subroutine'):
             time.sleep(0.05)
 
-
+def do_stuff():
+    time.sleep(0.001)
+    pass
 
 if __name__ == "__main__":
-    TestProfiler.execute_all()
-
     instance = ExampleClass()
     instance.some_method()
     instance.some_method()
     instance.subroutine()
+
+    p.show_call_graphs()
