@@ -14,7 +14,7 @@ class ProfiledImportScope:
     def _profiled_import(self, name, globals=None, locals=None, fromlist=(), level=0):
         if level == 0 and not self.is_in_stack:
             self.is_in_stack = True
-            with self.profiler.timed_scope(name=name):
+            with self.profiler.profiled_scope(name=name):
                 result = self._original_importer(name, globals, locals, fromlist, level=level)
             self.is_in_stack = False
         else:

@@ -10,15 +10,14 @@ from tabulate import tabulate
 
 class Profiler:
     def __init__(self, print_on_exit : bool = False):
-        self._execution_profiles : dict[str, ExecutionProfile] = {}
         self.print_on_exit : bool = print_on_exit
+        self.scopes : dict[str, TimedScope] = {}
 
         if self.print_on_exit:
             def print_report():
                 print(f'----> Profiler scope report\n')
                 print(self.scope_report())
             atexit.register(print_report)
-
 
     def scope_report(self, section_name : str = f'Routine', print_average_times=True, print_num_calls=True) -> str:
         headers = [section_name, "Total Time (s)"]
@@ -28,58 +27,39 @@ class Profiler:
             headers.append("Calls")
 
         table = []
-        for section, profile in self._execution_profiles.items():
-            row = [section, f"{profile.total_time:.6f}"]
+        for name, scope in self.scopes.items():
+            row = [name, f"{scope.total_time:.6f}"]
             if print_average_times:
-                row.append(f"{profile.average_time:.6f}")
+                row.append(f"{scope.average_time:.6f}")
             if print_num_calls:
-                row.append(profile.num_calls)
+                row.append(scope.num_calls)
             table.append(row)
 
         return tabulate(table, headers=headers, tablefmt="psql")
 
-    def timed_scope(self, name : str) -> TimedScope:
-        return TimedScope(name=name,storage=self._execution_profiles)
-
-
-    def call_report(self, depth : int):
+    def call_report(self):
         pass
 
-    @staticmethod
-    def measure(self, func):
-        def wrapper(*args, **kwargs):
-            with self.timed_scope(name=func.__name__):
-                result = func(*args, **kwargs)
-            return result
-
-        return wrapper
+    def profiled_scope(self, name : str) -> TimedScope:
+        if name in self.scopes:
+            ts = self.scopes[name]
+        else:
+            ts = TimedScope()
+            self.scopes[name] = ts
+        return ts
 
 
 class TimedScope:
-    def __init__(self, name: str, storage : dict[str, ExecutionProfile]):
-        self.name : str = name
-        self.storage : dict[str, ExecutionProfile] = storage
+    def __init__(self):
+        self.execution_times : list[float] = []
 
     def __enter__(self):
         self.start_time = time.time()
-        if not self.name in self.storage:
-            self.storage[self.name] = ExecutionProfile()
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         end_time = time.time()
         elapsed = end_time - self.start_time
-        if self.name in self.storage:
-            self.storage[self.name].register_time(elapsed)
-        else:
-            raise KeyError(f"Execution profile {self.name} not found in storage")
-
-
-class ExecutionProfile:
-    def __init__(self):
-        self.execution_times = []
-
-    def register_time(self, time_in_sec : float):
-        self.execution_times.append(time_in_sec)
+        self.execution_times.append(elapsed)
 
     @property
     def num_calls(self):
