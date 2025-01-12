@@ -25,6 +25,6 @@ class ProfiledImportScope:
         builtins.__import__ = self._profiled_import
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        print(self.profiler.make_report(section_name=f'Library', print_average_times=False, print_num_calls=False))
+        print(self.profiler.scope_report(section_name=f'Library', print_average_times=False, print_num_calls=False))
         builtins.__import__ = self._original_importer
 
