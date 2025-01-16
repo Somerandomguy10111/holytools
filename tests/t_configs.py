@@ -48,6 +48,8 @@ class FileConfigsTests(Hider.ConfigTest):
 
 class EncryptedFileConfigsTests(Hider.ConfigTest):
     def get_configs(self) -> BaseConfigs:
+        if not FileConfigs.keyring_available():
+            self.skipTest("Keyring not available, unable to use encrypted file configs")
         return FileConfigs(fpath=self.configs_fpath, encrypted=True)
 
 
