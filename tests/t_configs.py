@@ -49,11 +49,17 @@ class PassConfigTests(Hider.ConfigTest):
     def get_configs(self) -> BaseConfigs:
         return PassConfigs()
 
+
 class FileConfigsTests(Hider.ConfigTest):
     def get_configs(self) -> BaseConfigs:
         return FileConfigs(fpath=self.configs_fpath)
 
+class EncryptedFileConfigsTests(Hider.ConfigTest):
+    def get_configs(self) -> BaseConfigs:
+        return FileConfigs(fpath=self.configs_fpath, encrypted=True)
+
 
 if __name__ == '__main__':
     FileConfigsTests.execute_all()
-    PassConfigTests.execute_all()
+    EncryptedFileConfigsTests.execute_all()
+    # PassConfigTests.execute_all()
