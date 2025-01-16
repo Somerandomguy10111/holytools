@@ -46,6 +46,11 @@ class BaseConfigs(Loggable, ABC):
         self._map[section][key] = value
         self._update_resource()
 
+    def remove(self, key : str, section : Optional[str] = None):
+        if key in self._map[section]:
+            del self._map[section][key]
+            self._update_resource()
+
     def get_general_section(self) -> dict[str, str]:
         return self._map[None]
 
