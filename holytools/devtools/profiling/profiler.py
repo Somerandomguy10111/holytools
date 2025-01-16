@@ -5,8 +5,6 @@ import tempfile
 import time
 import webbrowser
 
-from pycallgraph import PyCallGraph
-from pycallgraph.output import GraphvizOutput
 from tabulate import tabulate
 
 
@@ -54,19 +52,16 @@ class Profiler:
         return ts
 
 
-class TrackedScope(PyCallGraph):
+class TrackedScope:
     def __init__(self):
         tmp_fpath = tempfile.mktemp(suffix='.png')
-        super().__init__(output=GraphvizOutput(output_file=tmp_fpath))
         self.execution_times : list[float] = []
         self.fpath = tmp_fpath
 
     def __enter__(self):
-        super().__enter__()
         self.start_time = time.time()
 
     def __exit__(self, *args):
-        super().__exit__(*args)
         end_time = time.time()
         elapsed = end_time - self.start_time
         self.execution_times.append(elapsed)
