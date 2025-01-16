@@ -78,7 +78,7 @@ class FileConfigs(BaseConfigs):
     def write(self, content : str):
         if self.is_encrypted:
             content = self.aes.encrypt(content=content, key=self.masterpw_hash)
-            print(f'Writing encrypted content = {content}')
+            # print(f'Writing encrypted content = {content}')
         with open(self._config_fpath, 'w') as f:
             f.write(content)
 
