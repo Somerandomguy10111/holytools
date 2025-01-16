@@ -67,7 +67,11 @@ class FileConfigs(BaseConfigs):
         with open(self._config_fpath, 'w') as f:
             self.write(content=config_content)
 
-    def read(self) -> str:
+    def read(self) -> Optional[str]:
+        if not os.path.isfile(self._config_fpath):
+            print(f'[Error]: No file exists at configured config fpath {self._config_fpath}')
+            return ''
+
         with open(self._config_fpath, 'r') as f:
             content = f.read()
         if self.is_encrypted:
