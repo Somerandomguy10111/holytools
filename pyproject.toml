@@ -11,4 +11,5 @@ urls = { "repository" = "https://github.com/Somerandomguy10111/holytools" }
 [tool.setuptools.package-data]
 "holytools.fileIO.mock" = ["*"]
 
-
+[project.scripts]
+cred = "holytools.configs.cred:main"

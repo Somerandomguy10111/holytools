@@ -64,7 +64,6 @@ class FileConfigs(BaseConfigs):
             for subkey, subval in section_map.items():
                 config_content += f'{subkey} = {subval}\n'
 
-        print(f'Writing to file: {self._config_fpath}')
         with open(self._config_fpath, 'w') as f:
             self.write(content=config_content)
 
@@ -73,7 +72,6 @@ class FileConfigs(BaseConfigs):
             content = f.read()
         if self.is_encrypted:
             content = self.aes.decrypt(content=content, key=self.masterpw_hash)
-            print(f'content from decryption = {content}')
 
         return content
 
