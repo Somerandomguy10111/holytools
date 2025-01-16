@@ -6,33 +6,6 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - name: Install pass and gpg
-        run: |
-          echo "set man-db/auto-update false" | sudo debconf-communicate; sudo dpkg-reconfigure man-db
-          sudo apt-get install pass -y
-          sudo apt-get install gnupg -y
-      - name: Generate key script
-        run: |
-          cat > gen-key-script << EOF
-          Key-Type: 1
-          Key-Length: 2048
-          Subkey-Type: 1
-          Subkey-Length: 2048
-          Name-Real: Root Superuser
-          Name-Email: root@githubactions.com
-          Expire-Date: 0
-          %no-protection
-          EOF
-          echo "Generated key script"
-      - name: Initialize pass
-        run: |
-          gpg --batch --generate-key gen-key-script
-          gpg_id=$(gpg --list-keys --with-colons | awk -F: '/pub/{print $5}')
-          echo "Gpg id = $gpg_id"
-          echo "Generated GPG Key ID: $gpg_id"
-          pass init $gpg_id
-          echo "Password store dir = $PASSWORD_STORE_DIR"
-
       - uses: Somerandomguy10111/actions/toxtests@main
         with:
           python-version: '3.11'
