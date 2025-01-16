@@ -105,43 +105,6 @@ class FileConfigs(BaseConfigs):
                 return master_pw_hash
 
 
-class PassConfigs(BaseConfigs):
-    def __init__(self):
-        if 'PASSWORD_STORE_DIR' in os.environ:
-            self._pass_dirpath: str = self._as_abspath(path=os.environ['PASSWORD_STORE_DIR'])
-        else:
-            self._pass_dirpath = os.path.expanduser(f'~/.password-store')
-        super().__init__()
-
-    def _populate_map(self):
-        keys = self._get_toplevel_keys()
-        for k in keys:
-            self._map[None][k] = self._try_run_cmd(f'pass {k}')
-
-    def _update_resource(self):
-        existing_keys = os.listdir(path=self._pass_dirpath)
-        sectionless_map = self.get_general_section()
-        missing_keys = [k for k in sectionless_map if k not in existing_keys]
-        for k in missing_keys:
-            value = sectionless_map[k]
-            insert_command = f"echo \"{value}\" | pass insert --echo {k}"
-            self._try_run_cmd(cmd=insert_command)
-
-    def _try_run_cmd(self, cmd : str) -> Optional[str]:
-        try:
-            result = subprocess.run(cmd, text=True, capture_output=True, check=True, shell=True)
-            return result.stdout.strip()
-        except Exception as e:
-            self.log(f"An error occurred during command execution, you configuration is likely not saved to pass:\n"
-                     f'err = \"{e}\"\n', level=LogLevel.WARNING)
-            result = None
-        return result
-
-    def _get_toplevel_keys(self) -> list[str]:
-        filenames = os.listdir(path=self._pass_dirpath)
-        keys = [os.path.splitext(f)[0] for f in filenames if f.endswith('.gpg')]
-        return keys
-
 if __name__ == "__main__":
     master_pwd = FileConfigs(encrypted=True).retrieve_masterpw_hash()
     print(f'Master pw = {master_pwd}')
