@@ -2,7 +2,7 @@ import tempfile
 import uuid
 from abc import abstractmethod
 
-from holytools.configs import BaseConfigs, FileConfigs, PassConfigs
+from holytools.configs import BaseConfigs, FileConfigs
 from holytools.devtools import Unittest
 
 
@@ -23,9 +23,6 @@ class Hider:
             self.assertEqual(new_value, value)
 
         def test_set_get_section(self):
-            if isinstance(self.configs, PassConfigs):
-                self.skipTest(reason=f'PassConfigs doesnt support sections')
-
             section = self.make_random_str()
             key, value = self.make_random_str(), self.make_random_str()
             self.configs.set(key=key, value=value, section=section)
@@ -43,11 +40,6 @@ class Hider:
         @abstractmethod
         def get_configs(self) -> BaseConfigs:
             pass
-
-
-class PassConfigTests(Hider.ConfigTest):
-    def get_configs(self) -> BaseConfigs:
-        return PassConfigs()
 
 
 class FileConfigsTests(Hider.ConfigTest):

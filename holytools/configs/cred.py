@@ -1,7 +1,6 @@
 import sys
 
 from holytools.configs import FileConfigs
-import argparse
 
 
 def main():

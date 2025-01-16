@@ -1,5 +1,4 @@
 import os.path
-import subprocess
 from typing import Optional
 
 import secretstorage
@@ -8,6 +7,7 @@ from easycrypt.hash import SHA
 
 from holytools.configs.base import BaseConfigs
 from holytools.logging import LogLevel
+
 
 # ---------------------------------------------------------
 
@@ -64,8 +64,7 @@ class FileConfigs(BaseConfigs):
             for subkey, subval in section_map.items():
                 config_content += f'{subkey} = {subval}\n'
 
-        with open(self._config_fpath, 'w') as f:
-            self.write(content=config_content)
+        self.write(content=config_content)
 
     def read(self) -> Optional[str]:
         if not os.path.isfile(self._config_fpath):
