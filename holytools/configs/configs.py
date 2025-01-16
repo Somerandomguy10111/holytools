@@ -15,6 +15,9 @@ class FileConfigs(BaseConfigs):
     def __init__(self, fpath : str = '~/.pyconfig', encrypted : bool = False):
         self._config_fpath: str = self._as_abspath(path=fpath)
         self.is_encrypted : bool = encrypted
+        if self.is_encrypted and not self.keyring_available():
+            raise ValueError('Encrypted configs can only be used with D-Bus Secret Service e.g. GNOME Keyring')
+
         if self.is_encrypted:
             self.aes : AES = AES()
             self.sha : SHA = SHA()
@@ -81,7 +84,6 @@ class FileConfigs(BaseConfigs):
     def write(self, content : str):
         if self.is_encrypted:
             content = self.aes.encrypt(content=content, key=self.masterpw_hash)
-            # print(f'Writing encrypted content = {content}')
         with open(self._config_fpath, 'w') as f:
             f.write(content)
 
@@ -102,6 +104,14 @@ class FileConfigs(BaseConfigs):
                 master_pw = master_pw_item.get_secret().decode('utf-8', errors='replace')
                 master_pw_hash = self.sha.get_hash(txt=master_pw)
                 return master_pw_hash
+
+    @staticmethod
+    def keyring_available() -> bool:
+        try:
+            secretstorage.dbus_init()
+            return True
+        except:
+            return False
 
 
 if __name__ == "__main__":
