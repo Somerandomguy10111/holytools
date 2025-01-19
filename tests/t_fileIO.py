@@ -103,7 +103,7 @@ class TestImageConverter(Unittest):
         if not self.is_manual_mode:
             self.skipTest(f'manual only')
         base64_str = ImageConverter.to_base64_str(image=self.jpg_file.read())
-        image = ImageConverter.from_base64_str(base64_str=base64_str)
+        image = ImageConverter.from_base64_str(s=base64_str)
         image.show()
         image.close()
 

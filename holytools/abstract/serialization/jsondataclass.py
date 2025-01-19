@@ -110,6 +110,8 @@ def make(cls, s : str):
         instance = orjson.loads(s)
     elif issubclass(cls, Serializable):
         instance = cls.from_str(s)
+    elif cls == Image:
+        instance = ImageConverter.from_base64_str(s)
     else:
         raise TypeError(f'Unsupported type {cls}')
     return instance

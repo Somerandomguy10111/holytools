@@ -76,10 +76,10 @@ class ImageConverter:
         return image
 
     @staticmethod
-    def from_base64_str(base64_str : str) -> Image:
-        if "base64," in base64_str:
-            base64_str = base64_str.split("base64,")[-1]
-        image_data = base64.b64decode(base64_str)
+    def from_base64_str(s : str) -> Image:
+        if "base64," in s:
+            s = s.split("base64,")[-1]
+        image_data = base64.b64decode(s)
         image = ImgHandler.open(BytesIO(image_data))
         return image
 
