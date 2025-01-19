@@ -1,3 +1,4 @@
+from __future__ import annotations
 import os.path
 from typing import Optional
 
@@ -7,7 +8,6 @@ from easycrypt.hash import SHA
 
 from holytools.configs.base import BaseConfigs
 from holytools.logging import LogLevel
-
 
 # ---------------------------------------------------------
 
@@ -25,6 +25,17 @@ class FileConfigs(BaseConfigs):
         config_dirpath = os.path.dirname(self._config_fpath)
         os.makedirs(config_dirpath, exist_ok=True)
         super().__init__()
+
+    @classmethod
+    def credentials(cls) -> FileConfigs:
+        try:
+            fpath = os.environ[f'CRED_FPATH']
+        except:
+            raise ValueError(f'Environment variable \"CRED_FPATH\" not found. '
+                             f'Please define file path of config file through environment variable \"CRED_FPATH\"')
+
+        return FileConfigs(encrypted=True, fpath=fpath)
+
 
     def _populate_map(self):
         if not os.path.isfile(self._config_fpath):

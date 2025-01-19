@@ -1,17 +1,10 @@
-import os
 import sys
 
 from holytools.configs import FileConfigs
 
 
 def main():
-    try:
-        fpath = os.environ[f'CRED_FPATH']
-    except:
-        raise ValueError(f'Environment variable \"CRED_FPATH\" not found. '
-                         f'Please define file path of config file through environment variable \"CRED_FPATH\"')
-
-    configs = FileConfigs(encrypted=True, fpath=fpath)
+    configs = FileConfigs.credentials()
     num_args = len(sys.argv) - 1
 
     if num_args == 0:
