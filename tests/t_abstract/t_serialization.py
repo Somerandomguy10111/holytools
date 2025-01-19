@@ -34,7 +34,6 @@ class TestPicklable(base.SerializationTest):
         cls = base.SimpleDataclass
         return instance, cls
 
-
 if __name__ == '__main__':
     TestJsonDataclass.execute_all()
     TestPicklable.execute_all()

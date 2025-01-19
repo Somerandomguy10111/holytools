@@ -1,4 +1,4 @@
-from holytools.fileIO import BinaryFile, PlaintextFile, ImageFile, FileMock
+from holytools.fileIO import BinaryFile, PlaintextFile, ImageFile, ExampleFiles
 from holytools.devtools import Unittest
 from holytools.fileIO.converters import ImageFormat, ImageConverter
 from holytools.fsys import FsysNode
@@ -14,9 +14,9 @@ class TestFile(Unittest):
         pass
 
     def setUp(self):
-        self.text_fpath = FileMock.lend_txt().fpath
-        self.jpg_fpath = FileMock.lend_jpg().fpath
-        self.png_fpath = FileMock.lend_png().fpath
+        self.text_fpath = ExampleFiles.lend_txt().fpath
+        self.jpg_fpath = ExampleFiles.lend_jpg().fpath
+        self.png_fpath = ExampleFiles.lend_png().fpath
 
     def test_binary_size(self):
         bio = BinaryFile(self.text_fpath)
@@ -65,7 +65,7 @@ class TestFile(Unittest):
 
 class TestImageConverter(Unittest):
     def setUp(self):
-        spoofer = FileMock()
+        spoofer = ExampleFiles()
         self.jpg_fpath = spoofer.lend_jpg().fpath
         self.png_fpath = spoofer.lend_png().fpath
         self.jpg_file = spoofer.lend_jpg()
@@ -74,21 +74,21 @@ class TestImageConverter(Unittest):
     def test_png_to_jpeg(self):
         image_io = ImageFile(fpath=self.png_fpath)
         image = image_io.read()
-        new = ImageConverter.convert(image=image, target_format=ImageFormat.JPEG)
+        new = ImageConverter.convert_format(image=image, target_format=ImageFormat.JPEG)
         self.assertTrue(new.format == 'JPEG')
 
     def test_jpg_to_png(self):
         image_io = ImageFile(fpath=self.jpg_fpath)
         image = image_io.read()
-        new = ImageConverter.convert(image=image, target_format=ImageFormat.PNG)
+        new = ImageConverter.convert_format(image=image, target_format=ImageFormat.PNG)
         self.assertTrue(new.format == 'PNG')
 
     def test_no_format_attempt(self):
         image_io = ImageFile(fpath=self.jpg_fpath)
         image = image_io.read()
-        no_format_img = ImageConverter.to_rgb(image=image)
+        no_format_img = ImageConverter._to_rgb(image=image)
         with self.assertRaises(TypeError):
-            ImageConverter.convert(image=no_format_img, target_format=ImageFormat.JPEG)
+            ImageConverter.convert_format(image=no_format_img, target_format=ImageFormat.JPEG)
 
     # noinspection PyClassVar
     def test_invalid_format_attempt(self):
@@ -97,12 +97,12 @@ class TestImageConverter(Unittest):
         image.format = 'xyz'
         self.log(f'just a test')
         with self.assertRaises(TypeError):
-            ImageConverter.convert(image=image, target_format=ImageFormat.PNG)
+            ImageConverter.convert_format(image=image, target_format=ImageFormat.PNG)
 
     def test_base64_roundtrip(self):
         if not self.is_manual_mode:
             self.skipTest(f'manual only')
-        base64_str = ImageConverter.as_base64_str(image=self.jpg_file.read())
+        base64_str = ImageConverter.to_base64_str(image=self.jpg_file.read())
         image = ImageConverter.from_base64_str(base64_str=base64_str)
         image.show()
         image.close()

@@ -4,14 +4,19 @@ import json
 import random
 import unittest
 import uuid
-from uuid import UUID
-from enum import Enum
-from datetime import datetime, date, time
-from dataclasses import dataclass, field
-from tempfile import NamedTemporaryFile
 from abc import abstractmethod
+from dataclasses import dataclass, field
+from datetime import datetime, date, time
+from enum import Enum
+from tempfile import NamedTemporaryFile
+from uuid import UUID
+
+from PIL.Image import Image
+
 from holytools.abstract import SerializableType, JsonDataclass, Serializable
 from holytools.devtools import Unittest
+from holytools.fileIO import ExampleFiles
+
 
 # -------------------------------------------
 
@@ -75,6 +80,8 @@ class SerializationTest(Unittest):
         test_time = time(12, 34, 56)
 
         ClassType = self.get_serializable_type()
+        img_file = ExampleFiles.lend_png()
+
 
         @dataclass
         class ComplexDataclass(ClassType):
@@ -89,6 +96,7 @@ class SerializationTest(Unittest):
             dataclass_list: list[SimpleDataclass]
             serializable_list : list[SerializableInt]
             serializable_dict : dict[SerializableInt, SerializableInt]
+            image_data : Image
             dictionary_data: dict[str, str] = field(default_factory=dict)
 
             def __post_init__(self):
@@ -105,7 +113,8 @@ class SerializationTest(Unittest):
             serializable_list=[SerializableInt(), SerializableInt()],
             serializable_dict={SerializableInt(): SerializableInt(), SerializableInt(): SerializableInt()},
             enum_field=ThisParticularEnum.OPTION_A,
-            simple_data=SimpleDataclass.make_example()
+            simple_data=SimpleDataclass.make_example(),
+            image_data=img_file.read()
         )
 
         return instance, ComplexDataclass

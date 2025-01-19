@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import dataclasses
+import io
 from datetime import datetime, date, time
 from enum import Enum
 from types import NoneType
@@ -8,7 +9,12 @@ from typing import get_type_hints, get_origin, get_args, Union
 
 import orjson
 from dataclasses import dataclass
+
+from PIL.Image import Image
+
 from holytools.abstract.serialization.serializable import Serializable
+
+from holytools.fileIO import ImageConverter
 
 castable_classes = ['Decimal', 'UUID', 'Path', 'Enum', 'str', 'int', 'float', 'bool']
 converters = {
@@ -86,6 +92,8 @@ def get_entry(obj):
         entry = tuple([get_entry(x) for x in obj])
     elif isinstance(obj, float) and obj != obj:
         entry = 'nan'
+    elif isinstance(obj, Image):
+        entry = ImageConverter.
     else:
         entry = obj
     return entry
