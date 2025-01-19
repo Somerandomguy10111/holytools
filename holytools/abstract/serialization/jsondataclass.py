@@ -93,7 +93,7 @@ def get_entry(obj):
     elif isinstance(obj, float) and obj != obj:
         entry = 'nan'
     elif isinstance(obj, Image):
-        entry = ImageConverter.
+        entry = ImageConverter.to_base64_str(image=obj)
     else:
         entry = obj
     return entry

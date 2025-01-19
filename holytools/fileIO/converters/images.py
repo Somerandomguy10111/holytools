@@ -63,14 +63,9 @@ class ImageConverter:
     # serialization
 
     @staticmethod
-    def as_bytes(image: Image, img_format : Optional[ImageFormat] = None) -> bytes:
-        if not img_format:
-            img_format = image.format
-        if not img_format:
-            raise ValueError(f'No img_format provided and failed to extract format from image as fallback')
-
+    def as_bytes(image: Image) -> bytes:
         buffer = BytesIO()
-        image.save(buffer, format=str(img_format))
+        image.save(buffer, format=str(image.format))
         img_bytes = buffer.getvalue()
         return img_bytes
 
@@ -89,8 +84,8 @@ class ImageConverter:
         return image
 
     @staticmethod
-    def to_base64_str(image: Image, img_format : Optional[ImageFormat] = None) -> str:
-        byte_content = ImageConverter.as_bytes(image=image, img_format=img_format)
+    def to_base64_str(image: Image) -> str:
+        byte_content = ImageConverter.as_bytes(image=image)
         base64_content = base64.b64encode(byte_content).decode('utf-8')
         return base64_content
 
