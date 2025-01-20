@@ -19,6 +19,8 @@ from holytools.fileIO import ImageConverter
 class JsonDataclass(Serializable):
     """Can serialize dataclasses with following attributes:
     - Basic serializable types: holytools.abstract.Serializable, int, float, bool, str, int, Path, UUID, Decimal, datetime, date, time
+        - Serialization: get_basic_entry()
+        - Deserialization: make_basic()
     - Lists, tuples or dicts of basic serializable types"""
     def __init__(self, *args, **kwargs):
         _, __ = args, kwargs
@@ -89,7 +91,7 @@ class JsonDataclass(Serializable):
         elif isinstance(obj, Image):
             entry = ImageConverter.to_base64_str(image=obj)
         else:
-            entry = obj
+            entry = str(obj)
         return entry
 
     @staticmethod

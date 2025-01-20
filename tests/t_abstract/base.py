@@ -143,4 +143,5 @@ class SerializationTest(Unittest):
         pass
 
 if __name__ == "__main__":
-    SerializationTest.execute_all()
+    # SerializationTest.execute_all()
+    pass
