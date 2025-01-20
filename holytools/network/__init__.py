@@ -1,2 +1,2 @@
-from .endpoint import Endpoint, Socket, Method
+from .endpoint import Endpoint, Method
 from .ip import NetworkArea, IpProvider

@@ -1,38 +1,41 @@
 from __future__ import annotations
 
-import ipaddress
+from dataclasses import dataclass
 from enum import Enum
-from .ip import IpProvider
+
+import requests
+from requests import Response
+
+
+# -----------------------------------------------------------
 
 class Method(Enum):
     GET = 'GET'
     POST = 'POST'
 
 
-class Socket:
-    def __init__(self, ip: str, port: int):
-        try:
-            ipaddress.ip_address(ip)
-        except ValueError:
-            raise ValueError("Invalid IP address")
-
-        self.ip = ip
-        self.port = port
-
-    def as_addr(self, protocol : str = 'https'):
-        return f'{protocol}://{self.ip}:{self.port}'
+@dataclass
+class Endpoint:
+    ip : str
+    port : int
+    path : str
 
     @classmethod
-    def get_localhost(cls, port : int):
-        return cls(ip=IpProvider.get_localhost(),port=port)
+    def make_localhost(cls, port : int, path : str):
+        return cls(ip='127.0.0.1', port=port, path=path)
 
-
-class Endpoint:
-    def __init__(self, socket : Socket, path : str, method : Method):
-        self.path : str = path
-        self.method : Method = method
-        self.socket : Socket = socket
-
-    def get_url(self, protocol : str = 'https') -> str:
-        socket_addr = self.socket.as_addr(protocol=protocol)
+    def get_url(self, protocol : str) -> str:
+        socket_addr = f'{protocol}://{self.ip}:{self.port}'
         return f'{socket_addr}{self.path}'
+
+    def get(self, secure : bool = True) -> Response:
+        protocol = 'https' if secure else 'http'
+        url = self.get_url(protocol=protocol)
+        print(f'Making get request to {url}')
+        return requests.get(url)
+
+    def post(self, msg : str, secure : bool = True) -> Response:
+        protocol = 'https' if secure else 'http'
+        url = self.get_url(protocol=protocol)
+        print(f'Making post request to {url}')
+        return requests.post(self.get_url(protocol=protocol), data=msg)

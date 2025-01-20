@@ -3,7 +3,6 @@ from __future__ import annotations
 import base64
 from enum import Enum
 from io import BytesIO
-from typing import Optional
 
 import PIL.Image as ImgHandler
 from PIL import Image
