@@ -5,9 +5,8 @@ from enum import Enum
 from io import BytesIO
 from typing import Optional
 
-from PIL import Image
 import PIL.Image as ImgHandler
-
+from PIL import Image
 
 
 class ImageConverter:
@@ -30,18 +29,20 @@ class ImageConverter:
         else:
             image = image
 
-        return ImageConverter._reload_as_fmt(image=image, target_format=target_format)
+        return ImageConverter._reload_as_fmt(image=image, target_format=target_format.value)
 
     @staticmethod
-    def to_rgb(img):
+    def to_rgb(img : Image):
         new_img = ImgHandler.new('RGB', img.size, (255, 255, 255))
         rgb_content = img.convert('RGB')
         new_img.paste(rgb_content, mask=img.split()[-1])
-        return new_img
+
+        return ImageConverter._reload_as_fmt(img, target_format=img.format)
 
     @staticmethod
     def to_rgba(img):
-        return img.convert('RGBA')
+        new_img = img.convert('RGBA')
+        return ImageConverter._reload_as_fmt(new_img, target_format=img.format)
 
     @staticmethod
     def _is_valid(image: Image) -> bool:
@@ -55,9 +56,9 @@ class ImageConverter:
         return False
 
     @staticmethod
-    def _reload_as_fmt(image : Image, target_format : ImageFormat):
+    def _reload_as_fmt(image : Image, target_format : str):
         buffer = BytesIO()
-        image.save(buffer, format=target_format.value)
+        image.save(buffer, format=target_format)
         buffer.seek(0)
         return ImgHandler.open(buffer)
 
@@ -66,8 +67,11 @@ class ImageConverter:
 
     @staticmethod
     def as_bytes(image: Image) -> bytes:
+        if image.format is None:
+            raise TypeError(f'Given image {image} has no format')
+
         buffer = BytesIO()
-        image.save(buffer, format=str(image.format))
+        image.save(buffer, format=image.format)
         img_bytes = buffer.getvalue()
         return img_bytes
 
