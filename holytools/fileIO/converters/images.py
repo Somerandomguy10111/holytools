@@ -13,15 +13,6 @@ import PIL.Image as ImgHandler
 class ImageConverter:
     @staticmethod
     def convert_format(image: Image, target_format : ImageFormat) -> Image:
-        def _to_rgb(img):
-            new_img = ImgHandler.new('RGB', img.size, (255, 255, 255))
-            rgb_content = image.convert('RGB')
-            new_img.paste(rgb_content, mask=img.split()[-1])
-            return new_img
-        
-        def _to_rgba(img):
-            return img.convert('RGBA')
-
         if not image.format:
             raise TypeError(f'Given image {image} has no format')
         if not image.format.lower() in ImageFormat.get_all_formats():
@@ -33,13 +24,24 @@ class ImageConverter:
 
         new_format = target_format.value.upper()
         if image.mode in ('LA', 'RGBA') and new_format in ['JPG', 'JPEG']:
-            image = _to_rgb(image)
+            image = ImageConverter.to_rgb(image)
         elif image.mode != 'RGBA' and new_format == 'PNG':
-            image = _to_rgba(image)
+            image = ImageConverter.to_rgba(image)
         else:
             image = image
 
         return ImageConverter._reload_as_fmt(image=image, target_format=target_format)
+
+    @staticmethod
+    def to_rgb(img):
+        new_img = ImgHandler.new('RGB', img.size, (255, 255, 255))
+        rgb_content = img.convert('RGB')
+        new_img.paste(rgb_content, mask=img.split()[-1])
+        return new_img
+
+    @staticmethod
+    def to_rgba(img):
+        return img.convert('RGBA')
 
     @staticmethod
     def _is_valid(image: Image) -> bool:

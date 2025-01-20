@@ -1,19 +1,16 @@
 from __future__ import annotations
 
 import dataclasses
-import io
+from dataclasses import dataclass
 from datetime import datetime, date, time
 from enum import Enum
 from types import NoneType
 from typing import get_type_hints, get_origin, get_args, Union
 
 import orjson
-from dataclasses import dataclass
-
 from PIL.Image import Image
 
 from holytools.abstract.serialization.serializable import Serializable
-
 from holytools.fileIO import ImageConverter
 
 castable_classes = ['Decimal', 'UUID', 'Path', 'Enum', 'str', 'int', 'float', 'bool']
@@ -38,7 +35,7 @@ class JsonDataclass(Serializable):
 
     def to_str(self) -> str:
         defined_fields = set([f.name for f in dataclasses.fields(self) if f.init])
-        json_dict = {attr: get_entry(obj=value) for attr, value in self.__dict__.items() if attr in defined_fields}
+        json_dict = {attr: self.get_entry(obj=value) for attr, value in self.__dict__.items() if attr in defined_fields}
         return orjson.dumps(json_dict).decode("utf-8")
 
     @classmethod
@@ -61,60 +58,57 @@ class JsonDataclass(Serializable):
             origin = get_origin(dtype)
             if origin == list:
                 item_type = TypeAnalzer.get_inner_types(dtype)[0]
-                restored_value = [make(cls=item_type, s=x) for x in value]
+                restored_value = [cls.make_basic(makecls=item_type, s=x) for x in value]
             elif origin == tuple:
                 item_types = TypeAnalzer.get_inner_types(dtype)
-                restored_value = tuple([make(cls=item_type, s=s) for item_type, s in zip(item_types, value)])
-            elif origin == dict:
+                restored_value = tuple([cls.make_basic(makecls=item_type, s=s) for item_type, s in zip(item_types, value)])
+            elif origin == dict or dtype == dict:
                 key_type, value_type = TypeAnalzer.get_inner_types(dtype)
-                key_list = [make(cls=key_type, s=x) for x in value[0]]
-                value_list = [make(cls=value_type, s=x) for x in value[1]]
+                key_list = [cls.make_basic(makecls=key_type, s=x) for x in value[0]]
+                value_list = [cls.make_basic(makecls=value_type, s=x) for x in value[1]]
                 restored_value = {key: value for key, value in zip(key_list, value_list)}
             else:
-                restored_value = make(cls=dtype, s=value)
+                restored_value = cls.make_basic(makecls=dtype, s=value)
             init_dict[key] = restored_value
 
         return cls(**init_dict)
 
+    def get_entry(self, obj):
+        if isinstance(obj, dict):
+            key_list = [self.get_entry(k) for k in obj.keys()]
+            value_list = [self.get_entry(v) for v in obj.values()]
+            entry = (key_list, value_list)
+        elif isinstance(obj, list):
+            entry = [self.get_entry(x) for x in obj]
+        elif isinstance(obj, tuple):
+            entry = tuple([self.get_entry(x) for x in obj])
+        elif isinstance(obj, Serializable):
+            entry = obj.to_str()
+        elif isinstance(obj, Enum):
+            entry = obj.value
+        elif isinstance(obj, float) and obj != obj:
+            entry = 'nan'
+        elif isinstance(obj, Image):
+            entry = ImageConverter.to_base64_str(image=obj)
+        else:
+            entry = obj
+        return entry
 
-def get_entry(obj):
-    if isinstance(obj, Serializable):
-        entry = obj.to_str()
-    elif isinstance(obj, Enum):
-        entry = obj.value
-    elif isinstance(obj, dict):
-        key_list = [get_entry(k) for k in obj.keys()]
-        value_list = [get_entry(v) for v in obj.values()]
-        entry = (key_list, value_list)
-    elif isinstance(obj, list):
-        entry = [get_entry(x) for x in obj]
-    elif isinstance(obj, tuple):
-        entry = tuple([get_entry(x) for x in obj])
-    elif isinstance(obj, float) and obj != obj:
-        entry = 'nan'
-    elif isinstance(obj, Image):
-        entry = ImageConverter.to_base64_str(image=obj)
-    else:
-        entry = obj
-    return entry
-
-
-def make(cls, s : str):
-    if cls in converters:
-        instance = converters[cls](s)
-    elif cls.__name__ in castable_classes:
-        instance = cls(s)
-    elif issubclass(cls, Enum):
-        instance =  cls(s)
-    elif get_origin(cls) == dict:
-        instance = orjson.loads(s)
-    elif issubclass(cls, Serializable):
-        instance = cls.from_str(s)
-    elif cls == Image:
-        instance = ImageConverter.from_base64_str(s)
-    else:
-        raise TypeError(f'Unsupported type {cls}')
-    return instance
+    @staticmethod
+    def make_basic(makecls, s : str):
+        if makecls in converters:
+            instance = converters[makecls](s)
+        elif makecls.__name__ in castable_classes:
+            instance = makecls(s)
+        elif issubclass(makecls, Enum):
+            instance =  makecls(s)
+        elif issubclass(makecls, Serializable):
+            instance = makecls.from_str(s)
+        elif makecls == Image:
+            instance = ImageConverter.from_base64_str(s)
+        else:
+            raise TypeError(f'Unsupported type {makecls}')
+        return instance
         
 
 
@@ -149,5 +143,4 @@ class TypeAnalzer:
 
 
 if __name__ == "__main__":
-    a = make(cls=float, s='4')
-    print(a)
+    pass
