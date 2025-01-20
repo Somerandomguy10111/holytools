@@ -82,7 +82,9 @@ class JsonDataclass(Serializable):
 
     @staticmethod
     def get_basic_entry(obj):
-        if isinstance(obj, Serializable):
+        if obj is None:
+            entry = None
+        elif isinstance(obj, Serializable):
             entry = obj.to_str()
         elif isinstance(obj, Enum):
             entry = obj.value

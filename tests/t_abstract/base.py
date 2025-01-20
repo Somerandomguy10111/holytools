@@ -9,6 +9,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, date, time
 from enum import Enum
 from tempfile import NamedTemporaryFile
+from typing import Optional
 from uuid import UUID
 
 from PIL.Image import Image
@@ -98,6 +99,7 @@ class SerializationTest(Unittest):
             serializable_dict : dict[SerializableInt, SerializableInt]
             image_data : Image
             dictionary_data: dict[str, str] = field(default_factory=dict)
+            optional_data : Optional[str] = None
 
             def __post_init__(self):
                 self.dictionary_data = {'key1': 'value1', 'key2': 'value2'}
