@@ -10,7 +10,7 @@ dependencies = ["requests", "pathvalidate", "psutil", "pympler",
 urls = { "repository" = "https://github.com/Somerandomguy10111/holytools" }
 
 [tool.setuptools.package-data]
-"holytools.fileIO.mock" = ["*"]
+"holytools.fileIO.examples" = ["*"]
 
 [project.scripts]
 cred = "holytools.configs.cred:main"

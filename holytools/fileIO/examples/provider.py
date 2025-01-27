@@ -20,38 +20,39 @@ def create_temp_copy(filename: str) -> str:
 class ExampleFiles:
     @staticmethod
     def lend_png() -> ImageFile:
-        fpath = create_temp_copy('mock.png')
+        fpath = create_temp_copy('file.png')
         return ImageFile(fpath=fpath)
 
     @staticmethod
     def lend_jpg() -> ImageFile:
-        fpath = create_temp_copy('mock.jpg')
+        fpath = create_temp_copy('file.jpg')
         return ImageFile(fpath=fpath)
 
     @staticmethod
     def lend_pdf() -> PlaintextFile:
-        fpath = create_temp_copy('mock.pdf')
+        fpath = create_temp_copy('file.pdf')
         return PlaintextFile(fpath=fpath)
 
     @staticmethod
     def lend_txt() -> PlaintextFile:
-        fpath = create_temp_copy('mock.txt')
+        fpath = create_temp_copy('file.txt')
         return PlaintextFile(fpath=fpath)
 
     @staticmethod
     def lend_csv() -> PlaintextFile:
-        fpath = create_temp_copy('mock.csv')
+        fpath = create_temp_copy('file.csv')
         return PlaintextFile(fpath=fpath)
 
     @staticmethod
     def lend_bin() -> BinaryFile:
-        fpath = create_temp_copy('mock.bin')
+        fpath = create_temp_copy('file.bin')
         return BinaryFile(fpath=fpath)
 
     @staticmethod
     def lend_wav() -> BinaryFile:
-        fpath = create_temp_copy('mock.wav')
+        fpath = create_temp_copy('file.wav')
         return BinaryFile(fpath=fpath)
+
 
 if __name__ == "__main__":
     print(os.path.abspath(__file__))
