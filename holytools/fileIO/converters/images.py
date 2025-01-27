@@ -9,8 +9,11 @@ from PIL import Image
 
 
 class ImageConverter:
-    @staticmethod
-    def convert_format(image: Image, target_format : ImageFormat) -> Image:
+    PNG_MODES = ['L', 'LA', 'RGB', 'RGBA', 'P']
+    JPG_MODES = ['L', 'RGB', 'CMYK']
+
+    @classmethod
+    def convert_format(cls, image: Image, target_format : ImageFormat) -> Image:
         if not image.format:
             raise TypeError(f'Given image {image} has no format')
         if not image.format.lower() in ImageFormat.get_all_formats():
@@ -21,9 +24,9 @@ class ImageConverter:
             raise TypeError(f'Image mode {image.mode} is invalid for format {image.format}')
 
         new_format = target_format.value.upper()
-        if image.mode in ('LA', 'RGBA') and new_format in ['JPG', 'JPEG']:
+        if new_format in ['JPG', 'JPEG'] and not image.mode in cls.JPG_MODES:
             image = ImageConverter.to_rgb(image)
-        elif image.mode != 'RGBA' and new_format == 'PNG':
+        if new_format == 'PNG' and not image.mode in cls.PNG_MODES:
             image = ImageConverter.to_rgba(image)
         else:
             image = image
@@ -36,22 +39,22 @@ class ImageConverter:
         rgb_content = img.convert('RGB')
         new_img.paste(rgb_content, mask=img.split()[-1])
 
-        return ImageConverter._reload_as_fmt(img, target_format=img.format)
+        return ImageConverter._reload_as_fmt(new_img, target_format=img.format)
 
     @staticmethod
     def to_rgba(img):
         new_img = img.convert('RGBA')
         return ImageConverter._reload_as_fmt(new_img, target_format=img.format)
 
-    @staticmethod
-    def _is_valid(image: Image) -> bool:
+    @classmethod
+    def _is_valid(cls, image: Image) -> bool:
         if not image.format.lower() in ImageFormat.get_all_formats():
             raise TypeError(f'Image format {image.format} is not supported')
 
         if image.format.upper() == 'PNG':
-            return image.mode in ['L', 'LA', 'RGB', 'RGBA', 'P']
+            return image.mode in cls.PNG_MODES
         elif image.format.upper() in ['JPEG', 'JPG']:
-            return image.mode in ['L', 'RGB', 'CMYK']
+            return image.mode in cls.JPG_MODES
         return False
 
     @staticmethod

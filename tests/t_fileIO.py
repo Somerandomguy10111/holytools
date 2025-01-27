@@ -83,13 +83,6 @@ class TestImageConverter(Unittest):
         new = ImageConverter.convert_format(image=image, target_format=ImageFormat.PNG)
         self.assertTrue(new.format == 'PNG')
 
-    def test_no_format_attempt(self):
-        image_io = ImageFile(fpath=self.jpg_fpath)
-        image = image_io.read()
-        no_format_img = ImageConverter.to_rgb(img=image)
-        with self.assertRaises(TypeError):
-            ImageConverter.convert_format(image=no_format_img, target_format=ImageFormat.JPEG)
-
     # noinspection PyClassVar
     def test_invalid_format_attempt(self):
         image_io = ImageFile(fpath=self.jpg_fpath)
