@@ -40,12 +40,18 @@ class TestEndpoint(Unittest):
 
             app.run(host='127.0.0.1', port=8080)
 
-        process = Process(target=run_app)
-        process.start()
+        cls.process = Process(target=run_app)
+        # noinspection PyUnresolvedReferences
+        cls.process.start()
 
         endpoint = Endpoint.make_localhost(port=8080, path='/test')
         cls.endpoint = endpoint
         time.sleep(1)
+
+    @classmethod
+    def tearDownClass(cls):
+        # noinspection PyUnresolvedReferences
+        cls.process.terminate()
 
     def test_get_url(self):
         url = self.endpoint.get_url(protocol=f'http')
@@ -58,6 +64,7 @@ class TestEndpoint(Unittest):
     def test_get(self):
         response = self.endpoint.get(secure=False)
         self.assertEqual(response.status_code, 200)
+
 
 if __name__ == "__main__":
     TestEndpoint.execute_all()

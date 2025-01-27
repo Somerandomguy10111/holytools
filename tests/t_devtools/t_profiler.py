@@ -2,7 +2,7 @@ import time
 
 from holytools.devtools import Unittest
 from holytools.devtools import Profiler
-p = Profiler(print_on_exit=True)
+p = Profiler(print_on_exit=False)
 
 # -------------------------------------
 
