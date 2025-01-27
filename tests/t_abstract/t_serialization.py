@@ -1,8 +1,6 @@
 from __future__ import annotations
 
 from holytools.abstract import SerializableType
-# from tests.t_abstract.base import SerializationTest, SimpleDataclass
-#
 import tests.t_abstract.base as base
 
 

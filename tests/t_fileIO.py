@@ -86,7 +86,7 @@ class TestImageConverter(Unittest):
     def test_no_format_attempt(self):
         image_io = ImageFile(fpath=self.jpg_fpath)
         image = image_io.read()
-        no_format_img = ImageConverter._to_rgb(image=image)
+        no_format_img = ImageConverter.to_rgb(img=image)
         with self.assertRaises(TypeError):
             ImageConverter.convert_format(image=no_format_img, target_format=ImageFormat.JPEG)
 

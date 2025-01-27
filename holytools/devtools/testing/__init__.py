@@ -1,3 +1,6 @@
+from .unit import Unittest
+
+
 import os
 import sys
 
@@ -5,7 +8,7 @@ from tox.run import run
 
 # -------------------------------------------------------------
 
-def main():
+def toxtests():
     cwd = os.getcwd()
     os.environ['REPO_DIRPATH'] = cwd
     os.environ['TOX_ENVNAME'] = os.path.basename(cwd)
