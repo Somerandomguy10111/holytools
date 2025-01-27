@@ -1,3 +1,4 @@
+import os
 from typing import Optional
 
 from pathvalidate import sanitize_filename
@@ -11,6 +12,15 @@ class PathTools:
         name = sanitize_filename(name)
     
         return name
+
+    @staticmethod
+    def increment_idx_until_free(initial_dirpath : str) -> str:
+        idx = 0
+        dirpath = initial_dirpath
+        while os.path.isdir(dirpath):
+            idx += 1
+            dirpath = f'{initial_dirpath}_{idx}'
+        return dirpath
 
     @staticmethod
     def prune_suffix(fpath : str) -> str:

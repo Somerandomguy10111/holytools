@@ -4,7 +4,7 @@ from holytools.devtools import Unittest
 from holytools.fsys import PathTools
 
 
-class TestSaveManager(Unittest):
+class TestPathTools(Unittest):
     @classmethod
     def setUpClass(cls):
         cls.test_dir = tempfile.mkdtemp()
@@ -26,4 +26,4 @@ class TestSaveManager(Unittest):
 
 if __name__ == '__main__':
     # TestFsysNode.execute_all()
-    TestSaveManager.execute_all()
+    TestPathTools.execute_all()
