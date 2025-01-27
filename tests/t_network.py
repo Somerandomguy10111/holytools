@@ -1,5 +1,9 @@
+import time
+
 from holytools.devtools import Unittest
 from holytools.network import IpProvider, NetworkArea, Endpoint
+from flask import Flask, request
+from multiprocessing import Process
 
 
 class TestIpProvider(Unittest):
@@ -23,8 +27,25 @@ class TestIpProvider(Unittest):
 class TestEndpoint(Unittest):
     @classmethod
     def setUpClass(cls):
+        def run_app():
+            app = Flask(__name__)
+
+            @app.route('/test', methods=['GET', 'POST'])
+            def test():
+                if request.method == 'GET':
+                    return 'GET request received', 200
+                elif request.method == 'POST':
+                    data = request.data.decode('utf-8')
+                    return f'POST request received with data: {data}', 200
+
+            app.run(host='127.0.0.1', port=8080)
+
+        process = Process(target=run_app)
+        process.start()
+
         endpoint = Endpoint.make_localhost(port=8080, path='/test')
         cls.endpoint = endpoint
+        time.sleep(1)
 
     def test_get_url(self):
         url = self.endpoint.get_url(protocol=f'http')
@@ -38,31 +59,5 @@ class TestEndpoint(Unittest):
         response = self.endpoint.get(secure=False)
         self.assertEqual(response.status_code, 200)
 
-
-if __name__ == '__main__':
-    from flask import Flask, request
-    from multiprocessing import Process
-
-    app = Flask(__name__)
-
-
-    @app.route('/test', methods=['GET', 'POST'])
-    def test():
-        if request.method == 'GET':
-            return 'GET request received', 200
-        elif request.method == 'POST':
-            data = request.data.decode('utf-8')
-            return f'POST request received with data: {data}', 200
-
-
-    def run_app():
-        # Adjust host and port as necessary
-        app.run(host='127.0.0.1', port=8080)
-
-
-    if __name__ == '__main__':
-        # Start the Flask app in a separate process
-        process = Process(target=run_app)
-        process.start()
-
+if __name__ == "__main__":
     TestEndpoint.execute_all()
