@@ -22,36 +22,9 @@ class Unittest(Case):
     @classmethod
     def execute_all(cls, manual_mode : bool = True):
         suite = unittest.TestLoader().loadTestsFromTestCase(cls)
-        warnings.simplefilter("always", ResourceWarning)
-        tracemalloc.start(25)
-
-        with warnings.catch_warnings(record=True) as captured_warnings:
-            runner = Runner(logger=cls.get_logger(), is_manual=manual_mode, test_name=cls.__name__)
-            results = runner.run(testsuite=suite)
-            results.print_summary()
-
-        def warning_record_to_str(warning_message: warnings.WarningMessage) -> str:
-            """Convert a warnings.WarningMessage to a string."""
-            warn_msg = warning_message.message
-            msg = warnings.formatwarning(
-                str(warn_msg),
-                warning_message.category,
-                warning_message.filename,
-                warning_message.lineno,
-                warning_message.line,
-            )
-            tb = tracemalloc.get_object_traceback(warning_message.source)
-            if tb is not None:
-                msg += "Source of unclosed object:\n" + '\n'.join(tb.format())
-            elif issubclass(warning_message.category, ResourceWarning):
-                msg += "Get a traceback for where the unclosed object was allocated by enabling tracemalloc."
-            return msg
-
-        for warning in captured_warnings:
-            print(f'Warning found!!')
-            print(warning_record_to_str(warning_message=warning))
-
-        warnings.simplefilter("ignore", ResourceWarning)
+        runner = Runner(logger=cls.get_logger(), is_manual=manual_mode, test_name=cls.__name__)
+        results = runner.run(testsuite=suite)
+        results.print_summary()
 
         return results
 
@@ -194,13 +167,41 @@ class Runner(unittest.TextTestRunner):
         self.test_name : str = test_name
 
     def run(self, testsuite : TestSuite) -> SuiteRunResult:
-        result = SuiteRunResult(logger=self.logger,
-                                testsuite_name=self.test_name,
-                                stream=self.stream,
-                                descriptions=self.descriptions,
-                                verbosity=2,
-                                manual_mode=self.manual_mode)
-        testsuite(result)
-        result.printErrors()
+        tracemalloc.start(25)
+        warnings.simplefilter("always", ResourceWarning)
+
+        with warnings.catch_warnings(record=True) as captured_warnings:
+            result = SuiteRunResult(logger=self.logger,
+                                    testsuite_name=self.test_name,
+                                    stream=self.stream,
+                                    descriptions=self.descriptions,
+                                    verbosity=2,
+                                    manual_mode=self.manual_mode)
+            testsuite(result)
+            result.printErrors()
+
+        for warning in captured_warnings:
+            print(f'- Unclosed resources:')
+            print(Runner.warning_to_str(warning_msg=warning))
+
+        warnings.simplefilter("ignore", ResourceWarning)
+        tracemalloc.stop()
 
         return result
+
+    @staticmethod
+    def warning_to_str(warning_msg: warnings.WarningMessage) -> str:
+        warn_msg = warning_msg.message
+        msg = warnings.formatwarning(
+            str(warn_msg),
+            warning_msg.category,
+            warning_msg.filename,
+            warning_msg.lineno,
+            warning_msg.line,
+        )
+        tb = tracemalloc.get_object_traceback(warning_msg.source)
+        if tb is not None:
+            msg += "Source of unclosed object:\n" + '\n'.join(tb.format())
+        elif issubclass(warning_msg.category, ResourceWarning):
+            msg += "Get a traceback for where the unclosed object was allocated by enabling tracemalloc."
+        return msg
