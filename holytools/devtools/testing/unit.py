@@ -2,19 +2,18 @@ import inspect
 import linecache
 import logging
 import os
-import traceback
-import unittest
-import warnings
 import tracemalloc
-from typing import Optional, Callable
+import unittest
 import unittest.mock
+import warnings
 from logging import Logger
-
+from typing import Optional, Callable
 from unittest import TestSuite
 
 from holytools.logging import LoggerFactory
 from .case import Case
 from .result import SuiteRunResult
+
 
 # ---------------------------------------------------------
 
@@ -193,14 +192,6 @@ class Runner(unittest.TextTestRunner):
 
     @staticmethod
     def warning_to_str(warning_msg: warnings.WarningMessage) -> str:
-        warn_msg = warning_msg.message
-        msg = warnings.formatwarning(
-            str(warn_msg),
-            warning_msg.category,
-            warning_msg.filename,
-            warning_msg.lineno,
-            warning_msg.line,
-        )
         tb = tracemalloc.get_object_traceback(warning_msg.source)
         frames = list(tb)
         frames = [f for f in frames if Runner.is_relevant(frame=f)]
