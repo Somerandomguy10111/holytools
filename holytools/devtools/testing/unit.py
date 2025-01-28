@@ -1,10 +1,12 @@
 import inspect
 import logging
 import unittest
-
+import warnings
+import tracemalloc
 from typing import Optional, Callable
 import unittest.mock
 from logging import Logger
+
 from unittest import TestSuite
 
 from holytools.logging import LoggerFactory
@@ -19,6 +21,8 @@ class Unittest(Case):
     @classmethod
     def execute_all(cls, manual_mode : bool = True):
         suite = unittest.TestLoader().loadTestsFromTestCase(cls)
+        warnings.simplefilter("always", ResourceWarning)
+        tracemalloc.start()
         runner = Runner(logger=cls.get_logger(), is_manual=manual_mode,test_name=cls.__name__)
         results =  runner.run(testsuite=suite)
         results.print_summary()
