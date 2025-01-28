@@ -1,5 +1,7 @@
 import inspect
+import linecache
 import logging
+import os
 import traceback
 import unittest
 import warnings
@@ -200,8 +202,19 @@ class Runner(unittest.TextTestRunner):
             warning_msg.line,
         )
         tb = tracemalloc.get_object_traceback(warning_msg.source)
-        if tb is not None:
-            msg += "Source of unclosed object:\n" + '\n'.join(tb.format())
-        elif issubclass(warning_msg.category, ResourceWarning):
-            msg += "Get a traceback for where the unclosed object was allocated by enabling tracemalloc."
-        return msg
+        frames = list(tb)
+        frames = [f for f in frames if Runner.is_relevant(frame=f)]
+
+        result = ''
+        for frame in frames:
+            file_path = frame.filename
+            line_number = frame.lineno
+            result += (f'File "{file_path}", line {line_number}\n'
+                      f'    {linecache.getline(file_path, line_number).strip()}\n')
+        return result
+
+    @staticmethod
+    def is_relevant(frame):
+        not_unittest = not os.path.dirname(unittest.__file__) in frame.filename
+        not_custom_unittest = not os.path.dirname(__file__) in frame.filename
+        return not_unittest and not_custom_unittest
