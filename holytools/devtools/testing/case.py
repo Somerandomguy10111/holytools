@@ -7,7 +7,7 @@ from enum import Enum
 # ---------------------------------------------------------
 
 
-class Case(unittest.TestCase):
+class UnitTestCase(unittest.TestCase):
     def __init__(self, *args):
         super().__init__(*args)
         self.is_manual_mode : bool = False

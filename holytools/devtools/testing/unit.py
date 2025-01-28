@@ -11,13 +11,13 @@ from typing import Optional, Callable
 from unittest import TestSuite
 
 from holytools.logging import LoggerFactory
-from .case import Case
+from .case import UnitTestCase
 from .result import SuiteRunResult
 
 
 # ---------------------------------------------------------
 
-class Unittest(Case):
+class Unittest(UnitTestCase):
     _logger : Logger = None
 
     @classmethod

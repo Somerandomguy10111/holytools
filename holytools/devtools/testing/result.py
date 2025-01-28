@@ -6,7 +6,7 @@ import unittest
 from typing import Optional
 from unittest import TestCase, TestResult
 import logging
-from .case import CaseReport, CaseStatus, Case
+from .case import CaseReport, CaseStatus, UnitTestCase
 
 # ---------------------------------------------------------
 
@@ -30,7 +30,7 @@ class SuiteRunResult(TestResult):
         super().stopTestRun()
         self.print_summary()
 
-    def startTest(self, case : Case):
+    def startTest(self, case : UnitTestCase):
         if self.is_manual:
             case.set_is_manual()
         self.log(msg=f'------> {case.get_name()[:self.test_spaces]} ', level=logging.INFO)
@@ -41,27 +41,27 @@ class SuiteRunResult(TestResult):
     # case logging
 
     # noinspection PyTypeChecker
-    def addSuccess(self, case : Case):
+    def addSuccess(self, case : UnitTestCase):
         super().addSuccess(case)
         self.make_report(case, CaseStatus.SUCCESS)
 
     # noinspection PyTypeChecker
-    def addError(self, case : Case, err):
+    def addError(self, case : UnitTestCase, err):
         super().addError(case, err)
         self.make_report(case, CaseStatus.ERROR, err)
 
     # noinspection PyTypeChecker
-    def addFailure(self, case : Case, err):
+    def addFailure(self, case : UnitTestCase, err):
         super().addFailure(case, err)
         self.make_report(case, CaseStatus.FAIL, err)
 
     # noinspection PyTypeChecker
-    def addSkip(self, case : Case, reason):
+    def addSkip(self, case : UnitTestCase, reason):
         super().addSkip(case, reason)
         self.make_report(case, CaseStatus.SKIPPED)
 
-    def make_report(self, case : Case, status: CaseStatus, err : Optional[tuple] = None):
-        if isinstance(case, Case):
+    def make_report(self, case : UnitTestCase, status: CaseStatus, err : Optional[tuple] = None):
+        if isinstance(case, UnitTestCase):
             report = CaseReport(name=case.get_name(), status=status, runtime=self.get_runtime(case))
             self.case_reports.append(report)
 
