@@ -3,8 +3,8 @@ import os.path
 from typing import Optional
 
 import secretstorage
-from easycrypt.encrypt import AES
-from easycrypt.hash import SHA
+from cryptoalgos.encrypt import AES
+from cryptoalgos.hash import SHA
 
 from holytools.configs.base import BaseConfigs
 from holytools.logging import LogLevel
