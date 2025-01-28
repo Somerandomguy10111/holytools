@@ -1,5 +1,6 @@
 import inspect
 import logging
+import traceback
 import unittest
 import warnings
 import tracemalloc
@@ -22,10 +23,36 @@ class Unittest(Case):
     def execute_all(cls, manual_mode : bool = True):
         suite = unittest.TestLoader().loadTestsFromTestCase(cls)
         warnings.simplefilter("always", ResourceWarning)
-        tracemalloc.start()
-        runner = Runner(logger=cls.get_logger(), is_manual=manual_mode,test_name=cls.__name__)
-        results =  runner.run(testsuite=suite)
-        results.print_summary()
+        tracemalloc.start(25)
+
+        with warnings.catch_warnings(record=True) as captured_warnings:
+            runner = Runner(logger=cls.get_logger(), is_manual=manual_mode, test_name=cls.__name__)
+            results = runner.run(testsuite=suite)
+            results.print_summary()
+
+        def warning_record_to_str(warning_message: warnings.WarningMessage) -> str:
+            """Convert a warnings.WarningMessage to a string."""
+            warn_msg = warning_message.message
+            msg = warnings.formatwarning(
+                str(warn_msg),
+                warning_message.category,
+                warning_message.filename,
+                warning_message.lineno,
+                warning_message.line,
+            )
+            tb = tracemalloc.get_object_traceback(warning_message.source)
+            if tb is not None:
+                msg += "Source of unclosed object:\n" + '\n'.join(tb.format())
+            elif issubclass(warning_message.category, ResourceWarning):
+                msg += "Get a traceback for where the unclosed object was allocated by enabling tracemalloc."
+            return msg
+
+        for warning in captured_warnings:
+            print(f'Warning found!!')
+            print(warning_record_to_str(warning_message=warning))
+
+        warnings.simplefilter("ignore", ResourceWarning)
+
         return results
 
     @classmethod
