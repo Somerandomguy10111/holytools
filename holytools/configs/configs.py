@@ -22,6 +22,8 @@ class FileConfigs(BaseConfigs):
             self.aes : AES = AES()
             self.sha : SHA = SHA()
             self.masterpw_hash : bytes = self.retrieve_masterpw_hash()
+            if self.masterpw_hash is None:
+                raise ValueError('Master password "masterpw" not set in login keyring. Aborting ...')
         config_dirpath = os.path.dirname(self._config_fpath)
         os.makedirs(config_dirpath, exist_ok=True)
         super().__init__()
@@ -33,6 +35,9 @@ class FileConfigs(BaseConfigs):
         except:
             raise ValueError(f'Environment variable \"CRED_FPATH\" not found. '
                              f'Please define file path of config file through environment variable \"CRED_FPATH\"')
+        print(f'fpath = {fpath}')
+        if not os.path.isfile(fpath):
+            raise ValueError(f'File at path \"{fpath}\" does not exist')
 
         return FileConfigs(encrypted=True, fpath=fpath)
 
@@ -80,10 +85,9 @@ class FileConfigs(BaseConfigs):
 
         self.write(content=config_content)
 
-    def read(self) -> Optional[str]:
+    def read(self) -> str:
         if not os.path.isfile(self._config_fpath):
-            print(f'[Error]: No file exists at configured config fpath {self._config_fpath}')
-            return ''
+            raise ValueError(f'No file exists at configured config fpath {self._config_fpath}')
 
         with open(self._config_fpath, 'r') as f:
             content = f.read()
@@ -99,7 +103,7 @@ class FileConfigs(BaseConfigs):
             f.write(content)
 
     def retrieve_masterpw_hash(self) -> Optional[bytes]:
-        label_name ="master_password"
+        label_name ="masterpw"
         connection = secretstorage.dbus_init()
         collections = secretstorage.get_all_collections(connection)
 
@@ -127,4 +131,4 @@ class FileConfigs(BaseConfigs):
 
 if __name__ == "__main__":
     master_pwd = FileConfigs(encrypted=True).retrieve_masterpw_hash()
-    print(f'Master pw = {master_pwd}')
+    print(f'Master pw hash = {master_pwd}')
