@@ -98,6 +98,8 @@ class SerializationTest(Unittest):
             serializable_list : list[SerializableInt]
             serializable_dict : dict[SerializableInt, SerializableInt]
             image_data : Image
+            some_bool: bool
+            single_float : float
             dictionary_data: dict[str, str] = field(default_factory=dict)
             optional_data : Optional[str] = None
 
@@ -109,6 +111,7 @@ class SerializationTest(Unittest):
             time_field=test_time,
             float_list=[1.0, 2.0, 3.0],
             float_tuple=(1.0, 2.0, 3.0),
+            single_float=2.2,
             nan_float_list=[float('nan'), float('nan')],
             int_list=[1, 2, 3],
             dataclass_list=[SimpleDataclass.make_example(), SimpleDataclass.make_example()],
@@ -116,7 +119,8 @@ class SerializationTest(Unittest):
             serializable_dict={SerializableInt(): SerializableInt(), SerializableInt(): SerializableInt()},
             enum_field=ThisParticularEnum.OPTION_A,
             simple_data=SimpleDataclass.make_example(),
-            image_data=img_file.read()
+            image_data=img_file.read(),
+            some_bool=False
         )
 
         return instance, ComplexDataclass

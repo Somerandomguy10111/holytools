@@ -94,6 +94,8 @@ class JsonDataclass(Serializable):
             entry = 'nan'
         elif isinstance(obj, Image):
             entry = ImageConverter.to_base64_str(image=obj)
+        elif isinstance(obj, bool):
+            entry = int(obj)
         else:
             entry = str(obj)
         return entry
