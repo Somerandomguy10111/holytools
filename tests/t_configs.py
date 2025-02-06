@@ -2,8 +2,11 @@ import tempfile
 import uuid
 from abc import abstractmethod
 
+import secretstorage
+
 from holytools.configs import BaseConfigs, FileConfigs
 from holytools.devtools import Unittest
+from holytools.events import Timer
 
 
 # ---------------------------------------------------------
@@ -54,6 +57,11 @@ class EncryptedFileConfigsTests(Hider.ConfigTest):
 
 
 if __name__ == '__main__':
-    FileConfigsTests.execute_all()
+    # FileConfigsTests.execute_all()
     EncryptedFileConfigsTests.execute_all()
     # PassConfigTests.execute_all()
+
+    timer = Timer()
+    credentials = FileConfigs.credentials()
+    credentials.get(key=f'groq_api_key')
+    timer.capture(verbose=True)

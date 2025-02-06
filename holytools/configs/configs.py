@@ -22,8 +22,6 @@ class FileConfigs(BaseConfigs):
             self.aes : AES = AES()
             self.sha : SHA = SHA()
             self.masterpw_hash : bytes = self.retrieve_masterpw_hash()
-            if self.masterpw_hash is None:
-                raise ValueError('Master password "masterpw" not set in login keyring. Aborting ...')
         config_dirpath = os.path.dirname(self._config_fpath)
         os.makedirs(config_dirpath, exist_ok=True)
         super().__init__()
@@ -35,7 +33,7 @@ class FileConfigs(BaseConfigs):
         except:
             raise ValueError(f'Environment variable \"CRED_FPATH\" not found. '
                              f'Please define file path of config file through environment variable \"CRED_FPATH\"')
-        print(f'fpath = {fpath}')
+        # print(f'fpath = {fpath}')
         if not os.path.isfile(fpath):
             raise ValueError(f'File at path \"{fpath}\" does not exist')
 
@@ -102,15 +100,15 @@ class FileConfigs(BaseConfigs):
         with open(self._config_fpath, 'w') as f:
             f.write(content)
 
-    def retrieve_masterpw_hash(self) -> Optional[bytes]:
+    def retrieve_masterpw_hash(self) -> bytes:
         label_name ="masterpw"
         connection = secretstorage.dbus_init()
         collections = secretstorage.get_all_collections(connection)
 
         if not collections:
-            print("No keyring collections found.")
-            return None
+            raise KeyError("No keyring collections found.")
 
+        master_pw_hash = None
         for collection in collections:
             items = collection.get_all_items()
             master_pw_matches = [i for i in items if i.get_label() == label_name]
@@ -118,12 +116,18 @@ class FileConfigs(BaseConfigs):
                 master_pw_item = master_pw_matches[0]
                 master_pw = master_pw_item.get_secret().decode('utf-8', errors='replace')
                 master_pw_hash = self.sha.get_hash(txt=master_pw)
-                return master_pw_hash
+
+        connection.close()
+        if master_pw_hash is None:
+            raise KeyError(f'No password labeled "{label_name}" found in any keyring')
+
+        return master_pw_hash
 
     @staticmethod
     def keyring_available() -> bool:
         try:
-            secretstorage.dbus_init()
+            connection = secretstorage.dbus_init()
+            connection.close()
             return True
         except:
             return False
@@ -132,3 +136,5 @@ class FileConfigs(BaseConfigs):
 if __name__ == "__main__":
     master_pwd = FileConfigs(encrypted=True).retrieve_masterpw_hash()
     print(f'Master pw hash = {master_pwd}')
+    creds = FileConfigs.credentials()
+
