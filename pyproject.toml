@@ -13,7 +13,7 @@ urls = { "repository" = "https://github.com/Somerandomguy10111/holytools" }
 "holytools.fileIO.examples" = ["*"]
 
 [project.optional-dependencies]
-dev = ["flask"]
+test = ["flask"]
 
 [project.scripts]
 cred = "holytools.configs.cred:main"
