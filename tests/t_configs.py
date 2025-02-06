@@ -57,9 +57,3 @@ class EncryptedFileConfigsTests(Hider.ConfigTest):
 if __name__ == '__main__':
     # FileConfigsTests.execute_all()
     EncryptedFileConfigsTests.execute_all()
-    # PassConfigTests.execute_all()
-
-    timer = Timer()
-    credentials = FileConfigs.credentials()
-    credentials.get(key=f'groq_api_key')
-    timer.capture(verbose=True)

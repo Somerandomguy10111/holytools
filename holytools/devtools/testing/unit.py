@@ -169,9 +169,11 @@ class Runner(unittest.TextTestRunner):
 
     def run(self, testsuite : TestSuite) -> SuiteRunResult:
         tracemalloc.start(25)
-        warnings.simplefilter("always", ResourceWarning)
 
         with warnings.catch_warnings(record=True) as captured_warnings:
+            warnings.simplefilter("ignore")
+            warnings.simplefilter("always", ResourceWarning)
+
             result = SuiteRunResult(logger=self.logger,
                                     testsuite_name=self.test_name,
                                     stream=self.stream,
