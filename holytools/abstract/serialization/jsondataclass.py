@@ -16,7 +16,7 @@ from holytools.fileIO import ImageConverter
 # -------------------------------------------
 
 @dataclass
-class JsonDataclass:
+class JsonDataclass(Serializable):
     """Can serialize dataclasses with following attributes:
     - Basic serializable types: holytools.abstract.Serializable, int, float, bool, str, int, Path, UUID, Decimal, datetime, date, time
         - Serialization: get_basic_entry()
