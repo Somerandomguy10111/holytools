@@ -21,10 +21,11 @@ class Unittest(UnitTestCase):
     _logger : Logger = None
 
     @classmethod
-    def execute_all(cls, manual_mode : bool = True):
+    def execute_all(cls, manual_mode : bool = True, trace_resourcewarning : bool = False):
         suite = unittest.TestLoader().loadTestsFromTestCase(cls)
         runner = Runner(logger=cls.get_logger(), is_manual=manual_mode, test_name=cls.__name__)
-        results = runner.run(testsuite=suite)
+        tracemalloc_depth = 10 if trace_resourcewarning else 1
+        results = runner.run(testsuite=suite, tracemalloc_depth=tracemalloc_depth)
         results.print_summary()
 
         return results
@@ -167,8 +168,8 @@ class Runner(unittest.TextTestRunner):
         self.manual_mode : bool = is_manual
         self.test_name : str = test_name
 
-    def run(self, testsuite : TestSuite) -> SuiteRunResult:
-        tracemalloc.start(25)
+    def run(self, testsuite : TestSuite, tracemalloc_depth : int = 1) -> SuiteRunResult:
+        tracemalloc.start(tracemalloc_depth)
 
         with warnings.catch_warnings(record=True) as captured_warnings:
             warnings.simplefilter("ignore")
