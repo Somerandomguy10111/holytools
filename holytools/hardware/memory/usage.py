@@ -44,22 +44,15 @@ class FunctionStatistics:
     @staticmethod
     def get_mem_usage() -> int:
         caller_frame = inspect.currentframe().f_back
-        try:
-            current_locals_size = asizeof.asizeof(caller_frame.f_locals)
-            return current_locals_size
-        finally:
-            del caller_frame
+        return asizeof.asizeof(caller_frame.f_locals)
 
     @staticmethod
     def get_variable_mem_usage() -> dict[str, int]:
         caller_frame = inspect.currentframe().f_back
-        try:
-            variables_memory_usage = {}
-            for var_name, var_value in caller_frame.f_locals.items():
-                variables_memory_usage[var_name] = asizeof.asizeof(var_value)
-            return variables_memory_usage
-        finally:
-            del caller_frame
+        variables_memory_usage = {}
+        for var_name, var_value in caller_frame.f_locals.items():
+            variables_memory_usage[var_name] = asizeof.asizeof(var_value)
+        return variables_memory_usage
 
 
 if __name__ == "__main__":

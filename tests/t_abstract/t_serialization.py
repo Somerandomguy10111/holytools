@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from holytools.abstract import SerializableType
 import tests.t_abstract.base as base
 
 
@@ -26,7 +25,7 @@ class TestPicklable(base.SerializationTest):
         return Picklable
 
       # pickle is unable to serialize the complex dataclass
-    def get_instance_and_cls(self) -> (SerializableType, type[SerializableType]):
+    def get_instance_and_cls(self):
         print(f'Using simple dataclass for pickle serialization test')
         instance = base.SimpleDataclass.make_example()
         cls = base.SimpleDataclass

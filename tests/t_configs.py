@@ -2,8 +2,6 @@ import tempfile
 import uuid
 from abc import abstractmethod
 
-import secretstorage
-
 from holytools.configs import BaseConfigs, FileConfigs
 from holytools.devtools import Unittest
 from holytools.events import Timer

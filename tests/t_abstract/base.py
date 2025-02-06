@@ -14,7 +14,7 @@ from uuid import UUID
 
 from PIL.Image import Image
 
-from holytools.abstract import SerializableType, JsonDataclass, Serializable
+from holytools.abstract import JsonDataclass, Serializable
 from holytools.devtools import Unittest
 from holytools.fileIO import ExampleFiles
 
@@ -76,7 +76,7 @@ class SerializationTest(Unittest):
         self.instance, self.cls = self.get_instance_and_cls()
 
 
-    def get_instance_and_cls(self) -> (SerializableType, type[SerializableType]):
+    def get_instance_and_cls(self):
         test_date = date.today()
         test_time = time(12, 34, 56)
 
@@ -141,7 +141,7 @@ class SerializationTest(Unittest):
 
     @classmethod
     @abstractmethod
-    def get_serializable_type(cls) -> SerializableType:
+    def get_serializable_type(cls):
         pass
 
 if __name__ == "__main__":

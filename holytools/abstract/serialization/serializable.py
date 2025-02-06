@@ -1,7 +1,6 @@
 from __future__ import annotations
 import os
 from abc import abstractmethod
-from typing import TypeVar
 from typing import Optional
 
 
@@ -33,7 +32,7 @@ class Serializable:
         return fpath
 
     @classmethod
-    def load(cls, fpath : str) -> SerializableType:
+    def load(cls, fpath : str):
         with open(fpath, 'r') as f:
             str_data = f.read()
         return cls.from_str(str_data)
@@ -64,5 +63,3 @@ def get_free_path(save_dirpath : str, name : str, suffix : Optional[str] = None,
         fpath = get_path(index=current_index)
     return fpath
 
-
-SerializableType = TypeVar(name='SerializableType', bound=Serializable)

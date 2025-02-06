@@ -16,7 +16,7 @@ from holytools.fileIO import ImageConverter
 # -------------------------------------------
 
 @dataclass
-class JsonDataclass(Serializable):
+class JsonDataclass:
     """Can serialize dataclasses with following attributes:
     - Basic serializable types: holytools.abstract.Serializable, int, float, bool, str, int, Path, UUID, Decimal, datetime, date, time
         - Serialization: get_basic_entry()
@@ -28,6 +28,8 @@ class JsonDataclass(Serializable):
             raise TypeError(f'{self.__class__} must be a dataclass to be Jsonifyable')
 
     def to_str(self) -> str:
+        # Inspection disabled because pycharm doesnt recognize JsonDataclass as dataclass
+        # noinspection PyTypeChecker
         defined_fields = set([f.name for f in dataclasses.fields(self) if f.init])
         json_dict = {}
         for attr, value in [(attr, value) for attr, value in self.__dict__.items() if attr in defined_fields]:

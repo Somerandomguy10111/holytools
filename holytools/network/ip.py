@@ -20,10 +20,12 @@ class IpProvider:
     def get_ip(cls, area: NetworkArea) -> str:
         if area == NetworkArea.LOCALHOST:
             return '127.0.0.1'
-        if area == NetworkArea.HOME:
+        elif area == NetworkArea.HOME:
             return cls.get_private_ip()
-        if area == NetworkArea.GLOBAL:
+        elif area == NetworkArea.GLOBAL:
             raise PermissionError("Unable to retrieve Global IP automatically. Please check manually")
+        else:
+            raise ValueError(f"Invalid network area: {area.value}")
 
     @staticmethod
     def get_private_ip() -> str:
@@ -35,8 +37,7 @@ class IpProvider:
             IP = s.getsockname()[0]
         except Exception:
             IP = '127.0.0.1'
-        finally:
-            s.close()
+        s.close()
         return IP
 
     @staticmethod
