@@ -127,7 +127,6 @@ class FileConfigs(BaseConfigs):
     def keyring_available() -> bool:
         try:
             connection = secretstorage.dbus_init()
-            connection.close()
             return True
         except:
             return False

@@ -24,7 +24,7 @@ class Unittest(UnitTestCase):
     def execute_all(cls, manual_mode : bool = True, trace_resourcewarning : bool = False):
         suite = unittest.TestLoader().loadTestsFromTestCase(cls)
         runner = Runner(logger=cls.get_logger(), is_manual=manual_mode, test_name=cls.__name__)
-        tracemalloc_depth = 10 if trace_resourcewarning else 1
+        tracemalloc_depth = 10 if trace_resourcewarning else 0
         results = runner.run(testsuite=suite, tracemalloc_depth=tracemalloc_depth)
         results.print_summary()
 
@@ -168,8 +168,9 @@ class Runner(unittest.TextTestRunner):
         self.manual_mode : bool = is_manual
         self.test_name : str = test_name
 
-    def run(self, testsuite : TestSuite, tracemalloc_depth : int = 1) -> SuiteRunResult:
-        tracemalloc.start(tracemalloc_depth)
+    def run(self, testsuite : TestSuite, tracemalloc_depth : int = 0) -> SuiteRunResult:
+        if tracemalloc_depth > 0:
+            tracemalloc.start(tracemalloc_depth)
 
         with warnings.catch_warnings(record=True) as captured_warnings:
             warnings.simplefilter("ignore")
@@ -185,11 +186,16 @@ class Runner(unittest.TextTestRunner):
             result.printErrors()
 
         for warning in captured_warnings:
-            print(f'- Unclosed resources:')
-            print(Runner.warning_to_str(warning_msg=warning))
+            if tracemalloc_depth > 0:
+                print(f'- Unclosed resources:')
+                print(Runner.warning_to_str(warning_msg=warning))
+            else:
+                self.logger.warning(msg=f'[Warning]: Unclosed resource: \"{warning.message}\"\n'
+                                        f'Enable trace_resourcewarning to obtain object trace')
 
         warnings.simplefilter("ignore", ResourceWarning)
-        tracemalloc.stop()
+        if tracemalloc_depth > 0:
+            tracemalloc.stop()
 
         return result
 

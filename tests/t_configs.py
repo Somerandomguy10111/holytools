@@ -56,4 +56,4 @@ class EncryptedFileConfigsTests(Hider.ConfigTest):
 
 if __name__ == '__main__':
     # FileConfigsTests.execute_all()
-    EncryptedFileConfigsTests.execute_all(trace_resourcewarning=True)
+    EncryptedFileConfigsTests.execute_all()
