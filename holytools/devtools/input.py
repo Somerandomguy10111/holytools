@@ -10,7 +10,7 @@ class InputSimulator:
         self.gen = generator()
         self.original_input = input
 
-    def redirect_input(self):
+    def substitute(self):
         builtins.input = self.simulated_input
 
     def restore_input(self):
@@ -28,7 +28,7 @@ class InputSimulator:
 
 if __name__ == "__main__":
     a = InputSimulator([f'An ice cream please','No, thank you'])
-    a.redirect_input()
+    a.substitute()
 
     item = input('What do you want?')
     r = input(f'Anything else?')

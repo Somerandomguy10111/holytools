@@ -190,7 +190,7 @@ class Runner(unittest.TextTestRunner):
                 print(f'- Unclosed resources:')
                 print(Runner.warning_to_str(warning_msg=warning))
             else:
-                self.logger.warning(msg=f'[Warning]: Unclosed resource: \"{warning.message}\"\n'
+                self.logger.warning(msg=f'[Warning]: Unclosed resource: \"{warning.message}\."'
                                         f'Enable trace_resourcewarning to obtain object trace')
 
         warnings.simplefilter("ignore", ResourceWarning)

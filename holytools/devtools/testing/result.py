@@ -55,7 +55,7 @@ class SuiteRunResult(TestResult):
         super().addFailure(case, err)
         self.make_report(case, CaseStatus.FAIL, err)
 
-    # noinspection PyTypeChecker
+    # noinspection
     def addSkip(self, case : UnitTestCase, reason):
         super().addSkip(case, reason)
         self.make_report(case, CaseStatus.SKIPPED)
