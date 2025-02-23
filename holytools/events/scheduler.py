@@ -6,7 +6,7 @@ from typing import Callable
 from dataclasses import dataclass
 
 @dataclass
-class Task:
+class FuncTask:
     func : Callable
     is_canceled : bool = False
 
@@ -26,9 +26,9 @@ class Task:
 
 class TaskScheduler:
     def __init__(self):
-        self.scheduled_tasks: dict[str, Task] = {}
+        self.scheduled_tasks: dict[str, FuncTask] = {}
     
-    def submit_once(self, task: Callable, delay: float) -> Task:
+    def submit_once(self, task: Callable, delay: float) -> FuncTask:
         return self._schedule_task(task=task, delay=delay)
 
     def submit_periodic(self, task: Callable, interval: float):
@@ -46,7 +46,7 @@ class TaskScheduler:
 
     # ---------------------------------------------------------
 
-    def _schedule_task(self, task : Callable, delay : float) -> Task:
+    def _schedule_task(self, task : Callable, delay : float) -> FuncTask:
         parameters = inspect.signature(task).parameters.values()
         for param in parameters:
             not_args_or_kwargs = (param.kind not in [param.VAR_POSITIONAL, param.VAR_KEYWORD])
@@ -54,7 +54,7 @@ class TaskScheduler:
             if has_no_defaults and not_args_or_kwargs:
                 raise InvalidCallableException("Cannot schedule task that requires arguments")
 
-        task = Task(func=task)
+        task = FuncTask(func=task)
         def do_delayed():
             self.scheduled_tasks[task.id] = task
             time.sleep(delay)

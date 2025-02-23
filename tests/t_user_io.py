@@ -1,36 +1,8 @@
 from __future__ import annotations
 import time
 
-from holytools.userIO import TrackedInt, CLI
+from holytools.userIO import TrackedInt, MessageFormatter
 from holytools.devtools import Unittest
-
-
-class Account:
-    def __init__(self, name: str, active: bool = True):
-        self.name = name
-        self.active = active
-
-    def greet(self):
-        return f"Hello, {self.name}! Active status: {self.active}"
-
-    def set_status(self, active: bool):
-        self.active = active
-        return f"Active status set to {self.active}"
-
-    def update_name(self, new_name: str):
-        self.name = new_name
-        return f"Name updated to {self.name}"
-
-    def set_details(self, new_name: str, age: int, height: float):
-        self.name = new_name
-        age = age
-        height = height
-        return f"Updated details - Name: {self.name}, Age: {age}, Height: {height}"
-
-    def deactivate(self):
-        self.active = False
-        return "Account deactivated"
-
 
 class TestTrackedInt(Unittest):
     def test_incrementation(self):
@@ -51,10 +23,35 @@ class TestTrackedInt(Unittest):
         is_smaller =  -1 < ti
         self.assertTrue(is_smaller)
 
-    # def test_sticky(s3
+
+class TestFormatter(Unittest):
+    def test_get_boxed(self):
+        msg = f'msg1'
+        boxed = MessageFormatter.get_boxed(text=msg)
+        headline_boxed = MessageFormatter.get_boxed(text=msg, headline='headline')
+
+        intended_boxed = ('+------+\n'
+                          '| msg1 |\n'
+                          '+------+')
+
+        intended_headline_boxed = (f'+- headline -+\n'
+                                   f'| msg1       |\n'
+                                   f'+------------+')
+
+        self.assertTrue(intended_boxed == boxed)
+        self.assertTrue(intended_headline_boxed == headline_boxed)
+
+    def test_get_boxed_train(self):
+        messages = ['msg1', 'msg2', 'msg3']
+        boxed_train = MessageFormatter.get_boxed_train(messages=messages)
+
+        intended_boxed_train = ('+------+     +------+     +------+\n'
+                                '| msg1 |-----| msg2 |-----| msg3 |\n'
+                                '+------+     +------+     +------+')
+        print(f'Boxed train =\n{boxed_train}')
+        print(f'Intended boxed train =\n{intended_boxed_train}')
+
+        self.assertTrue(intended_boxed_train == boxed_train)
 
 if __name__ == "__main__":
-    # Assuming InteractiveCLI and TestClass are defined
-    cli = CLI(Account, "This is a test class with various types of methods.")
-    cli.command_loop()
-    # TestTrackedInt.execute_all()
+    TestFormatter.execute_all()
