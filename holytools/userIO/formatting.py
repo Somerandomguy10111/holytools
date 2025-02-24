@@ -15,6 +15,9 @@ class MessageFormatter:
 
     @staticmethod
     def get_boxed_train(messages: list) -> str:
+        if len(messages) == 0:
+            raise ValueError("No messages to format")
+
         for msg in messages:
             if '\n' in msg:
                 raise ValueError(f"Message contains newline character: {msg}")
