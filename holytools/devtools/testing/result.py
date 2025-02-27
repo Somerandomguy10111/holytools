@@ -1,12 +1,15 @@
+from __future__ import annotations
+
 import linecache
+import logging
 import os
 import time
 import traceback
 import unittest
+from enum import Enum
 from typing import Optional
 from unittest import TestCase, TestResult
-import logging
-from .case import CaseReport, CaseStatus, UnitTestCase
+
 
 # ---------------------------------------------------------
 
@@ -43,31 +46,31 @@ class SuiteRunResult(TestResult):
     # noinspection PyTypeChecker
     def addSuccess(self, case : UnitTestCase):
         super().addSuccess(case)
-        self.make_report(case, CaseStatus.SUCCESS)
+        self.make_report(case, CaseReport.SUCCESS)
 
     # noinspection PyTypeChecker
     def addError(self, case : UnitTestCase, err):
         super().addError(case, err)
-        self.make_report(case, CaseStatus.ERROR, err)
+        self.make_report(case, CaseReport.ERROR, err)
 
     # noinspection PyTypeChecker
     def addFailure(self, case : UnitTestCase, err):
         super().addFailure(case, err)
-        self.make_report(case, CaseStatus.FAIL, err)
+        self.make_report(case, CaseReport.FAIL, err)
 
     # noinspection
     def addSkip(self, case : UnitTestCase, reason):
         super().addSkip(case, reason)
-        self.make_report(case, CaseStatus.SKIPPED)
+        self.make_report(case, CaseReport.SKIPPED)
 
-    def make_report(self, case : UnitTestCase, status: CaseStatus, err : Optional[tuple] = None):
+    def make_report(self, case : UnitTestCase, status: str, err : Optional[tuple] = None):
         if isinstance(case, UnitTestCase):
             report = CaseReport(name=case.get_name(), status=status, runtime=self.get_runtime(case))
             self.case_reports.append(report)
 
             conditional_err_msg = f'\n{self.get_err_details(err)}' if err else ''
-            finish_log_msg = f'Status: {status.value}{conditional_err_msg}\n'
-            self.log(msg=finish_log_msg, level=status.get_log_level())
+            finish_log_msg = f'Status: {status}{conditional_err_msg}\n'
+            self.log(msg=finish_log_msg, level=report.get_log_level())
         else:
             raise ValueError(f'Expected CustomTestCase, got {type(case)}')
 
@@ -110,9 +113,9 @@ class SuiteRunResult(TestResult):
     def print_summary(self):
         self.print_header(msg=' Summary ', seperator='-')
         for case in self.case_reports:
-            level = case.status.get_log_level()
+            level = case.get_log_level()
             name_msg = f'{case.name[:self.test_spaces - 4]:<{self.test_spaces}}'
-            status_msg = f'{case.status.value:<{self.status_spaces}}'
+            status_msg = f'{case.status:<{self.status_spaces}}'
             runtime_str = f'{case.runtime_sec}s'
             runtime_msg = f'{runtime_str:^{self.runtime_space}}'
 
@@ -145,4 +148,45 @@ class SuiteRunResult(TestResult):
             final_status = f"{RED}\n{CROSS} {num_unsuccessful}/{num_total} tests had errors or failures!{RESET}"
 
         return final_status
+
+
+class UnitTestCase(unittest.TestCase):
+    def __init__(self, *args):
+        super().__init__(*args)
+        self.is_manual_mode : bool = False
+
+    def set_is_manual(self):
+        self.is_manual_mode = True
+
+    def get_is_manual(self):
+        return self.is_manual_mode
+
+    def get_name(self) -> str:
+        full_test_name = self.id()
+        parts = full_test_name.split('.')
+        last_parts = parts[-2:]
+        test_name = '.'.join(last_parts)
+        return test_name
+
+
+
+class CaseReport:
+    SUCCESS = 'SUCCESS'
+    ERROR = 'ERROR'
+    FAIL = 'FAIL'
+    SKIPPED = 'SKIPPED'
+
+    def __init__(self, name : str, status : str, runtime : float):
+        self.runtime_sec : float = runtime
+        self.name : str = name
+        self.status : str = status
+
+    def get_log_level(self) -> int:
+        status_to_logging = {
+            self.SUCCESS: logging.INFO,
+            self.ERROR: logging.CRITICAL,
+            self.FAIL: logging.ERROR,
+            self.SKIPPED : logging.INFO
+        }
+        return status_to_logging[self]
 

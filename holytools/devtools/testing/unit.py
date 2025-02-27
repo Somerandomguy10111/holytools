@@ -14,7 +14,6 @@ from holytools.logging import LoggerFactory
 from .case import UnitTestCase
 from .result import SuiteRunResult
 
-
 # ---------------------------------------------------------
 
 class Unittest(UnitTestCase):
