@@ -182,11 +182,11 @@ class CaseReport:
         self.status : str = status
 
     def get_log_level(self) -> int:
-        status_to_logging = {
+        status_to_logging : dict[str, int] = {
             self.SUCCESS: logging.INFO,
             self.ERROR: logging.CRITICAL,
             self.FAIL: logging.ERROR,
             self.SKIPPED : logging.INFO
         }
-        return status_to_logging[self]
+        return status_to_logging[self.status]
 

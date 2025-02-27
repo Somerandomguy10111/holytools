@@ -11,8 +11,8 @@ from typing import Optional, Callable
 from unittest import TestSuite
 
 from holytools.logging import LoggerFactory
-from .case import UnitTestCase
-from .result import SuiteRunResult
+from .result import SuiteRunResult, UnitTestCase
+
 
 # ---------------------------------------------------------
 
