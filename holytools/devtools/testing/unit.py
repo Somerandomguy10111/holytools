@@ -1,17 +1,13 @@
 import inspect
-import linecache
 import logging
-import os
-import tracemalloc
 import unittest
 import unittest.mock
-import warnings
 from logging import Logger
 from typing import Optional, Callable
-from unittest import TestSuite
 
 from holytools.logging import LoggerFactory
-from .result import SuiteRunResult, UnitTestCase
+from .result import UnitTestCase
+from .runner import Runner
 
 
 # ---------------------------------------------------------
@@ -162,60 +158,3 @@ class Unittest(UnitTestCase):
         return decorator
 
 
-class Runner(unittest.TextTestRunner):
-    def __init__(self, logger : Logger, test_name : str, is_manual : bool = False):
-        super().__init__(resultclass=None)
-        self.logger : Logger = logger
-        self.manual_mode : bool = is_manual
-        self.test_name : str = test_name
-
-    def run(self, testsuite : TestSuite, tracemalloc_depth : int = 0) -> SuiteRunResult:
-        if tracemalloc_depth > 0:
-            tracemalloc.start(tracemalloc_depth)
-
-        with warnings.catch_warnings(record=True) as captured_warnings:
-            warnings.simplefilter("ignore")
-            warnings.simplefilter("always", ResourceWarning)
-
-            result = SuiteRunResult(logger=self.logger,
-                                    testsuite_name=self.test_name,
-                                    stream=self.stream,
-                                    descriptions=self.descriptions,
-                                    verbosity=2,
-                                    manual_mode=self.manual_mode)
-            testsuite(result)
-            result.printErrors()
-
-        for warning in captured_warnings:
-            if tracemalloc_depth > 0:
-                print(f'- Unclosed resources:')
-                print(Runner.warning_to_str(warning_msg=warning))
-            else:
-                self.logger.warning(msg=f'[Warning]: Unclosed resource: \"{warning.message}\."'
-                                        f'Enable trace_resourcewarning to obtain object trace')
-
-        warnings.simplefilter("ignore", ResourceWarning)
-        if tracemalloc_depth > 0:
-            tracemalloc.stop()
-
-        return result
-
-    @staticmethod
-    def warning_to_str(warning_msg: warnings.WarningMessage) -> str:
-        tb = tracemalloc.get_object_traceback(warning_msg.source)
-        frames = list(tb)
-        frames = [f for f in frames if Runner.is_relevant(frame=f)]
-
-        result = ''
-        for frame in frames:
-            file_path = frame.filename
-            line_number = frame.lineno
-            result += (f'File "{file_path}", line {line_number}\n'
-                      f'    {linecache.getline(file_path, line_number).strip()}\n')
-        return result
-
-    @staticmethod
-    def is_relevant(frame):
-        not_unittest = not os.path.dirname(unittest.__file__) in frame.filename
-        not_custom_unittest = not os.path.dirname(__file__) in frame.filename
-        return not_unittest and not_custom_unittest
