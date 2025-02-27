@@ -70,12 +70,25 @@ class Unittest(UnitTestCase):
                        f'\nSecond: {second_str} ({type(second)})')
             raise AssertionError(msg)
 
-    def assertSame(self, first : object, second : object):
+    def assertSame(self, first : dict, second : dict, msg : Optional[str] = None):
+        """Checks whether contents of dicts first and second are the same"""
+        for key in first:
+            first_obj = first[key]
+            second_obj = second[key]
+            self.assertSameElementary(type(first_obj), type(second_obj))
+            if isinstance(first_obj, dict):
+                self.assertSame(first_obj, second_obj, msg=msg)
+            elif isinstance(first_obj, list):
+                for i in range(len(first_obj)):
+                    self.assertSameElementary(first_obj[i], second_obj[i])
+            else:
+                self.assertSameElementary(first_obj, second_obj)
+
+    def assertSameElementary(self, first : object, second : object):
         if isinstance(first, float) and isinstance(second, float):
             self.assertSameFloat(first, second)
         else:
             self.assertEqual(first, second)
-
 
     @staticmethod
     def assertSameFloat(first : float, second : float, msg : Optional[str] = None):
@@ -126,18 +139,7 @@ class Unittest(UnitTestCase):
 
 
 
-    def assert_recursively_same(self, first : dict, second : dict, msg : Optional[str] = None):
-        for key in first:
-            first_obj = first[key]
-            second_obj = second[key]
-            self.assertSame(type(first_obj), type(second_obj))
-            if isinstance(first_obj, dict):
-                self.assert_recursively_same(first_obj, second_obj, msg=msg)
-            elif isinstance(first_obj, list):
-                for i in range(len(first_obj)):
-                    self.assertSame(first_obj[i], second_obj[i])
-            else:
-                self.assertSame(first_obj, second_obj)
+
 
     @staticmethod
     def patch_module(original: type | Callable, replacement: type | Callable):
