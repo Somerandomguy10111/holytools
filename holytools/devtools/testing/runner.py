@@ -81,8 +81,7 @@ class BlockedTester:
     def __init__(self):
         self.shared_bool = Value(ctypes.c_bool, False)
 
-
-    def run(self, runtime : int, delay : int, case : str) -> bool:
+    def check_ok(self, runtime : int, delay : int, case : str) -> bool:
         def do_run():
             threading.Thread(target=self.blocked).start()
             time.sleep(delay)
@@ -99,9 +98,9 @@ class BlockedTester:
     def blocked(self):
         pass
 
-    def check_condition(self):
-        self.shared_bool = self.perform_check()
+    def check_condition(self, case : str):
+        self.shared_bool.value = self.perform_check(case=case)
 
     @abstractmethod
-    def perform_check(self) -> bool:
+    def perform_check(self, case : str) -> bool:
         pass
