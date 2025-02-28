@@ -1,7 +1,8 @@
 import ctypes
 import linecache
-import linecache
+import multiprocessing
 import os
+import queue
 import threading
 import time
 import tracemalloc
@@ -14,6 +15,7 @@ from multiprocessing import Process, Value
 from unittest import TestSuite
 
 from .result import SuiteRunResult
+
 
 # ----------------------------------------------
 
@@ -81,15 +83,19 @@ class BlockedTester:
     def __init__(self):
         self.shared_bool = Value(ctypes.c_bool, False)
 
-    def check_ok(self, runtime : int, delay : int, case : str) -> bool:
+    def check_ok(self, delay : int, case : str) -> bool:
         def do_run():
             threading.Thread(target=self.blocked).start()
             time.sleep(delay)
-            threading.Thread(target=self.check_condition, args=(case,)).start()
+            check_thread = threading.Thread(target=self.check_condition, args=(case,))
+            check_thread.start()
+            check_thread.join()
+            q.put('stop')
 
+        q = multiprocessing.Queue()
         process = Process(target=do_run)
         process.start()
-        time.sleep(runtime)
+        q.get()
         process.terminate()
         return self.shared_bool.value
 
