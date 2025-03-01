@@ -8,7 +8,9 @@ jobs:
   deploy:
 
     runs-on: ubuntu-latest
-
+    permissions:
+      id-token: write
+    
     steps:
     - name: Prepare python + code
       uses: Somerandomguy10111/devops/actions/basepy@main
