@@ -4,7 +4,7 @@ import tempfile
 
 from holytools.devtools import Unittest
 from holytools.fsys import FsysNode
-from holytools.fsys.fsys_node import Directory
+from holytools.fsys.fsys_node import Directory, File
 
 
 # -------------------------------------------------------------
@@ -27,24 +27,38 @@ class TestFsysNode(Unittest):
         self.subfiles = {'dir1': ['sub1.dat', 'sub2.dat', 'sub3.dat', '.hiddenfile.dat'],
                          'dir2': ['sub1.png', 'sub2.png', 'sub3.png']}
 
+        for d in self.subdirs:
+            os.makedirs(os.path.join(self.test_dir, d))
+
         for the_file in self.files:
             open(os.path.join(self.test_dir, the_file), 'a').close()  # Create empty files
 
         for subdir, subfiles in self.subfiles.items():
             subdir_path = os.path.join(self.test_dir, subdir)
-            os.makedirs(subdir_path)
             for subfile in subfiles:
                 open(os.path.join(subdir_path, subfile), 'a').close()
 
         os.symlink(os.path.join(self.test_dir, 'dir1', 'sub1.dat'), os.path.join(self.test_dir, 'symlink_sub1.dat'))
-        self.root_node = Directory(self.test_dir)
+        self.root_node = Directory(path=self.test_dir)
 
-    def tearDown(self):
-        shutil.rmtree(self.test_dir)
+    # def tearDown(self):
+    #     shutil.rmtree(self.test_dir)
 
-    def test_get_file_fpaths(self):
+    def test_dir(self):
         subfile_paths = self.root_node.get_subfile_fpaths()
         self.assertEqual(len(subfile_paths), self.num_total_files)
+        self.assertTrue(self.root_node.get_name() == os.path.basename(self.test_dir))
+        self.assertTrue(isinstance(self.root_node.get_last_modified_epochtime(), float))
+
+    def test_file(self):
+        dat_fpath = os.path.join(self.test_dir, 'dir1', 'sub1.dat')
+        file = File(path=dat_fpath)
+        self.assertTrue(file.get_suffix() == 'dat')
+
+    def test_hidden(self):
+        self.assertTrue(self.root_node.is_hidden() == False)
+        hidden_dir = Directory(path=os.path.join(self.test_dir, '.hiddendir'))
+        self.assertTrue(hidden_dir.is_hidden() == True)
 
     def test_zip(self):
         zip_bytes = self.root_node.get_zip()
