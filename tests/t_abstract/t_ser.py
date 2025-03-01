@@ -1,12 +1,21 @@
 from __future__ import annotations
 
+from dataclasses import dataclass
+from datetime import datetime
+from uuid import UUID
+
+from holytools.abstract import JsonDataclass, Picklable
+from holytools.abstract.serialization import Dillable
+
 import tests.t_abstract.base as base
+
+# -----------------------------------------
+
 
 
 class TestJsonDataclass(base.SerializationTest):
     @classmethod
     def get_serializable_type(cls):
-        from holytools.abstract.serialization import JsonDataclass
         return JsonDataclass
 
 # dill has a known issue that prevents it from serializing "Enums defined in __main__" in particular
@@ -14,22 +23,31 @@ class TestJsonDataclass(base.SerializationTest):
 class TestDillable(base.SerializationTest):
     @classmethod
     def get_serializable_type(cls):
-        print(f' Getting serializable for Dillable')
-        from holytools.abstract.serialization import Dillable
         return Dillable
 
 class TestPicklable(base.SerializationTest):
+    @dataclass
+    class PicklableDataclass(Picklable):
+        id: int
+        name: str
+        timestamp: datetime
+        is_active: bool
+        unique_id: UUID
+
+        @classmethod
+        def make_example(cls):
+            return cls(id=1, name='Test', timestamp=datetime.now(), is_active=True,
+                       unique_id=UUID('12345678-1234-5678-1234-567812345678'))
+
+    # pickle is unable to serialize classes defined in function scope => Cannot use base get_instance
+    def get_instance(self):
+        return self.PicklableDataclass.make_example()
+
+    # Only needed in base get_instance
     @classmethod
     def get_serializable_type(cls):
-        from holytools.abstract.serialization import Picklable
-        return Picklable
+        pass
 
-      # pickle is unable to serialize the complex dataclass
-    def get_instance_and_cls(self):
-        print(f'Using simple dataclass for pickle serialization test')
-        instance = base.SimpleDataclass.make_example()
-        cls = base.SimpleDataclass
-        return instance, cls
 
 if __name__ == '__main__':
     TestJsonDataclass.execute_all()

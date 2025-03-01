@@ -21,6 +21,85 @@ from holytools.fileIO import ExampleFiles
 
 # -------------------------------------------
 
+class SerializationTest(Unittest):
+    def setUp(self):
+        if self.__class__ is SerializationTest:
+            raise unittest.SkipTest("Skip BaseTest tests, it's a base class")
+        self.instance : Serializable = self.get_instance()
+        self.cls : type[Serializable] = self.instance.__class__
+
+    def test_ser_deser_roundtrip(self):
+        serialized_str = self.instance.to_str()
+        reloaded_data = self.cls.from_str(serialized_str)
+        self.check_effectively_equal(obj1=self.instance, obj2=reloaded_data)
+
+    def test_save_load_roundtrip(self):
+        with NamedTemporaryFile(delete=False) as temp_file:
+            temp_file_path = temp_file.name
+        self.instance.save(temp_file_path, force_overwrite=True)
+        reloaded_data = self.cls.load(temp_file_path)
+
+        self.check_effectively_equal(obj1=self.instance, obj2=reloaded_data)
+
+    def check_effectively_equal(self, obj1 : object, obj2 : object):
+        self.assertSame(obj1.__dict__, obj2.__dict__)
+
+    # ----------------------------
+
+    def get_instance(self) -> Serializable:
+        test_date = date.today()
+        test_time = time(12, 34, 56)
+
+        ClassType = self.get_serializable_type()
+        img_file = ExampleFiles.lend_png()
+
+        @dataclass
+        class ComplexDataclass(ClassType):
+            date_field: date
+            time_field: time
+            enum_field : ThisParticularEnum
+            simple_data: SimpleDataclass
+            float_list : list[float]
+            nan_float_list : list[float]
+            float_tuple: tuple[float, float, float]
+            int_list : list[int]
+            dataclass_list: list[SimpleDataclass]
+            serializable_list : list[SerializableInt]
+            serializable_dict : dict[SerializableInt, SerializableInt]
+            image_data : Image
+            some_bool: bool
+            single_float : float
+            dictionary_data: dict[str, str] = field(default_factory=dict)
+            optional_data : Optional[str] = None
+
+            def __post_init__(self):
+                self.dictionary_data = {'key1': 'value1', 'key2': 'value2'}
+
+        instance = ComplexDataclass(
+            date_field=test_date,
+            time_field=test_time,
+            float_list=[1.0, 2.0, 3.0],
+            float_tuple=(1.0, 2.0, 3.0),
+            single_float=2.2,
+            nan_float_list=[float('nan'), float('nan')],
+            int_list=[1, 2, 3],
+            dataclass_list=[SimpleDataclass.make_example(), SimpleDataclass.make_example()],
+            serializable_list=[SerializableInt(), SerializableInt()],
+            serializable_dict={SerializableInt(): SerializableInt(), SerializableInt(): SerializableInt()},
+            enum_field=ThisParticularEnum.OPTION_A,
+            simple_data=SimpleDataclass.make_example(),
+            image_data=img_file.read(),
+            some_bool=False
+        )
+
+        return instance
+
+
+    @classmethod
+    @abstractmethod
+    def get_serializable_type(cls):
+        pass
+
 
 class ThisParticularEnum(Enum):
     OPTION_A = 1
@@ -66,87 +145,6 @@ class SerializableInt(Serializable):
 
     def __hash__(self):
         return self.uuid
-
-
-
-class SerializationTest(Unittest):
-    def setUp(self):
-        if self.__class__ is SerializationTest:
-            raise unittest.SkipTest("Skip BaseTest tests, it's a base class")
-        self.instance, self.cls = self.get_instance_and_cls()
-
-
-    def get_instance_and_cls(self):
-        test_date = date.today()
-        test_time = time(12, 34, 56)
-
-        ClassType = self.get_serializable_type()
-        img_file = ExampleFiles.lend_png()
-
-
-        @dataclass
-        class ComplexDataclass(ClassType):
-            date_field: date
-            time_field: time
-            enum_field : ThisParticularEnum
-            simple_data: SimpleDataclass
-            float_list : list[float]
-            nan_float_list : list[float]
-            float_tuple: tuple[float, float, float]
-            int_list : list[int]
-            dataclass_list: list[SimpleDataclass]
-            serializable_list : list[SerializableInt]
-            serializable_dict : dict[SerializableInt, SerializableInt]
-            image_data : Image
-            some_bool: bool
-            single_float : float
-            dictionary_data: dict[str, str] = field(default_factory=dict)
-            optional_data : Optional[str] = None
-
-            def __post_init__(self):
-                self.dictionary_data = {'key1': 'value1', 'key2': 'value2'}
-
-        instance = ComplexDataclass(
-            date_field=test_date,
-            time_field=test_time,
-            float_list=[1.0, 2.0, 3.0],
-            float_tuple=(1.0, 2.0, 3.0),
-            single_float=2.2,
-            nan_float_list=[float('nan'), float('nan')],
-            int_list=[1, 2, 3],
-            dataclass_list=[SimpleDataclass.make_example(), SimpleDataclass.make_example()],
-            serializable_list=[SerializableInt(), SerializableInt()],
-            serializable_dict={SerializableInt(): SerializableInt(), SerializableInt(): SerializableInt()},
-            enum_field=ThisParticularEnum.OPTION_A,
-            simple_data=SimpleDataclass.make_example(),
-            image_data=img_file.read(),
-            some_bool=False
-        )
-
-        return instance, ComplexDataclass
-
-
-    def test_ser_deser_roundtrip(self):
-        serialized_str = self.instance.to_str()
-        reloaded_data = self.cls.from_str(serialized_str)
-        self.check_effectively_equal(obj1=self.instance, obj2=reloaded_data)
-
-    def test_save_load_roundtrip(self):
-        with NamedTemporaryFile(delete=False) as temp_file:
-            temp_file_path = temp_file.name
-        self.instance.save(temp_file_path, force_overwrite=True)
-        reloaded_data = self.cls.load(temp_file_path)
-
-        self.check_effectively_equal(obj1=self.instance, obj2=reloaded_data)
-
-
-    def check_effectively_equal(self, obj1 : object, obj2 : object):
-        self.assertSame(obj1.__dict__, obj2.__dict__)
-
-    @classmethod
-    @abstractmethod
-    def get_serializable_type(cls):
-        pass
 
 if __name__ == "__main__":
     # SerializationTest.execute_all()
