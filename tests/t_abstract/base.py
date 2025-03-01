@@ -7,10 +7,10 @@ import uuid
 from abc import abstractmethod
 from dataclasses import dataclass, field
 from datetime import datetime, date, time
+from decimal import Decimal
 from enum import Enum
 from tempfile import NamedTemporaryFile
 from typing import Optional
-from uuid import UUID
 
 from PIL.Image import Image
 
@@ -46,29 +46,27 @@ class SerializationTest(Unittest):
 
     # ----------------------------
 
+
     def get_instance(self) -> Serializable:
         test_date = date.today()
         test_time = time(12, 34, 56)
 
         ClassType = self.get_serializable_type()
-        img_file = ExampleFiles.lend_png()
 
         @dataclass
         class ComplexDataclass(ClassType):
             date_field: date
             time_field: time
             enum_field : ThisParticularEnum
-            simple_data: SimpleDataclass
+            simple_data: BasicDataclass
             float_list : list[float]
             nan_float_list : list[float]
             float_tuple: tuple[float, float, float]
             int_list : list[int]
-            dataclass_list: list[SimpleDataclass]
+            dataclass_list: list[BasicDataclass]
             serializable_list : list[SerializableInt]
             serializable_dict : dict[SerializableInt, SerializableInt]
-            image_data : Image
-            some_bool: bool
-            single_float : float
+
             dictionary_data: dict[str, str] = field(default_factory=dict)
             optional_data : Optional[str] = None
 
@@ -80,16 +78,13 @@ class SerializationTest(Unittest):
             time_field=test_time,
             float_list=[1.0, 2.0, 3.0],
             float_tuple=(1.0, 2.0, 3.0),
-            single_float=2.2,
             nan_float_list=[float('nan'), float('nan')],
             int_list=[1, 2, 3],
-            dataclass_list=[SimpleDataclass.make_example(), SimpleDataclass.make_example()],
+            dataclass_list=[BasicDataclass.make_example(), BasicDataclass.make_example()],
             serializable_list=[SerializableInt(), SerializableInt()],
             serializable_dict={SerializableInt(): SerializableInt(), SerializableInt(): SerializableInt()},
             enum_field=ThisParticularEnum.OPTION_A,
-            simple_data=SimpleDataclass.make_example(),
-            image_data=img_file.read(),
-            some_bool=False
+            simple_data=BasicDataclass.make_example(),
         )
 
         return instance
@@ -108,16 +103,35 @@ class ThisParticularEnum(Enum):
     def __str__(self):
         return self.name
 
+
 @dataclass
-class SimpleDataclass(JsonDataclass):
-    id: int
-    name: str
-    timestamp: datetime
+class BasicDataclass(JsonDataclass):
     is_active: bool
+    id: int
+    single_float: float
+    name: str
+    serializable : SerializableInt
+    decimal : Decimal
+    dt: datetime
+    d : date
+    t : time
+    enum_field : ThisParticularEnum
+    img: Image
+
 
     @classmethod
-    def make_example(cls) -> SimpleDataclass:
-        return cls(id=1, name='Test', timestamp=datetime.now(), is_active=True)
+    def make_example(cls) -> BasicDataclass:
+        return cls(id=1, name='Test',
+                   dt=datetime.now(),
+                   decimal=Decimal('1.234'),
+                   d=date.today(),
+                   t=time(12, 34, 56),
+                   enum_field=ThisParticularEnum.OPTION_A,
+                   serializable=SerializableInt(),
+                   is_active=True,
+                   single_float=2.2,
+                   img=ExampleFiles.lend_png().read())
+
 
 
 class SerializableInt(Serializable):
@@ -147,3 +161,5 @@ class SerializableInt(Serializable):
 if __name__ == "__main__":
     # SerializationTest.execute_all()
     pass
+
+

@@ -1,22 +1,40 @@
 from __future__ import annotations
 
+import dataclasses
 from dataclasses import dataclass
 from datetime import datetime
+from types import UnionType
 from uuid import UUID
 
 from holytools.abstract import JsonDataclass, Picklable
 from holytools.abstract.serialization import Dillable
 
 import tests.t_abstract.base as base
+from holytools.abstract.serialization.jsondataclass import BasicSerializable
+from tests.t_abstract.base import BasicDataclass
+
 
 # -----------------------------------------
-
-
 
 class TestJsonDataclass(base.SerializationTest):
     @classmethod
     def get_serializable_type(cls):
         return JsonDataclass
+
+    def test_shit(self):
+        basic_types = self.extract_types_from_union(BasicSerializable)
+        basic_types_names =  [cls.__name__ for cls in basic_types]
+        actual_types_names = set([f.type for f in dataclasses.fields(BasicDataclass) if f.init])
+        print(f'Basic types: {basic_types}')
+        print(f'Actual types = {actual_types_names}')
+        self.assertTrue(basic_types_names == actual_types_names)
+
+    @staticmethod
+    def extract_types_from_union(union):
+        if isinstance(union, UnionType):
+            return list(union.__args__)
+        else:
+            return [union]
 
 # dill has a known issue that prevents it from serializing "Enums defined in __main__" in particular
 # see: https://github.com/uqfoundation/dill/issues/250
