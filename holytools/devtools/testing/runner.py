@@ -2,7 +2,6 @@ import ctypes
 import linecache
 import multiprocessing
 import os
-import queue
 import threading
 import time
 import tracemalloc
@@ -83,7 +82,7 @@ class BlockedTester:
     def __init__(self):
         self.shared_bool = Value(ctypes.c_bool, False)
 
-    def check_ok(self, delay : int, case : str) -> bool:
+    def check_ok(self, case : str, delay : float) -> bool:
         def do_run():
             threading.Thread(target=self.blocked).start()
             time.sleep(delay)

@@ -6,7 +6,6 @@ import os
 import time
 import traceback
 import unittest
-from enum import Enum
 from typing import Optional
 from unittest import TestCase, TestResult
 

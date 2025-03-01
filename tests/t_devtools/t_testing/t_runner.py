@@ -32,7 +32,7 @@ class ServerTester(BlockedTester):
 class TestBlockedTester(Unittest):
     def test_run(self):
         tester = ServerTester()
-        self.assertTrue(tester.check_ok(runtime=2, delay=1, case=''))
+        self.assertTrue(tester.check_ok(delay=1, case=''))
 
 
 if __name__ == "__main__":

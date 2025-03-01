@@ -141,7 +141,7 @@ class SerializationTest(Unittest):
 
 
     def check_effectively_equal(self, obj1 : object, obj2 : object):
-        self.assert_recursively_same(obj1.__dict__, obj2.__dict__)
+        self.assertSame(obj1.__dict__, obj2.__dict__)
 
     @classmethod
     @abstractmethod
