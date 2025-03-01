@@ -1,6 +1,6 @@
-from .file import File
+from .fileio import FileIO
 
-class PlaintextFile(File):
+class PlaintextFile(FileIO):
     def read(self) -> str:
         with open(self.fpath, 'r') as f:
             text = f.read()

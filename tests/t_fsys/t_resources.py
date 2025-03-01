@@ -1,14 +1,14 @@
 import os
 import tempfile
 
-from holytools.fsys import LocationManager
+from holytools.fsys import ResourceManager
 from holytools.devtools import Unittest
 
 class TestLocationManager(Unittest):
     def setUp(self):
         test_root_dir = tempfile.mktemp()
         os.makedirs(test_root_dir, exist_ok=True)
-        self.location_manager = LocationManager(root_dirpath=test_root_dir)
+        self.location_manager = ResourceManager(root_dirpath=test_root_dir)
         self.test_root_dir = test_root_dir
 
     def test_set_root(self):

@@ -3,13 +3,13 @@ from __future__ import annotations
 import PIL.Image as ImgHandler
 from PIL.Image import Image
 
-from .file import File
+from .fileio import FileIO
 
 
 # ---------------------------------------------------------
 
 
-class ImageFile(File):
+class ImageFile(FileIO):
     def check_content_ok(self) -> bool:
         pass
 

@@ -11,7 +11,8 @@ class Access(Enum):
     WRITABLE = os.W_OK
     EXECUTABLE = os.X_OK
 
-class File(ABC):
+
+class FileIO(ABC):
     def __init__(self, fpath : str, require_writable : bool = True, require_executable : bool = False):
         self.fpath : str = str(Path(fpath).absolute())
         required_permissions : set[Access] = {Access.READABLE}

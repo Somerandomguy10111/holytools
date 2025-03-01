@@ -5,7 +5,7 @@ import os
 
 # -------------------------------------------
 
-class LocationManager:
+class ResourceManager:
     def __init__(self, root_dirpath : str):
         if not os.path.isdir(root_dirpath):
             raise ValueError(f'Failed to initialize {self.__class__.__name__}: Root directory {root_dirpath} does not exist')

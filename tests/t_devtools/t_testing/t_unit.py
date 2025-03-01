@@ -1,5 +1,5 @@
 from holytools.devtools import Unittest
-from holytools.fileIO import File
+from holytools.fileIO import FileIO
 import os
 
 from tests.t_devtools.t_type import TestTypeInspector
@@ -35,9 +35,9 @@ class CustomFile:
 
 
 class TestPatchMechanism(Unittest):
-    @Unittest.patch_module(File, CustomFile)
+    @Unittest.patch_module(FileIO, CustomFile)
     def test_imported_cls(self):
-        file_instance = File(fpath='any')
+        file_instance = FileIO(fpath='any')
         output = file_instance.write(content='this content')
         self.assertEqual(output, "Pranked!")
 

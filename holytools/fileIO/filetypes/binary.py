@@ -1,7 +1,7 @@
-from .file import File
+from .fileio import FileIO
 
 
-class BinaryFile(File):
+class BinaryFile(FileIO):
     def read(self) -> bytes:
         return self.as_bytes()
 

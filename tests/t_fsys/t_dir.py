@@ -4,6 +4,8 @@ import tempfile
 
 from holytools.devtools import Unittest
 from holytools.fsys import FsysNode
+from holytools.fsys.fsys_node import Directory
+
 
 # -------------------------------------------------------------
 
@@ -35,14 +37,14 @@ class TestFsysNode(Unittest):
                 open(os.path.join(subdir_path, subfile), 'a').close()
 
         os.symlink(os.path.join(self.test_dir, 'dir1', 'sub1.dat'), os.path.join(self.test_dir, 'symlink_sub1.dat'))
-        self.root_node = FsysNode(self.test_dir)
+        self.root_node = Directory(self.test_dir)
 
     def tearDown(self):
         shutil.rmtree(self.test_dir)
 
-    def test_get_file_subnodes(self):
-        file_subnodes = self.root_node.get_subfile_paths()
-        self.assertEqual(len(file_subnodes), self.num_total_files)
+    def test_get_file_fpaths(self):
+        subfile_paths = self.root_node.get_subfile_fpaths()
+        self.assertEqual(len(subfile_paths), self.num_total_files)
 
     def test_zip(self):
         zip_bytes = self.root_node.get_zip()

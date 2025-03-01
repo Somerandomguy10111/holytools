@@ -1,4 +1,4 @@
 from .plaintext import PlaintextFile
 from .binary import BinaryFile
-from .file import File, Access
+from .fileio import FileIO, Access
 from .image import  ImageFile
