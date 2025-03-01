@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import dataclasses
 from dataclasses import dataclass
 from datetime import datetime
@@ -21,13 +19,15 @@ class TestJsonDataclass(base.SerializationTest):
     def get_serializable_type(cls):
         return JsonDataclass
 
-    def test_shit(self):
+    def test_type_coverage(self):
         basic_types = self.extract_types_from_union(BasicSerializable)
-        basic_types_names =  [cls.__name__ for cls in basic_types]
-        actual_types_names = set([f.type for f in dataclasses.fields(BasicDataclass) if f.init])
-        print(f'Basic types: {basic_types}')
-        print(f'Actual types = {actual_types_names}')
-        self.assertTrue(basic_types_names == actual_types_names)
+        actual_types = set([f.type for f in dataclasses.fields(BasicDataclass) if f.init])
+
+        for t in basic_types:
+            print(t)
+            contains = any([b==t for b in actual_types])
+            is_subbclass = any(issubclass(b, t) for b in actual_types)
+            self.assertTrue(contains or is_subbclass)
 
     @staticmethod
     def extract_types_from_union(union):

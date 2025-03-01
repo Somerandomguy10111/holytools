@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import json
 import random
 import unittest
@@ -10,6 +8,7 @@ from datetime import datetime, date, time
 from decimal import Decimal
 from enum import Enum
 from tempfile import NamedTemporaryFile
+from types import NoneType
 from typing import Optional
 
 from PIL.Image import Image
@@ -103,6 +102,30 @@ class ThisParticularEnum(Enum):
     def __str__(self):
         return self.name
 
+class SerializableInt(Serializable):
+    def __init__(self):
+        self.the_int_val : int = random.randint(2, 100)
+        self.uuid : int = uuid.uuid4().int
+
+    def to_str(self) -> str:
+        the_dict = {'the_int_val': self.the_int_val, 'uuid': self.uuid}
+        return json.dumps(the_dict)
+
+    @classmethod
+    def from_str(cls, s: str):
+        this = cls()
+        the_dict = json.loads(s)
+
+        this.the_int_val = the_dict['the_int_val']
+        this.uuid = the_dict['uuid']
+        return this
+
+    def __eq__(self, other):
+        return self.the_int_val == other.the_int_val
+
+    def __hash__(self):
+        return self.uuid
+
 
 @dataclass
 class BasicDataclass(JsonDataclass):
@@ -117,10 +140,10 @@ class BasicDataclass(JsonDataclass):
     t : time
     enum_field : ThisParticularEnum
     img: Image
-
+    none_obj : NoneType = None
 
     @classmethod
-    def make_example(cls) -> BasicDataclass:
+    def make_example(cls):
         return cls(id=1, name='Test',
                    dt=datetime.now(),
                    decimal=Decimal('1.234'),
@@ -134,29 +157,6 @@ class BasicDataclass(JsonDataclass):
 
 
 
-class SerializableInt(Serializable):
-    def __init__(self):
-        self.the_int_val : int = random.randint(2, 100)
-        self.uuid : int = uuid.uuid4().int
-
-    def to_str(self) -> str:
-        the_dict = {'the_int_val': self.the_int_val, 'uuid': self.uuid}
-        return json.dumps(the_dict)
-
-    @classmethod
-    def from_str(cls, s: str) -> SerializableInt:
-        this = cls()
-        the_dict = json.loads(s)
-
-        this.the_int_val = the_dict['the_int_val']
-        this.uuid = the_dict['uuid']
-        return this
-
-    def __eq__(self, other):
-        return self.the_int_val == other.the_int_val
-
-    def __hash__(self):
-        return self.uuid
 
 if __name__ == "__main__":
     # SerializationTest.execute_all()

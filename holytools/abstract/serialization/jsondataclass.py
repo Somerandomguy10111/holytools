@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import dataclasses
 from dataclasses import dataclass
 from datetime import datetime, date, time
@@ -15,7 +13,7 @@ from PIL.Image import Image
 from holytools.abstract.serialization.serializable import Serializable
 from holytools.fileIO import ImageConverter
 
-BasicSerializable = (bool | int | float | str | Serializable | Decimal | Path | datetime | date | time | Enum | Image | None)
+BasicSerializable = (bool | int | float | str | Serializable | Decimal | datetime | date | time | Enum | Image | None)
 
 # -------------------------------------------
 
@@ -50,7 +48,7 @@ class JsonDataclass(Serializable):
         return orjson.dumps(json_dict).decode("utf-8")
 
     @classmethod
-    def from_str(cls, json_str: str) -> JsonDataclass:
+    def from_str(cls, json_str: str):
         if not dataclasses.is_dataclass(cls):
             raise TypeError(f'{cls} is not a dataclass. from_json can only be used with dataclasses')
 
@@ -124,6 +122,8 @@ class JsonDataclass(Serializable):
             instance = basic_cls.from_str(s)
         elif basic_cls == Image:
             instance = ImageConverter.from_base64_str(s)
+        elif basic_cls == NoneType:
+            instance = None
         else:
             raise TypeError(f'Unsupported type {basic_cls}')
         return instance
