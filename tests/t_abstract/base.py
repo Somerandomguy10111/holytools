@@ -114,12 +114,10 @@ class SimpleDataclass(JsonDataclass):
     name: str
     timestamp: datetime
     is_active: bool
-    unique_id: UUID
 
     @classmethod
     def make_example(cls) -> SimpleDataclass:
-        return cls(id=1, name='Test', timestamp=datetime.now(), is_active=True,
-                        unique_id=UUID('12345678-1234-5678-1234-567812345678'))
+        return cls(id=1, name='Test', timestamp=datetime.now(), is_active=True)
 
 
 class SerializableInt(Serializable):

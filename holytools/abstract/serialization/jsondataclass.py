@@ -15,7 +15,7 @@ from PIL.Image import Image
 from holytools.abstract.serialization.serializable import Serializable
 from holytools.fileIO import ImageConverter
 
-BasicSerializable = (bool | int | float | str | Serializable | Decimal | Path | datetime)
+BasicSerializable = (bool | int | float | str | Serializable | Decimal | Path | datetime | date | time | Enum | Image | None)
 
 # -------------------------------------------
 
@@ -100,7 +100,7 @@ class JsonDataclass(Serializable):
         elif isinstance(obj, Image):
             entry = ImageConverter.to_base64_str(image=obj)
         elif isinstance(obj, bool):
-             bool(int(obj))
+             entry = bool(int(obj))
         else:
             entry = str(obj)
         return entry
@@ -110,6 +110,8 @@ class JsonDataclass(Serializable):
         castable_classes = ['str', 'int', 'float', 'bool', 'Decimal', 'UUID', 'Path']
         converters = {
             datetime: datetime.fromisoformat,
+            date : date.fromisoformat,
+            time : time.fromisoformat,
         }
 
         if basic_cls in converters:
