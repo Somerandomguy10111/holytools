@@ -70,6 +70,45 @@ class Directory(FsysNode):
                 subfile_paths.append(fpath)
         return subfile_paths
 
+    def get_tree(self) -> str:
+        fpaths = self.get_subfile_fpaths()
+        structure_dict = self._to_dict(fpaths)
+        return self._as_tree(fs_dict=structure_dict)
+
+    @classmethod
+    def _as_tree(cls, fs_dict: dict, indent: int = 0, max_children: int = 10) -> str:
+        total_str = ''
+        if not fs_dict:
+            return total_str
+
+        items = fs_dict.items()
+        for n, (k, v) in enumerate(items):
+            indentation = '\t' * indent
+
+            if n == max_children:
+                total_str += f'{indentation}... (Max folder elements displayed = {max_children})\n'
+                break
+
+            is_file = len(v) == 0
+            symbol = f'🗎' if is_file else '🗀'
+            conditional_backslash = '' if is_file else '/'
+            total_str += (f'{indentation}{symbol} {k}{conditional_backslash}\n'
+                          f'{cls._as_tree(v, indent=indent + 1)}')
+        if indent == 0:
+            total_str = total_str.rstrip()
+        return total_str
+
+    @staticmethod
+    def _to_dict(fpaths: list[str]) -> dict:
+        tree_dict = {}
+        for path in fpaths:
+            parts = path.split('/')
+            node = tree_dict
+            for p in parts:
+                if not p in node:
+                    node[p] = {}
+                node = node[p]
+        return tree_dict
 
 class File(FsysNode):
     def __init__(self, path : str):
@@ -86,5 +125,5 @@ class File(FsysNode):
 
 
 if __name__ == "__main__":
-    a = Directory(path='/home/daniel/sciai/')
-    a.get_subfile_fpaths()
+    directory = Directory(path='/home/daniel/misc/holytools', )
+    print(directory.get_tree())

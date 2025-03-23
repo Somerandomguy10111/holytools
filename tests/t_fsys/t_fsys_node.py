@@ -41,8 +41,25 @@ class TestFsysNode(Unittest):
         os.symlink(os.path.join(self.test_dir, 'dir1', 'sub1.dat'), os.path.join(self.test_dir, 'symlink_sub1.dat'))
         self.root_node = Directory(path=self.test_dir)
 
-    # def tearDown(self):
-    #     shutil.rmtree(self.test_dir)
+    def test_get_tree(self):
+        tree = self.root_node.get_tree()
+        testdir_name = os.path.basename(self.test_dir)
+        expected_tree = f'''🗀 /
+	🗀 tmp/
+		🗀 {testdir_name}/
+			🗎 file1.txt
+			🗎 file2.txt
+			🗎 symlink_sub1.dat
+			🗀 dir2/
+				🗎 sub3.png
+				🗎 sub2.png
+				🗎 sub1.png
+			🗀 dir1/
+				🗎 sub2.dat
+				🗎 sub1.dat
+				🗎 .hiddenfile.dat
+				🗎 sub3.dat'''
+        self.assertEqual(tree, expected_tree)
 
     def test_dir(self):
         subfile_paths = self.root_node.get_subfile_fpaths()
