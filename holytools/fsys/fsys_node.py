@@ -72,11 +72,11 @@ class Directory(FsysNode):
 
     def get_tree(self) -> str:
         fpaths = self.get_subfile_fpaths()
-        structure_dict = self._to_dict(fpaths)
-        return self._as_tree(fs_dict=structure_dict)
+        structure_dict = self.to_dict(fpaths)
+        return self.dict_to_tree(fs_dict=structure_dict)
 
     @classmethod
-    def _as_tree(cls, fs_dict: dict, indent: int = 0, max_children: int = 10) -> str:
+    def dict_to_tree(cls, fs_dict: dict, indent: int = 0, max_children: int = 10) -> str:
         total_str = ''
         if not fs_dict:
             return total_str
@@ -93,13 +93,13 @@ class Directory(FsysNode):
             symbol = f'🗎' if is_file else '🗀'
             conditional_backslash = '' if is_file else '/'
             total_str += (f'{indentation}{symbol} {k}{conditional_backslash}\n'
-                          f'{cls._as_tree(v, indent=indent + 1)}')
+                          f'{cls.dict_to_tree(v, indent=indent + 1)}')
         if indent == 0:
             total_str = total_str.rstrip()
         return total_str
 
     @staticmethod
-    def _to_dict(fpaths: list[str]) -> dict:
+    def to_dict(fpaths: list[str]) -> dict:
         tree_dict = {}
         for path in fpaths:
             parts = path.split('/')
