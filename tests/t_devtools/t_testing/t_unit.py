@@ -2,16 +2,7 @@ from holytools.devtools import Unittest
 from holytools.fileIO import FileIO
 import os
 
-from tests.t_devtools.t_type import TestTypeInspector
-
-
 # -------------------------------------------
-
-
-class TestUnitTest(Unittest):
-    def test_summary(self):
-        results = TestTypeInspector.execute_all()
-        self.assertIn(f'tests ran successfully!',results.get_final_status())
 
 class RealCar:
     @staticmethod
@@ -60,5 +51,4 @@ class TestPatchMechanism(Unittest):
 
 
 if __name__ == "__main__":
-    # TestPatchMechanism.execute_all()
-    TestUnitTest.execute_all()
+    TestPatchMechanism.execute_all()

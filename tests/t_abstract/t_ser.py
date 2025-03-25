@@ -11,7 +11,6 @@ import tests.t_abstract.base as base
 from holytools.abstract.serialization.jsondataclass import BasicSerializable
 from tests.t_abstract.base import BasicDataclass
 
-
 # -----------------------------------------
 
 class TestJsonDataclass(base.SerializationTest):

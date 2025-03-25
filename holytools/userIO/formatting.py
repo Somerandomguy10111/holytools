@@ -1,7 +1,9 @@
 class MessageFormatter:
     @staticmethod
     def get_boxed(text: str, headline: str = "") -> str:
+        text = text.replace('\t', ' ' * 4)
         lines = text.split("\n")
+
         max_length = max([len(line) for line in lines] + [len(headline)+2])
         border = "+" + "-" * (max_length + 2) + "+"
         if headline:
@@ -9,9 +11,28 @@ class MessageFormatter:
             top_line = f"+{headline.center(max_length + 2, '-')}+"
         else:
             top_line =  border
-        boxed_text = [top_line] + [f"| {line.ljust(max_length)} |" for line in lines] + [border]
-        return "\n".join(boxed_text)
+        bottom_line = border
 
+        boxed_lines = [top_line] + [f"| {line.ljust(max_length)} |" for line in lines] + [bottom_line]
+        return "\n".join(boxed_lines) + '\n'
+
+    @staticmethod
+    def multi_section_box(texts: list[str], headlines: list[str]) -> str:
+        combined_text = ''.join(texts)
+        text = combined_text.replace('\t', ' ' * 4)
+        lines = text.split("\n")
+
+        max_length = max([len(line) for line in lines] + [len(h)+2 for h in headlines])
+        border = "+" + "-" * (max_length + 2) + "+"
+
+        lines = []
+        for t, h in zip(texts, headlines):
+            headline = f' {h} '
+            top_line = f"+{h.center(max_length + 2, '-')}+"
+            lines += [top_line] + [f"| {line.ljust(max_length)} |" for line in t.split("\n")]
+        lines += [border]
+
+        return "\n".join(lines) + '\n'
 
     @staticmethod
     def get_boxed_train(messages: list) -> str:

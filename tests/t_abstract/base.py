@@ -99,8 +99,6 @@ class ThisParticularEnum(Enum):
     OPTION_A = 1
     OPTION_B = 2
 
-    def __str__(self):
-        return self.name
 
 class SerializableInt(Serializable):
     def __init__(self):

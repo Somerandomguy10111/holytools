@@ -27,19 +27,38 @@ class TestTrackedInt(Unittest):
 class TestFormatter(Unittest):
     def test_get_boxed(self):
         msg = f'msg1'
-        boxed = MessageFormatter.get_boxed(text=msg)
-        headline_boxed = MessageFormatter.get_boxed(text=msg, headline='headline')
+        a1 = MessageFormatter.get_boxed(text=msg)
+        a2 = MessageFormatter.get_boxed(text=msg, headline='headline')
 
-        intended_boxed = ('+------+\n'
-                          '| msg1 |\n'
-                          '+------+')
+        i1 = ('+------+\n'
+              '| msg1 |\n'
+              '+------+\n')
 
-        intended_headline_boxed = (f'+- headline -+\n'
-                                   f'| msg1       |\n'
-                                   f'+------------+')
+        i2 = (f'+- headline -+\n'
+              f'| msg1       |\n'
+              f'+------------+\n')
 
-        self.assertTrue(intended_boxed == boxed)
-        self.assertTrue(intended_headline_boxed == headline_boxed)
+        print(f'Expected box:\n{i1}')
+        print(f'Actual box:\n{a1}')
+
+        self.assertEqual(i1, a1)
+        self.assertEqual(i2, a2)
+
+    def test_multi_box_section(self):
+        texts = ['msg2', 'msg2']
+        headlines= ['h1', 'h2']
+
+        actual_multi_box = MessageFormatter.multi_section_box(texts=texts, headlines=headlines)
+        expected_multi_box=   ('+----h1----+\n'
+                               '| msg2     |\n'
+                               '+----h2----+\n'
+                               '| msg2     |\n'
+                               '+----------+\n')
+
+        print(f'Expected multi box:\n{expected_multi_box}')
+        print(f'Actual multi box:\n{actual_multi_box}')
+        self.assertEqual(expected_multi_box, actual_multi_box)
+
 
     def test_get_boxed_train(self):
         messages = ['msg1', 'msg2', 'msg3']
@@ -55,3 +74,4 @@ class TestFormatter(Unittest):
 
 if __name__ == "__main__":
     TestFormatter.execute_all()
+
