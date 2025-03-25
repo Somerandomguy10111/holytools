@@ -27,7 +27,7 @@ class MessageFormatter:
 
         lines = []
         for t, h in zip(texts, headlines):
-            headline = f' {h} '
+            h = f' {h} '
             top_line = f"+{h.center(max_length + 2, '-')}+"
             lines += [top_line] + [f"| {line.ljust(max_length)} |" for line in t.split("\n")]
         lines += [border]

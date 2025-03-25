@@ -49,9 +49,9 @@ class TestFormatter(Unittest):
         headlines= ['h1', 'h2']
 
         actual_multi_box = MessageFormatter.multi_section_box(texts=texts, headlines=headlines)
-        expected_multi_box=   ('+----h1----+\n'
+        expected_multi_box=   ('+--- h1 ---+\n'
                                '| msg2     |\n'
-                               '+----h2----+\n'
+                               '+--- h2 ---+\n'
                                '| msg2     |\n'
                                '+----------+\n')
 
