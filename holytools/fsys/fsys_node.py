@@ -90,9 +90,8 @@ class Directory(FsysNode):
                 break
 
             is_file = len(v) == 0
-            symbol = f'🗎' if is_file else '🗀'
             conditional_backslash = '' if is_file else '/'
-            total_str += (f'{indentation}{symbol} {k}{conditional_backslash}\n'
+            total_str += (f'{indentation} {k}{conditional_backslash}\n'
                           f'{cls.dict_to_tree(v, indent=indent + 1)}')
         if indent == 0:
             total_str = total_str.rstrip()
