@@ -87,7 +87,7 @@ class Directory(FsysNode):
         return self.dict_to_tree(fs_dict=structure_dict)
 
     @classmethod
-    def dict_to_tree(cls, fs_dict: dict, indent: int = 0, max_children: int = 10) -> str:
+    def dict_to_tree(cls, fs_dict: dict, indent: int = 0, max_children: int = 10, parent_dirpath : str = '') -> str:
         total_str = ''
         if not fs_dict:
             return total_str
@@ -100,10 +100,15 @@ class Directory(FsysNode):
                 total_str += f'{indentation}... (Max folder elements displayed = {max_children})\n'
                 break
 
-            is_file = len(v) == 0
+            parent_dirpath = os.path.join(parent_dirpath, k)
+            parent_name = os.path.basename(parent_dirpath)
+
+            fpath = os.path.join(parent_dirpath, k)
+            is_file = os.path.isfile(fpath)
+            symbol = f'🗎' if is_file else '🗀'
             conditional_backslash = '' if is_file else '/'
-            total_str += (f'{indentation} {k}{conditional_backslash}\n'
-                          f'{cls.dict_to_tree(v, indent=indent + 1)}')
+            total_str += (f'{indentation}{symbol} {k}{conditional_backslash} (parent={parent_name})\n'
+                          f'{cls.dict_to_tree(v, indent=indent + 1, parent_dirpath=k)}')
         if indent == 0:
             total_str = total_str.rstrip()
         return total_str
