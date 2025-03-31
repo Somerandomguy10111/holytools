@@ -70,8 +70,19 @@ class Directory(FsysNode):
                 subfile_paths.append(fpath)
         return subfile_paths
 
+    def get_all_subpaths(self) -> list[str]:
+        all_paths = []
+        for root, dirs, files in os.walk(self.get_path()):
+            for d in dirs:
+                dirpath = os.path.join(root, d)
+                all_paths.append(dirpath)
+            for f in files:
+                fpath = os.path.join(root, f)
+                all_paths.append(fpath)
+        return all_paths
+
     def get_tree(self) -> str:
-        fpaths = self.get_subfile_fpaths()
+        fpaths = self.get_all_subpaths()
         structure_dict = self.to_dict(fpaths)
         return self.dict_to_tree(fs_dict=structure_dict)
 

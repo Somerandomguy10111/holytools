@@ -3,7 +3,6 @@ from dataclasses import dataclass
 from datetime import datetime, date, time
 from decimal import Decimal
 from enum import Enum
-from pathlib import Path
 from types import NoneType
 from typing import get_type_hints, get_origin, get_args, Union
 
