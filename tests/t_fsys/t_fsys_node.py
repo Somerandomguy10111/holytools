@@ -39,6 +39,11 @@ class TestFsysNode(Unittest):
         os.symlink(os.path.join(self.test_dir, 'dir1', 'sub1.dat'), os.path.join(self.test_dir, 'symlink_sub1.dat'))
         self.root_node = Directory(path=self.test_dir)
 
+    def test_get_tree(self):
+        tree = self.root_node.get_tree()
+        print(tree)
+        self.assertTrue('tmp/ (parent=/)' in tree)
+
 
     def test_get_subnodes(self):
         subfile_paths = self.root_node.get_subfile_fpaths()
