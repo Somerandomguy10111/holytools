@@ -37,5 +37,4 @@ class Endpoint:
     def post(self, msg : str, secure : bool = True) -> Response:
         protocol = 'https' if secure else 'http'
         url = self.get_url(protocol=protocol)
-        print(f'Making post request to {url}')
-        return requests.post(self.get_url(protocol=protocol), data=msg)
+        return requests.post(url=url, data=msg)
