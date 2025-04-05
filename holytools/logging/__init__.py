@@ -1,6 +1,5 @@
-from .factory import Loggable, LoggerFactory
+from .loggers import Loggable, LoggerFactory
 from .tools import LoggingTools
-from .manager import LoggerManager
 
 
 import logging

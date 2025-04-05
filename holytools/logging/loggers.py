@@ -4,10 +4,10 @@ import logging
 import sys
 from dataclasses import dataclass
 from enum import Enum
+from io import StringIO
 from logging import Logger
 from typing import Optional
 
-from holytools.logging.manager import LoggerManager
 
 # ---------------------------------------------------------
 
@@ -19,7 +19,7 @@ class LoggerFactory:
                    include_location : bool = False,
                    include_logger_name : bool = False,
                    threshold : int = logging.INFO) -> Logger:
-        if LoggerManager.logger_exists(name=name):
+        if LoggerOverseer.logger_exists(name=name):
             return logging.getLogger(name)
 
         logger = logging.getLogger(name=name)
@@ -40,6 +40,38 @@ class LoggerFactory:
             logger.addHandler(file_handler)
 
         return logger
+
+
+class LoggerOverseer:
+    @staticmethod
+    def logger_exists(name : str) -> bool:
+        logger_names = [name for name in logging.root.manager.loggerDict]
+        return name in logger_names
+
+
+    @staticmethod
+    def force_identification():
+        logging.basicConfig(level=logging.DEBUG)
+        root_logger = logging.getLogger()
+        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        for handler in root_logger.handlers:
+            handler.setFormatter(formatter)
+
+    @staticmethod
+    def show_loggers():
+        logger_names = [name for name in logging.root.manager.loggerDict]
+        print("-> Currently running Loggers:")
+        for name in logger_names:
+            print(f"- {name}")
+        return logger_names
+
+    @staticmethod
+    def redirect(logger : logging.Logger, new_stream : StringIO):
+        for h in logger.handlers:
+            logger.removeHandler(hdlr=h)
+        handler = logging.StreamHandler(new_stream)
+        logger.addHandler(handler)
+
 
 class Formatter(logging.Formatter):
     custom_file_name = 'custom_file_name'
@@ -87,32 +119,6 @@ class Formatter(logging.Formatter):
         self._style._fmt = log_fmt
         return super().format(record)
 
-
-
-class Loggable:
-    def __init__(self):
-        self.logger = LoggerFactory.get_logger(name=self.__class__.__name__)
-
-    def log(self, msg : str, level : int = logging.INFO):
-        self.logger.log(level=level, msg=msg)
-
-    def warning(self, msg : str, *args, **kwargs):
-        kwargs['level'] = logging.WARNING
-        self.logger.log(msg=msg, *args, **kwargs)
-
-    def error(self, msg : str, *args, **kwargs):
-        kwargs['level'] = logging.ERROR
-        self.logger.log(msg=msg, *args, **kwargs)
-
-    def critical(self, msg : str, *args, **kwargs):
-        kwargs['level'] = logging.CRITICAL
-        self.logger.log(msg=msg, *args, **kwargs)
-
-    def info(self, msg : str, *args, **kwargs):
-        kwargs['level'] = logging.INFO
-        self.logger.log(msg=msg, *args, **kwargs)
-
-
 class LogTarget(Enum):
     FILE = "FILE"
     CONSOLE = "CONSOLE"
@@ -123,3 +129,4 @@ class Formatting:
     print_timestamp : bool
     print_logger_name : bool
     print_location : bool
+
