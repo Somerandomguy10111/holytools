@@ -26,7 +26,7 @@ class LoggerFactory:
                                 print_location=include_location,
                                 print_logger_name=include_logger_name)
 
-        console_handler = logging.StreamHandler(sys.stdout)
+        console_handler = logging.StreamHandler(sys.stderr)
         console_formatter = Formatter(log_target=LogTarget.CONSOLE, formatting=formatting)
         console_handler.setFormatter(console_formatter)
         logger.addHandler(console_handler)
@@ -45,6 +45,14 @@ class LoggerFactory:
     def logger_exists(name : str) -> bool:
         logger_names = [name for name in logging.root.manager.loggerDict]
         return name in logger_names
+
+    @staticmethod
+    def show_loggers():
+        logger_names = [name for name in logging.root.manager.loggerDict]
+        print("-> Currently running Loggers:")
+        for name in logger_names:
+            print(f"- {name}")
+        return logger_names
 
 
 class Formatter(logging.Formatter):

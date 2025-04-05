@@ -26,7 +26,6 @@ class LoggingModifier:
         color_code = color_code_map[color]
         return f"{color_code}{msg}\033[0m"
 
-
     @staticmethod
     def get_limited_stacktrace(err: Exception, excluded_modules : list[types.ModuleType]) -> str:
         err_class, err_instance, err_traceback = err.__class__, err, err.__traceback__
