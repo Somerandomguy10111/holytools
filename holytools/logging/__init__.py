@@ -1,6 +1,6 @@
 from .factory import Loggable, LoggerFactory
-from .modifier import LoggingModifier
-from .tools import get_timestamp, mute, to_sci_notation
+from .tools import LoggingTools
+from .manager import LoggerManager
 
 
 import logging

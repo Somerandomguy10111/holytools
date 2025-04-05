@@ -7,6 +7,8 @@ from enum import Enum
 from logging import Logger
 from typing import Optional
 
+from holytools.logging.manager import LoggerManager
+
 # ---------------------------------------------------------
 
 class LoggerFactory:
@@ -17,7 +19,7 @@ class LoggerFactory:
                    include_location : bool = False,
                    include_logger_name : bool = False,
                    threshold : int = logging.INFO) -> Logger:
-        if cls.logger_exists(name=name):
+        if LoggerManager.logger_exists(name=name):
             return logging.getLogger(name)
 
         logger = logging.getLogger(name=name)
@@ -38,22 +40,6 @@ class LoggerFactory:
             logger.addHandler(file_handler)
 
         return logger
-
-    # ---------------------------------------------------------
-
-    @staticmethod
-    def logger_exists(name : str) -> bool:
-        logger_names = [name for name in logging.root.manager.loggerDict]
-        return name in logger_names
-
-    @staticmethod
-    def show_loggers():
-        logger_names = [name for name in logging.root.manager.loggerDict]
-        print("-> Currently running Loggers:")
-        for name in logger_names:
-            print(f"- {name}")
-        return logger_names
-
 
 class Formatter(logging.Formatter):
     custom_file_name = 'custom_file_name'
@@ -130,6 +116,7 @@ class Loggable:
 class LogTarget(Enum):
     FILE = "FILE"
     CONSOLE = "CONSOLE"
+
 
 @dataclass
 class Formatting:
