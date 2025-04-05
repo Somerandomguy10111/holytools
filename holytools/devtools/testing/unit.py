@@ -28,7 +28,7 @@ class Unittest(UnitTestCase):
     @classmethod
     def get_logger(cls) -> Logger:
         if not cls._logger:
-            cls._logger = LoggerFactory.get_logger(include_location=False, include_timestamp=False, name=cls.__name__)
+            cls._logger = LoggerFactory.get_logger(include_location=False, include_timestamp=False, name=cls.__name__, use_stdout=True)
         return cls._logger
 
     @classmethod

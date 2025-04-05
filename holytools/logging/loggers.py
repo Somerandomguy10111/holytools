@@ -18,7 +18,8 @@ class LoggerFactory:
                    include_timestamp : bool = True,
                    include_location : bool = False,
                    include_logger_name : bool = False,
-                   threshold : int = logging.INFO) -> Logger:
+                   threshold : int = logging.INFO,
+                   use_stdout : bool = False) -> Logger:
         if LoggerOverseer.logger_exists(name=name):
             return logging.getLogger(name)
 
@@ -28,7 +29,8 @@ class LoggerFactory:
                                 print_location=include_location,
                                 print_logger_name=include_logger_name)
 
-        console_handler = logging.StreamHandler(sys.stderr)
+        stream = sys.stdout if use_stdout else sys.stderr
+        console_handler = logging.StreamHandler(stream)
         console_formatter = Formatter(log_target=LogTarget.CONSOLE, formatting=formatting)
         console_handler.setFormatter(console_formatter)
         logger.addHandler(console_handler)

@@ -41,8 +41,11 @@ class TestFsysNode(Unittest):
 
     def test_get_tree(self):
         tree = self.root_node.get_tree()
-        print(tree)
-        self.assertTrue('tmp/ (parent=/)' in tree)
+
+        expected_expression = f'{os.path.basename(self.test_dir)}/ -> tmp/'
+        print(f'- Expected expression: {expected_expression}')
+        print(f'- Tree:\n{tree}')
+        self.assertTrue(expected_expression in tree)
 
 
     def test_get_subnodes(self):

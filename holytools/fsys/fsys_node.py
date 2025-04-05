@@ -62,6 +62,11 @@ class Directory(FsysNode):
         if not self._path_wrapper.is_dir():
             raise FileNotFoundError(f'Path {path} is not a directory')
 
+    def get_tree(self) -> str:
+        fpaths = self.get_all_subpaths()
+        structure_dict = self.to_dict(fpaths)
+        return self.dict_to_tree(fs_dict=structure_dict)
+
     def get_subfile_fpaths(self) -> list[str]:
         subfile_paths = []
         for root, dirs, files in os.walk(self.get_path()):
@@ -81,11 +86,6 @@ class Directory(FsysNode):
                 all_paths.append(fpath)
         return all_paths
 
-    def get_tree(self) -> str:
-        fpaths = self.get_all_subpaths()
-        structure_dict = self.to_dict(fpaths)
-        return self.dict_to_tree(fs_dict=structure_dict)
-
     @classmethod
     def dict_to_tree(cls, fs_dict: dict, indent: int = 0, max_children: int = 10, parent_dirpath : str = '') -> str:
         total_str = ''
@@ -101,14 +101,13 @@ class Directory(FsysNode):
                 break
 
             parent_name = os.path.basename(parent_dirpath)
-            if parent_name == '':
-                parent_name = '/'
+            parent_indicator = f'-> {parent_name}/' if parent_name else ''
             fpath = os.path.join(parent_dirpath, k)
 
             is_file = os.path.isfile(fpath)
             symbol = f'🗎' if is_file else '🗀'
             conditional_backslash = '' if is_file else '/'
-            total_str += (f'{indentation}{symbol} {k}{conditional_backslash} (parent={parent_name})\n'
+            total_str += (f'{indentation}{symbol} {k}{conditional_backslash} {parent_indicator}\n'
                           f'{cls.dict_to_tree(v, indent=indent + 1, parent_dirpath=k)}')
         if indent == 0:
             total_str = total_str.rstrip()
