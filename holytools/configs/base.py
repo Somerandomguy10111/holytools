@@ -4,12 +4,12 @@ import os
 from abc import abstractmethod, ABC
 from typing import Optional
 
-from holytools.logging import Loggable, LogLevel
+from holytools.logging import Timber, LogLevel
 
 
 # ---------------------------------------------------------
 
-class BaseConfigs(Loggable, ABC):
+class BaseConfigs(Timber, ABC):
     def __init__(self, *args, **kwargs):
         super().__init__()
         self._map = {None : {}}

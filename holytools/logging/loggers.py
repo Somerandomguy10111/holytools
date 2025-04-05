@@ -72,7 +72,6 @@ class LoggerOverseer:
         handler = logging.StreamHandler(new_stream)
         logger.addHandler(handler)
 
-
 class Formatter(logging.Formatter):
     custom_file_name = 'custom_file_name'
     custom_line_no = 'custom_lineno'

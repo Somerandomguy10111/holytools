@@ -1,5 +1,6 @@
-from .loggers import Loggable, LoggerFactory
 from .tools import LoggingTools
+from .loggers import LoggerOverseer, LoggerFactory
+from .timber import Timber
 
 
 import logging
