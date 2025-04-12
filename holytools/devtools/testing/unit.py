@@ -1,3 +1,4 @@
+from __future__ import annotations
 import inspect
 import logging
 import unittest
@@ -14,6 +15,13 @@ from .runner import Runner
 
 class Unittest(UnitTestCase):
     _logger : Logger = None
+
+    @classmethod
+    def ready(cls) -> Unittest:
+        instance = cls()
+        instance.setUpClass()
+        instance.setUp()
+        return instance
 
     @classmethod
     def execute_all(cls, manual_mode : bool = True, trace_resourcewarning : bool = False):
@@ -131,9 +139,6 @@ class Unittest(UnitTestCase):
             if msg is None:
                 msg = f'Tested expression should be false'
             raise AssertionError(msg)
-
-
-
 
 
     @staticmethod

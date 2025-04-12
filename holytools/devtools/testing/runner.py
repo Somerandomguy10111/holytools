@@ -15,9 +15,7 @@ from unittest import TestSuite
 
 from .result import SuiteRunResult
 
-
 # ----------------------------------------------
-
 
 class Runner(unittest.TextTestRunner):
     def __init__(self, logger : Logger, test_name : str, is_manual : bool = False):

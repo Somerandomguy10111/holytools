@@ -168,7 +168,6 @@ class UnitTestCase(unittest.TestCase):
         return test_name
 
 
-
 class CaseReport:
     SUCCESS = 'SUCCESS'
     ERROR = 'ERROR'
