@@ -159,15 +159,4 @@ class TypeAnalzer:
 
 
 if __name__ == "__main__":
-    class ASDF(Serializable):
-
-        def to_str(self) -> str:
-            return 'a'
-
-        @classmethod
-        def from_str(cls, s: str):
-            return ASDF()
-
-
-    asdf = ASDF()
-    print(JsonDataclass.get_basic_entry(obj=asdf))
+    pass
