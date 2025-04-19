@@ -25,7 +25,7 @@ class SuiteRunResult(TestResult):
         self.case_reports : list[CaseReport] = []
         self.start_times : dict[str, float] = {}
         self.is_manual : bool = manual_mode
-        self.print_header(f'  Test suite: \"{testsuite_name}\"  ')
+        self.log_header(f'  Test suite: \"{testsuite_name}\"  ')
 
     def log(self, msg : str, level : int = logging.INFO):
         self.logger.log(msg=msg, level=level)
@@ -33,7 +33,7 @@ class SuiteRunResult(TestResult):
     def startTest(self, case : UnitTestCase):
         if self.is_manual:
             case.set_is_manual()
-        self.log(msg=f'------> {case.get_name()[:self.test_spaces]} ', level=logging.INFO)
+        self.log_test_start(case=case)
         self.start_times[case.id()] = time.time()
         super().startTest(case)
 
@@ -103,12 +103,14 @@ class SuiteRunResult(TestResult):
             result += f'{err_class.__name__}: {err_instance}\n{tb_str}'
         return result
 
+    def log_test_start(self, case : UnitTestCase):
+        self.log(msg=f'------> {case.get_name()[:self.test_spaces]} ', level=logging.INFO)
 
     # ---------------------------------------------------------
     # summary logging
 
     def print_summary(self):
-        self.print_header(msg=' Summary ', seperator='-')
+        self.log_header(msg=' Summary ', seperator='-')
         for case in self.case_reports:
             level = case.get_log_level()
             name_msg = f'{case.name[:self.test_spaces - 4]:<{self.test_spaces}}'
@@ -118,10 +120,10 @@ class SuiteRunResult(TestResult):
 
             self.log(msg=f'{name_msg}{status_msg}{runtime_msg}', level=level)
         self.log(self.get_final_status())
-        self.print_header(msg='')
+        self.log_header(msg='')
 
 
-    def print_header(self, msg: str, seperator : str = '='):
+    def log_header(self, msg: str, seperator : str = '='):
         total_len = self.test_spaces + self.status_spaces
         total_len += self.runtime_space
         line_len = max(total_len- len(msg), 0)

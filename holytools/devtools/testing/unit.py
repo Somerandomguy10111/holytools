@@ -1,11 +1,14 @@
 from __future__ import annotations
 import inspect
 import logging
+import sys
 import unittest
 import unittest.mock
+from io import StringIO
 from logging import Logger
 from typing import Optional, Callable
 
+from holytools.devtools.testing.case import CaseReport
 from holytools.logging import LoggerFactory
 from .suite import UnitTestCase
 from .runner import Runner
@@ -34,16 +37,28 @@ class Unittest(UnitTestCase):
         return results
 
     @classmethod
-    def execute_statistiically(cls, reps : int, manual_mode : bool = True):
+    def execute_statistiically(cls, reps : int, success_rate : float):
         suite = unittest.TestSuite()
+        current_case = cls('testA')
         for _ in range(reps):
             suite.addTest(cls('testA'))
 
-        runner = Runner(logger=cls.get_logger(), is_manual=manual_mode, test_name=cls.__name__)
+        sys.stdout, sys.stderr = StringIO(), StringIO()
+        runner = Runner(logger=cls.get_logger(), test_name=cls.__name__)
+        sys.stdout, sys.stderr = sys.__stdout__, sys.__stderr__
         results = runner.run(testsuite=suite)
-        checkmark_arr = ['✓' if result.lower() == 'Success'.lower() else '✗' for result in suite.case]
+        is_successful = [True if c == c.SUCCESS else False for c in results.case_reports]
+        checkmark_arr = ['✓' if s else '✗' for s in is_successful]
 
-        # results.print_summary()
+        ratio = sum(is_successful) / len(is_successful)
+        results.log_test_start(case=current_case)
+        print(f'Results: {checkmark_arr}')
+        if ratio >= success_rate:
+            print(f'Status: {CaseReport.SUCCESS}')
+        else:
+            print(f'Status: {CaseReport.FAIL}')
+
+
 
         return results
 
