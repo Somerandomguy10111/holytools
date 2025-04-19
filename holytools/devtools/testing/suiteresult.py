@@ -9,7 +9,7 @@ import unittest
 from typing import Optional
 from unittest import TestCase, TestResult
 
-from holytools.devtools.testing.case import UnitTestCase, CaseReport, CaseStatus
+from holytools.devtools.testing.case import UnitTestCase, Report, CaseStatus
 
 
 # ---------------------------------------------------------
@@ -22,7 +22,7 @@ class SuiteResuult(TestResult):
     def __init__(self, logger : logging.Logger, testsuite_name: str, manual_mode : bool = False, mute : bool = False, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.logger = logger
-        self.case_reports : list[CaseReport] = []
+        self.reports : list[Report] = []
         self.start_times : dict[str, float] = {}
         self.is_manual : bool = manual_mode
         self.testsuite_name = testsuite_name
@@ -70,12 +70,10 @@ class SuiteResuult(TestResult):
         self.start_times[case.id()] = time.time()
 
     def on_case_finish(self, case : UnitTestCase, status: str, err : Optional[tuple] = None):
-        report = CaseReport(name=case.get_name(), status=status, runtime=self._get_runtime(case))
-        self.case_reports.append(report)
+        report = Report(name=case.get_name(), status=status, runtime=self._get_runtime(case), err=err)
 
-        conditional_err_msg = f'\n{self._get_err_details(err)}' if err else ''
-        finish_log_msg = f'Status: {status}{conditional_err_msg}\n'
-        self.log(msg=finish_log_msg, level=report.get_log_level())
+        self.log(msg=report.get_view(), level=report.get_log_level())
+        self.reports.append(report)
 
 
     def _get_runtime(self, test : TestCase) -> Optional[float]:
@@ -87,27 +85,7 @@ class SuiteResuult(TestResult):
             self.log(msg=f'Couldnt find start time of test {test_id}. Current start_times : {self.start_times}',
                      level=logging.ERROR)
 
-    @staticmethod
-    def _get_err_details(err) -> str:
-        err_class, err_instance, err_traceback = err
-        tb_list = traceback.extract_tb(err_traceback)
 
-        def is_relevant(tb):
-            not_unittest = not os.path.dirname(unittest.__file__) in tb.filename
-            not_custom_unittest = not os.path.dirname(__file__) in tb.filename
-            return not_unittest and not_custom_unittest
-
-        user_tb = [tb for tb in tb_list if is_relevant(tb)]
-
-        result = ''
-        relevant_tb = user_tb if not len(user_tb) == 0 else tb_list
-        for frame in relevant_tb:
-            file_path = frame.filename
-            line_number = frame.lineno
-            tb_str = (f'File "{file_path}", line {line_number}, in {frame.name}\n'
-                      f'    {linecache.getline(file_path, line_number).strip()}')
-            result += f'{err_class.__name__}: {err_instance}\n{tb_str}'
-        return result
 
     # ---------------------------------------------------------
     # logging
@@ -115,11 +93,11 @@ class SuiteResuult(TestResult):
 
     def log_summary(self):
         self.log(self.get_header(msg=' Summary ', seperator='-'))
-        for case in self.case_reports:
+        for case in self.reports:
             level = case.get_log_level()
             name_msg = f'{case.name[:self.test_spaces - 4]:<{self.test_spaces}}'
             status_msg = f'{case.status:<{self.status_spaces}}'
-            runtime_str = f'{case.runtime_sec}s'
+            runtime_str = f'{case.runtime}s'
             runtime_msg = f'{runtime_str:^{self.runtime_space}}'
 
             self.log(msg=f'{name_msg}{status_msg}{runtime_msg}', level=level)

@@ -8,7 +8,7 @@ import unittest.mock
 from logging import Logger
 from typing import Optional, Callable
 
-from holytools.devtools.testing.case import CaseStatus, CaseReport
+from holytools.devtools.testing.case import CaseStatus, Report
 from holytools.devtools.testing.suiteresult import SuiteResuult
 from holytools.logging import LoggerFactory
 
@@ -46,7 +46,15 @@ class Unittest(UnitTestCase):
             current_case = cls(tn)
             start_time = time.time()
             suite_result = cls._run_several(reps=reps, name=tn)
-            is_successful = [True if c.status == CaseStatus.SUCCESS else False for c in suite_result.case_reports]
+            is_successful = [True if c.status == CaseStatus.SUCCESS else False for c in suite_result.reports]
+
+            first_report = suite_result.reports[0]
+
+            if first_report.status == CaseStatus.ERROR:
+                suite_result.mute = False
+                suite_result.log_test_start(case=current_case)
+                suite_result.log(first_report.get_view(), level=first_report.get_log_level())
+                continue
 
             num_successful = sum(is_successful)
             total = len(is_successful)
@@ -57,7 +65,7 @@ class Unittest(UnitTestCase):
             print(f'Stats: {num_successful}/{total} tests succeeded')
 
             status = CaseStatus.SUCCESS if ratio >= success_rate else CaseStatus.FAIL
-            case_reports = CaseReport(name=tn,status=status, runtime=time.time() - start_time)
+            case_reports = Report(name=tn, status=status, runtime=time.time() - start_time)
             status_msg = f'Status: {status}'
             suite_result.log(msg=status_msg, level=case_reports.get_log_level())
 
