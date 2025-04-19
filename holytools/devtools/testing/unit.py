@@ -10,7 +10,7 @@ from typing import Optional, Callable
 
 from holytools.devtools.testing.case import CaseReport
 from holytools.logging import LoggerFactory
-from .suite import UnitTestCase
+from .suiteresult import UnitTestCase
 from .runner import Runner
 
 
@@ -32,7 +32,6 @@ class Unittest(UnitTestCase):
         runner = Runner(logger=cls.get_logger(), is_manual=manual_mode, test_name=cls.__name__)
         tracemalloc_depth = 10 if trace_resourcewarning else 0
         results = runner.run(testsuite=suite, tracemalloc_depth=tracemalloc_depth)
-        results.print_summary()
 
         return results
 

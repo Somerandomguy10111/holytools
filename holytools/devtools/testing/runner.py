@@ -13,32 +13,36 @@ from logging import Logger
 from multiprocessing import Process, Value
 from unittest import TestSuite
 
-from .suite import SuiteRunResult
+from .suiteresult import SuiteResuult
 
 # ----------------------------------------------
 
 class Runner(unittest.TextTestRunner):
-    def __init__(self, logger : Logger, test_name : str, is_manual : bool = False):
+    def __init__(self, logger : Logger, test_name : str, is_manual : bool = False, mute : bool = False):
         super().__init__(resultclass=None)
         self.logger : Logger = logger
         self.manual_mode : bool = is_manual
         self.test_name : str = test_name
+        self.mute : bool = mute
 
-    def run(self, testsuite : TestSuite, tracemalloc_depth : int = 0) -> SuiteRunResult:
+    def run(self, testsuite : TestSuite, tracemalloc_depth : int = 0) -> SuiteResuult:
         if tracemalloc_depth > 0:
             tracemalloc.start(tracemalloc_depth)
+
 
         with warnings.catch_warnings(record=True) as captured_warnings:
             warnings.simplefilter("ignore")
             warnings.simplefilter("always", ResourceWarning)
 
-            result = SuiteRunResult(logger=self.logger,
-                                    testsuite_name=self.test_name,
-                                    stream=self.stream,
-                                    descriptions=self.descriptions,
-                                    verbosity=2,
-                                    manual_mode=self.manual_mode)
+            result = SuiteResuult(logger=self.logger,
+                                  testsuite_name=self.test_name,
+                                  stream=self.stream,
+                                  descriptions=self.descriptions,
+                                  verbosity=2,
+                                  manual_mode=self.manual_mode)
+            result.startTestRun()
             testsuite(result)
+            result.stopTestRun()
             result.printErrors()
 
         for warning in captured_warnings:
@@ -62,9 +66,9 @@ class Runner(unittest.TextTestRunner):
         frames = [f for f in frames if Runner.is_relevant(frame=f)]
 
         result = ''
-        for frame in frames:
-            file_path = frame.filename
-            line_number = frame.lineno
+        for f in frames:
+            file_path = f.filename
+            line_number = f.lineno
             result += (f'File "{file_path}", line {line_number}\n'
                       f'    {linecache.getline(file_path, line_number).strip()}\n')
         return result

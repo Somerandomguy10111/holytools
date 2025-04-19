@@ -14,7 +14,7 @@ from holytools.devtools.testing.case import UnitTestCase, CaseReport
 
 # ---------------------------------------------------------
 
-class SuiteRunResult(TestResult):
+class SuiteResuult(TestResult):
     test_spaces = 50
     status_spaces = 10
     runtime_space = 10
@@ -25,54 +25,59 @@ class SuiteRunResult(TestResult):
         self.case_reports : list[CaseReport] = []
         self.start_times : dict[str, float] = {}
         self.is_manual : bool = manual_mode
-        self.log_header(f'  Test suite: \"{testsuite_name}\"  ')
-
-    def log(self, msg : str, level : int = logging.INFO):
-        self.logger.log(msg=msg, level=level)
-
+        self.testsuite_name = testsuite_name
+    #
+    # def startTestRun(self):
+    #     super().startTestRun()
+    #     self.log_header(f'  Test suite: \"{self.testsuite_name}\"  ')
+    #
     def startTest(self, case : UnitTestCase):
-        if self.is_manual:
-            case.set_is_manual()
-        self.log_test_start(case=case)
-        self.start_times[case.id()] = time.time()
         super().startTest(case)
+        self.on_case_start(case=case)
 
-    # ---------------------------------------------------------
-    # case logging
+    def stopTestRun(self):
+        self.print_summary()
+        super().stopTestRun()
 
     # noinspection PyTypeChecker
     def addSuccess(self, case : UnitTestCase):
         super().addSuccess(case)
-        self.make_report(case, CaseReport.SUCCESS)
+        self.on_case_finish(case, CaseReport.SUCCESS)
 
     # noinspection PyTypeChecker
     def addError(self, case : UnitTestCase, err):
         super().addError(case, err)
-        self.make_report(case, CaseReport.ERROR, err)
+        self.on_case_finish(case, CaseReport.ERROR, err)
 
     # noinspection PyTypeChecker
     def addFailure(self, case : UnitTestCase, err):
         super().addFailure(case, err)
-        self.make_report(case, CaseReport.FAIL, err)
+        self.on_case_finish(case, CaseReport.FAIL, err)
 
     # noinspection
     def addSkip(self, case : UnitTestCase, reason):
         super().addSkip(case, reason)
-        self.make_report(case, CaseReport.SKIPPED)
+        self.on_case_finish(case, CaseReport.SKIPPED)
 
-    def make_report(self, case : UnitTestCase, status: str, err : Optional[tuple] = None):
-        if isinstance(case, UnitTestCase):
-            report = CaseReport(name=case.get_name(), status=status, runtime=self.get_runtime(case))
-            self.case_reports.append(report)
+    # ---------------------------------------------------------
+    # case reports
 
-            conditional_err_msg = f'\n{self.get_err_details(err)}' if err else ''
-            finish_log_msg = f'Status: {status}{conditional_err_msg}\n'
-            self.log(msg=finish_log_msg, level=report.get_log_level())
-        else:
-            raise ValueError(f'Expected CustomTestCase, got {type(case)}')
+    def on_case_start(self, case : UnitTestCase):
+        if self.is_manual:
+            case.set_is_manual()
+        self.log_test_start(case=case)
+        self.start_times[case.id()] = time.time()
+
+    def on_case_finish(self, case : UnitTestCase, status: str, err : Optional[tuple] = None):
+        report = CaseReport(name=case.get_name(), status=status, runtime=self._get_runtime(case))
+        self.case_reports.append(report)
+
+        conditional_err_msg = f'\n{self._get_err_details(err)}' if err else ''
+        finish_log_msg = f'Status: {status}{conditional_err_msg}\n'
+        self.log(msg=finish_log_msg, level=report.get_log_level())
 
 
-    def get_runtime(self, test : TestCase) -> Optional[float]:
+    def _get_runtime(self, test : TestCase) -> Optional[float]:
         test_id = test.id()
         if test_id in self.start_times:
             time_in_sec =  time.time() - self.start_times[test_id]
@@ -82,7 +87,7 @@ class SuiteRunResult(TestResult):
                      level=logging.ERROR)
 
     @staticmethod
-    def get_err_details(err) -> str:
+    def _get_err_details(err) -> str:
         err_class, err_instance, err_traceback = err
         tb_list = traceback.extract_tb(err_traceback)
 
@@ -103,11 +108,9 @@ class SuiteRunResult(TestResult):
             result += f'{err_class.__name__}: {err_instance}\n{tb_str}'
         return result
 
-    def log_test_start(self, case : UnitTestCase):
-        self.log(msg=f'------> {case.get_name()[:self.test_spaces]} ', level=logging.INFO)
-
     # ---------------------------------------------------------
-    # summary logging
+    # logging
+
 
     def print_summary(self):
         self.log_header(msg=' Summary ', seperator='-')
@@ -148,4 +151,8 @@ class SuiteRunResult(TestResult):
 
         return final_status
 
+    def log_test_start(self, case : UnitTestCase):
+        self.log(msg=f'------> {case.get_name()[:self.test_spaces]} ', level=logging.INFO)
 
+    def log(self, msg : str, level : int = logging.INFO):
+        self.logger.log(msg=msg, level=level)
