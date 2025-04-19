@@ -28,10 +28,6 @@ class SuiteRunResult(TestResult):
     def log(self, msg : str, level : int = logging.INFO):
         self.logger.log(msg=msg, level=level)
 
-    def stopTestRun(self):
-        super().stopTestRun()
-        self.print_summary()
-
     def startTest(self, case : UnitTestCase):
         if self.is_manual:
             case.set_is_manual()
