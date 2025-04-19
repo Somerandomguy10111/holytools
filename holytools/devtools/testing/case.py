@@ -21,11 +21,8 @@ class UnitTestCase(unittest.TestCase):
         return test_name
 
 
+
 class CaseReport:
-    SUCCESS = 'SUCCESS'
-    ERROR = 'ERROR'
-    FAIL = 'FAIL'
-    SKIPPED = 'SKIPPED'
 
     def __init__(self, name : str, status : str, runtime : float):
         self.runtime_sec : float = runtime
@@ -34,9 +31,16 @@ class CaseReport:
 
     def get_log_level(self) -> int:
         status_to_logging : dict[str, int] = {
-            self.SUCCESS: logging.INFO,
-            self.ERROR: logging.CRITICAL,
-            self.FAIL: logging.ERROR,
-            self.SKIPPED : logging.INFO
+            CaseStatus.SUCCESS: logging.INFO,
+            CaseStatus.ERROR: logging.CRITICAL,
+            CaseStatus.FAIL: logging.ERROR,
+            CaseStatus.SKIPPED : logging.INFO
         }
         return status_to_logging[self.status]
+
+
+class CaseStatus:
+    SUCCESS = 'SUCCESS'
+    ERROR = 'ERROR'
+    FAIL = 'FAIL'
+    SKIPPED = 'SKIPPED'

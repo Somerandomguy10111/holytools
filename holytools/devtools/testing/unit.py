@@ -8,7 +8,7 @@ from io import StringIO
 from logging import Logger
 from typing import Optional, Callable
 
-from holytools.devtools.testing.case import CaseReport
+from holytools.devtools.testing.case import CaseReport, CaseStatus
 from holytools.logging import LoggerFactory
 from .suiteresult import UnitTestCase
 from .runner import Runner
@@ -42,20 +42,20 @@ class Unittest(UnitTestCase):
         for _ in range(reps):
             suite.addTest(cls('testA'))
 
-        sys.stdout, sys.stderr = StringIO(), StringIO()
         runner = Runner(logger=cls.get_logger(), test_name=cls.__name__)
-        sys.stdout, sys.stderr = sys.__stdout__, sys.__stderr__
-        results = runner.run(testsuite=suite)
-        is_successful = [True if c == c.SUCCESS else False for c in results.case_reports]
-        checkmark_arr = ['✓' if s else '✗' for s in is_successful]
+        results = runner.run(testsuite=suite,mute=True)
+        is_successful = [True if c.status == CaseStatus.SUCCESS else False for c in results.case_reports]
 
+        num_successful = sum(is_successful)
+        total = len(is_successful)
         ratio = sum(is_successful) / len(is_successful)
+        results.mute = False
         results.log_test_start(case=current_case)
-        print(f'Results: {checkmark_arr}')
+        print(f'Stats: {num_successful}/{total} tests succeeded')
         if ratio >= success_rate:
-            print(f'Status: {CaseReport.SUCCESS}')
+            print(f'Status: {CaseStatus.SUCCESS}')
         else:
-            print(f'Status: {CaseReport.FAIL}')
+            print(f'Status: {CaseStatus.FAIL}')
 
 
 

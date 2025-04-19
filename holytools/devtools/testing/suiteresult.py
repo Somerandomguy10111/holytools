@@ -9,7 +9,7 @@ import unittest
 from typing import Optional
 from unittest import TestCase, TestResult
 
-from holytools.devtools.testing.case import UnitTestCase, CaseReport
+from holytools.devtools.testing.case import UnitTestCase, CaseReport, CaseStatus
 
 
 # ---------------------------------------------------------
@@ -43,22 +43,22 @@ class SuiteResuult(TestResult):
     # noinspection PyTypeChecker
     def addSuccess(self, case : UnitTestCase):
         super().addSuccess(case)
-        self.on_case_finish(case, CaseReport.SUCCESS)
+        self.on_case_finish(case, CaseStatus.SUCCESS)
 
     # noinspection PyTypeChecker
     def addError(self, case : UnitTestCase, err):
         super().addError(case, err)
-        self.on_case_finish(case, CaseReport.ERROR, err)
+        self.on_case_finish(case, CaseStatus.ERROR, err)
 
     # noinspection PyTypeChecker
     def addFailure(self, case : UnitTestCase, err):
         super().addFailure(case, err)
-        self.on_case_finish(case, CaseReport.FAIL, err)
+        self.on_case_finish(case, CaseStatus.FAIL, err)
 
     # noinspection
     def addSkip(self, case : UnitTestCase, reason):
         super().addSkip(case, reason)
-        self.on_case_finish(case, CaseReport.SKIPPED)
+        self.on_case_finish(case, CaseStatus.SKIPPED)
 
     # ---------------------------------------------------------
     # case reports
