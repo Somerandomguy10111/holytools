@@ -2,12 +2,14 @@ from __future__ import annotations
 
 import inspect
 import logging
+import time
 import unittest
 import unittest.mock
 from logging import Logger
 from typing import Optional, Callable
 
-from holytools.devtools.testing.case import CaseStatus
+from holytools.devtools.testing.case import CaseStatus, CaseReport
+from holytools.devtools.testing.suiteresult import SuiteResuult
 from holytools.logging import LoggerFactory
 
 from .runner import Runner
@@ -38,24 +40,31 @@ class Unittest(UnitTestCase):
     @classmethod
     def execute_statistiically(cls, reps : int, success_rate : float):
         test_names = unittest.TestLoader().getTestCaseNames(cls)
+        case_reports = []
 
-        for n in test_names:
-            current_case = cls(n)
-            results = cls._run_several(reps=reps, name=n)
-            is_successful = [True if c.status == CaseStatus.SUCCESS else False for c in results.case_reports]
+        for tn in test_names:
+            current_case = cls(tn)
+            start_time = time.time()
+            suite_result = cls._run_several(reps=reps, name=tn)
+            is_successful = [True if c.status == CaseStatus.SUCCESS else False for c in suite_result.case_reports]
 
             num_successful = sum(is_successful)
             total = len(is_successful)
             ratio = sum(is_successful) / len(is_successful)
 
-            results.mute = False
-            results.log_test_start(case=current_case)
+            suite_result.mute = False
+            suite_result.log_test_start(case=current_case)
             print(f'Stats: {num_successful}/{total} tests succeeded')
-            if ratio >= success_rate:
-                print(f'Status: {CaseStatus.SUCCESS}')
-            else:
-                print(f'Status: {CaseStatus.FAIL}')
+
+            status = CaseStatus.SUCCESS if ratio >= success_rate else CaseStatus.FAIL
+            case_reports = CaseReport(name=tn,status=status, runtime=time.time() - start_time)
+            status_msg = f'Status: {status}'
+            suite_result.log(msg=status_msg, level=case_reports.get_log_level())
+
             print()
+
+        result = SuiteResuult(logger=cls.get_logger(), testsuite_name=cls.__name__)
+
 
     @classmethod
     def _run_several(cls, name : str, reps : int):

@@ -27,11 +27,11 @@ class SuiteResuult(TestResult):
         self.is_manual : bool = manual_mode
         self.testsuite_name = testsuite_name
         self.mute : bool = mute
-    #
-    # def startTestRun(self):
-    #     super().startTestRun()
-    #     self.log_header(f'  Test suite: \"{self.testsuite_name}\"  ')
-    #
+
+    def startTestRun(self):
+        super().startTestRun()
+        self.log(self.get_header(f'  Test suite: \"{self.testsuite_name}\"  '))
+
     def startTest(self, case : UnitTestCase):
         super().startTest(case)
         self.on_case_start(case=case)
@@ -114,7 +114,7 @@ class SuiteResuult(TestResult):
 
 
     def log_summary(self):
-        self.get_header(msg=' Summary ', seperator='-')
+        self.log(self.get_header(msg=' Summary ', seperator='-'))
         for case in self.case_reports:
             level = case.get_log_level()
             name_msg = f'{case.name[:self.test_spaces - 4]:<{self.test_spaces}}'
