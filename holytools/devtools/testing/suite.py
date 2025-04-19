@@ -9,6 +9,8 @@ import unittest
 from typing import Optional
 from unittest import TestCase, TestResult
 
+from holytools.devtools.testing.case import UnitTestCase, CaseReport
+
 
 # ---------------------------------------------------------
 
@@ -144,43 +146,4 @@ class SuiteRunResult(TestResult):
 
         return final_status
 
-
-class UnitTestCase(unittest.TestCase):
-    def __init__(self, *args):
-        super().__init__(*args)
-        self.is_manual_mode : bool = False
-
-    def set_is_manual(self):
-        self.is_manual_mode = True
-
-    def get_is_manual(self):
-        return self.is_manual_mode
-
-    def get_name(self) -> str:
-        full_test_name = self.id()
-        parts = full_test_name.split('.')
-        last_parts = parts[-2:]
-        test_name = '.'.join(last_parts)
-        return test_name
-
-
-class CaseReport:
-    SUCCESS = 'SUCCESS'
-    ERROR = 'ERROR'
-    FAIL = 'FAIL'
-    SKIPPED = 'SKIPPED'
-
-    def __init__(self, name : str, status : str, runtime : float):
-        self.runtime_sec : float = runtime
-        self.name : str = name
-        self.status : str = status
-
-    def get_log_level(self) -> int:
-        status_to_logging : dict[str, int] = {
-            self.SUCCESS: logging.INFO,
-            self.ERROR: logging.CRITICAL,
-            self.FAIL: logging.ERROR,
-            self.SKIPPED : logging.INFO
-        }
-        return status_to_logging[self.status]
 

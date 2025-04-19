@@ -13,7 +13,7 @@ from logging import Logger
 from multiprocessing import Process, Value
 from unittest import TestSuite
 
-from .result import SuiteRunResult
+from .suite import SuiteRunResult
 
 # ----------------------------------------------
 

@@ -7,7 +7,7 @@ from logging import Logger
 from typing import Optional, Callable
 
 from holytools.logging import LoggerFactory
-from .result import UnitTestCase
+from .suite import UnitTestCase
 from .runner import Runner
 
 
@@ -33,17 +33,17 @@ class Unittest(UnitTestCase):
 
         return results
 
-
     @classmethod
-    def execute_statistiically(cls, reps : int, manual_mode : bool = True, trace_resourcewarning : bool = False):
+    def execute_statistiically(cls, reps : int, manual_mode : bool = True):
         suite = unittest.TestSuite()
         for _ in range(reps):
             suite.addTest(cls('testA'))
 
         runner = Runner(logger=cls.get_logger(), is_manual=manual_mode, test_name=cls.__name__)
-        tracemalloc_depth = 10 if trace_resourcewarning else 0
-        results = runner.run(testsuite=suite, tracemalloc_depth=tracemalloc_depth)
-        results.print_summary()
+        results = runner.run(testsuite=suite)
+        checkmark_arr = ['✓' if result.lower() == 'Success'.lower() else '✗' for result in suite.case]
+
+        # results.print_summary()
 
         return results
 
