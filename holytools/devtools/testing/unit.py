@@ -63,16 +63,15 @@ class Unittest(UnitTestCase):
             suite_result.mute = False
             suite_result.log_test_start(case=current_case)
             spaces = 13
-            print(f'{"Success rate:":<{spaces}} {num_successful/total*100}%')
+            suite_result.log(f'{"Success rate:":<{spaces}} {num_successful/total*100}%')
 
             status = CaseStatus.SUCCESS if ratio >= min_success_rate else CaseStatus.FAIL
             statistical_case = Report(name=f'{cls.__name__}.{tn}', status=status, runtime=round(time.time() - start_time,3))
-            status_msg = f'{"Status:":<{spaces}} {status}'
+            status_msg = f'{"Status:":<{spaces}} {status}\n'
             suite_result.log(msg=status_msg, level=statistical_case.get_log_level())
 
             case_reports.append(statistical_case)
 
-            print()
 
         result = SuiteResuult(logger=cls.get_logger(), testsuite_name=cls.__name__)
         result.reports = case_reports
@@ -92,12 +91,16 @@ class Unittest(UnitTestCase):
 
         return results
 
-
     @classmethod
     def get_logger(cls) -> Logger:
         if not cls._logger:
-            cls._logger = LoggerFactory.get_logger(include_location=False, include_timestamp=False, name=cls.__name__, use_stdout=True)
+            cls._logger = LoggerFactory.get_logger(include_location=False, include_timestamp=False, name=cls.__name__, use_stdout=True, log_fpath=cls.log_fpath())
         return cls._logger
+
+
+    @classmethod
+    def log_fpath(cls) -> Optional[str]:
+        return None
 
     @classmethod
     def log(cls, msg : str, level : int = logging.INFO):
