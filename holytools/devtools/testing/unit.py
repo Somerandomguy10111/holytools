@@ -1,17 +1,17 @@
 from __future__ import annotations
+
 import inspect
 import logging
-import sys
 import unittest
 import unittest.mock
-from io import StringIO
 from logging import Logger
 from typing import Optional, Callable
 
-from holytools.devtools.testing.case import CaseReport, CaseStatus
+from holytools.devtools.testing.case import CaseStatus
 from holytools.logging import LoggerFactory
-from .suiteresult import UnitTestCase
+
 from .runner import Runner
+from .suiteresult import UnitTestCase
 
 
 # ---------------------------------------------------------
@@ -37,29 +37,39 @@ class Unittest(UnitTestCase):
 
     @classmethod
     def execute_statistiically(cls, reps : int, success_rate : float):
+        test_names = unittest.TestLoader().getTestCaseNames(cls)
+
+        for n in test_names:
+            current_case = cls(n)
+            results = cls._run_several(reps=reps, name=n)
+            is_successful = [True if c.status == CaseStatus.SUCCESS else False for c in results.case_reports]
+
+            num_successful = sum(is_successful)
+            total = len(is_successful)
+            ratio = sum(is_successful) / len(is_successful)
+
+            results.mute = False
+            results.log_test_start(case=current_case)
+            print(f'Stats: {num_successful}/{total} tests succeeded')
+            if ratio >= success_rate:
+                print(f'Status: {CaseStatus.SUCCESS}')
+            else:
+                print(f'Status: {CaseStatus.FAIL}')
+            print()
+
+    @classmethod
+    def _run_several(cls, name : str, reps : int):
         suite = unittest.TestSuite()
-        current_case = cls('testA')
+        current_case = cls(name)
         for _ in range(reps):
-            suite.addTest(cls('testA'))
+            suite.addTest(current_case)
 
         runner = Runner(logger=cls.get_logger(), test_name=cls.__name__)
         results = runner.run(testsuite=suite,mute=True)
-        is_successful = [True if c.status == CaseStatus.SUCCESS else False for c in results.case_reports]
-
-        num_successful = sum(is_successful)
-        total = len(is_successful)
-        ratio = sum(is_successful) / len(is_successful)
-        results.mute = False
-        results.log_test_start(case=current_case)
-        print(f'Stats: {num_successful}/{total} tests succeeded')
-        if ratio >= success_rate:
-            print(f'Status: {CaseStatus.SUCCESS}')
-        else:
-            print(f'Status: {CaseStatus.FAIL}')
-
 
 
         return results
+
 
     @classmethod
     def get_logger(cls) -> Logger:
