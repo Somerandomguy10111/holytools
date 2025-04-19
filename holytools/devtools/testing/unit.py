@@ -38,7 +38,7 @@ class Unittest(UnitTestCase):
         return results
 
     @classmethod
-    def execute_statistiically(cls, reps : int, success_rate : float):
+    def execute_statistiically(cls, reps : int, min_success_rate : float):
         test_names = unittest.TestLoader().getTestCaseNames(cls)
         case_reports = []
 
@@ -49,11 +49,11 @@ class Unittest(UnitTestCase):
             is_successful = [True if c.status == CaseStatus.SUCCESS else False for c in suite_result.reports]
 
             first_report = suite_result.reports[0]
-
             if first_report.status == CaseStatus.ERROR:
                 suite_result.mute = False
                 suite_result.log_test_start(case=current_case)
                 suite_result.log(first_report.get_view(), level=first_report.get_log_level())
+                case_reports.append(first_report)
                 continue
 
             num_successful = sum(is_successful)
@@ -62,16 +62,21 @@ class Unittest(UnitTestCase):
 
             suite_result.mute = False
             suite_result.log_test_start(case=current_case)
-            print(f'Stats: {num_successful}/{total} tests succeeded')
+            spaces = 13
+            print(f'{"Success rate:":<{spaces}} {num_successful/total*100}%')
 
-            status = CaseStatus.SUCCESS if ratio >= success_rate else CaseStatus.FAIL
-            case_reports = Report(name=tn, status=status, runtime=time.time() - start_time)
-            status_msg = f'Status: {status}'
-            suite_result.log(msg=status_msg, level=case_reports.get_log_level())
+            status = CaseStatus.SUCCESS if ratio >= min_success_rate else CaseStatus.FAIL
+            statistical_case = Report(name=f'{cls.__name__}.{tn}', status=status, runtime=round(time.time() - start_time,3))
+            status_msg = f'{"Status:":<{spaces}} {status}'
+            suite_result.log(msg=status_msg, level=statistical_case.get_log_level())
+
+            case_reports.append(statistical_case)
 
             print()
 
         result = SuiteResuult(logger=cls.get_logger(), testsuite_name=cls.__name__)
+        result.reports = case_reports
+        result.log_summary()
 
 
     @classmethod

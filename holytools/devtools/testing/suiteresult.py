@@ -114,8 +114,9 @@ class SuiteResuult(TestResult):
 
 
     def get_final_status(self) -> str:
-        num_total = self.testsRun
-        num_unsuccessful = len(self.errors)+ len(self.failures)
+        num_total = len(self.reports)
+        unsuccessful_cases = [c for c in self.reports if c.status != CaseStatus.SUCCESS]
+        num_unsuccessful = len(unsuccessful_cases)
 
         RED = '\033[91m'
         GREEN = '\033[92m'
