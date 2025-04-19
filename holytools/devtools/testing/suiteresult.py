@@ -19,13 +19,14 @@ class SuiteResuult(TestResult):
     status_spaces = 10
     runtime_space = 10
 
-    def __init__(self, logger : logging.Logger, testsuite_name: str, manual_mode : bool = False, *args, **kwargs):
+    def __init__(self, logger : logging.Logger, testsuite_name: str, manual_mode : bool = False, mute : bool = False, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.logger = logger
         self.case_reports : list[CaseReport] = []
         self.start_times : dict[str, float] = {}
         self.is_manual : bool = manual_mode
         self.testsuite_name = testsuite_name
+        self.mute : bool = mute
     #
     # def startTestRun(self):
     #     super().startTestRun()
@@ -36,7 +37,7 @@ class SuiteResuult(TestResult):
         self.on_case_start(case=case)
 
     def stopTestRun(self):
-        self.print_summary()
+        self.log_summary()
         super().stopTestRun()
 
     # noinspection PyTypeChecker
@@ -112,8 +113,8 @@ class SuiteResuult(TestResult):
     # logging
 
 
-    def print_summary(self):
-        self.log_header(msg=' Summary ', seperator='-')
+    def log_summary(self):
+        self.get_header(msg=' Summary ', seperator='-')
         for case in self.case_reports:
             level = case.get_log_level()
             name_msg = f'{case.name[:self.test_spaces - 4]:<{self.test_spaces}}'
@@ -123,15 +124,15 @@ class SuiteResuult(TestResult):
 
             self.log(msg=f'{name_msg}{status_msg}{runtime_msg}', level=level)
         self.log(self.get_final_status())
-        self.log_header(msg='')
+        self.log(self.get_header(msg=''))
 
 
-    def log_header(self, msg: str, seperator : str = '='):
+    def get_header(self, msg: str, seperator : str = '=') -> str:
         total_len = self.test_spaces + self.status_spaces
         total_len += self.runtime_space
         line_len = max(total_len- len(msg), 0)
         lines = seperator * int(line_len / 2.)
-        self.log(msg=f'{lines}{msg}{lines}')
+        return f'{lines}{msg}{lines}'
 
 
     def get_final_status(self) -> str:
@@ -155,4 +156,5 @@ class SuiteResuult(TestResult):
         self.log(msg=f'------> {case.get_name()[:self.test_spaces]} ', level=logging.INFO)
 
     def log(self, msg : str, level : int = logging.INFO):
-        self.logger.log(msg=msg, level=level)
+        if not self.mute:
+            self.logger.log(msg=msg, level=level)
