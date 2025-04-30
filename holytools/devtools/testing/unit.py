@@ -38,7 +38,10 @@ class Unittest(UnitTestCase):
         return results
 
     @classmethod
-    def execute_statistiically(cls, reps : int, min_success_rate : float):
+    def execute_statistically(cls, reps : int, min_success_percent : float):
+        if not 0 <= min_success_percent <= 100:
+            raise ValueError(f'Min success percent should be in [0,100], got {min_success_percent}')
+
         test_names = unittest.TestLoader().getTestCaseNames(cls)
         case_reports = []
 
@@ -58,14 +61,14 @@ class Unittest(UnitTestCase):
 
             num_successful = sum(is_successful)
             total = len(is_successful)
-            ratio = sum(is_successful) / len(is_successful)
+            success_pc = 100*sum(is_successful) / len(is_successful)
 
             suite_result.mute = False
             suite_result.log_test_start(case=current_case)
             spaces = 13
             suite_result.log(f'{"Success rate:":<{spaces}} {num_successful/total*100}%')
 
-            status = CaseStatus.SUCCESS if ratio >= min_success_rate else CaseStatus.FAIL
+            status = CaseStatus.SUCCESS if success_pc >= min_success_percent else CaseStatus.FAIL
             statistical_case = Report(name=f'{cls.__name__}.{tn}', status=status, runtime=round(time.time() - start_time,3))
             status_msg = f'{"Status:":<{spaces}} {status}\n'
             suite_result.log(msg=status_msg, level=statistical_case.get_log_level())

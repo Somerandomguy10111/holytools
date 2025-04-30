@@ -1,3 +1,5 @@
+import random
+
 from holytools.devtools import Unittest
 from holytools.fileIO import FileIO
 import os
@@ -49,6 +51,29 @@ class TestPatchMechanism(Unittest):
         result = os.path.abspath("anything")
         self.assertEqual(result, "/fake/path")
 
+class Hider:
+    class VariedTest(Unittest):
+        def test_always(self):
+            pass
+
+        def test_often(self):
+            if random.random() < 0.25:
+                self.fail("This test sometimes fails (~20% of the time).")
+
+        def test_equal(self):
+            if random.random() < 0.5:
+                self.fail("This test fails 50% of the time.")
+
+        def test_sometimes(self):
+            if random.random() < 0.75:
+                self.fail("This test often fails (~80% of the time).")
+
+        def test_never(self):
+            self.fail("This test always fails (100% failure).")
+
+        def test_err(self):
+            raise RuntimeError("This test always raises an error.")
+
 
 if __name__ == "__main__":
-    TestPatchMechanism.execute_all()
+    Hider.VariedTest.execute_statistically(reps=5, min_success_percent=80)
