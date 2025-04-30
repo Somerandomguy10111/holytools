@@ -77,3 +77,4 @@ class Hider:
 
 if __name__ == "__main__":
     Hider.VariedTest.execute_statistically(reps=5, min_success_percent=80)
+    Hider.VariedTest.execute_all()
