@@ -75,6 +75,13 @@ class IpProvider:
 
         return ipconfig
 
+    @staticmethod
+    def get_free_port() -> int:
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.bind(('', 0))
+            socknum = s.getsockname()[1]
+        return socknum
+
 
 if __name__ == "__main__":
     print(IpProvider.get_ipconfig())
