@@ -1,4 +1,4 @@
-from .tools import LoggingTools
+from .tools import LoggingTools, LogStorage
 from .loggers import LoggerOverseer, LoggerFactory
 from .timber import Timber
 

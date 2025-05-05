@@ -72,24 +72,6 @@ class LoggingTools:
         return muted_func
 
     @staticmethod
-    def log_execution(func):
-        def wrapper(*args, **kwargs):
-            start_time = time.time()
-            timestamp_start = LoggingTools.get_timestamp(time_only=True)
-            print(f"-[{timestamp_start}]: Launched \"{func.__name__}\" ")
-
-            result = func(*args, **kwargs)
-
-            end_time = time.time()
-            timestamp_end = LoggingTools.get_timestamp(time_only=True)
-            elapsed_time_ms = (end_time - start_time) * 1000
-            print(f"-[{timestamp_end}]: Finished \"{func.__name__}\" (Time taken: {elapsed_time_ms:.2f} ms)")
-
-            return result
-
-        return wrapper
-
-    @staticmethod
     def to_sci_notation(val : str | float | int) -> str:
         try:
             val = float(val)
@@ -99,9 +81,18 @@ class LoggingTools:
         return  display_val
 
 
-    @staticmethod
-    def get_copied_stream(stdout, stderr) -> StoredStream:
-        return StoredStream(stdout, stderr)
+class LogStorage:
+    def __init__(self, fpath : str):
+        self.fpath : str = fpath
+        self.copied_stream = StoredStream(stdout=sys.stdout, stderr=sys.stderr)
+
+    def __enter__(self):
+        sys.stdout, sys.stderr = self.copied_stream, self.copied_stream
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        with open(self.fpath, 'a') as f:
+            f.write(self.copied_stream.get_value())
+        sys.stdout, sys.stderr = sys.__stdout__, sys.__stderr__
 
 
 class StoredStream:

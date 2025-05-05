@@ -47,9 +47,6 @@ class Unittest(UnitTestCase):
         test_names = test_names or unittest.TestLoader().getTestCaseNames(cls)
         case_reports = []
 
-        copied_stream = StoredStream(stdout=sys.stdout, stderr=sys.stderr)
-        sys.stdout, sys.stderr = copied_stream, copied_stream
-
         for tn in test_names:
             current_case = cls(tn)
             start_time = time.time()
@@ -87,13 +84,6 @@ class Unittest(UnitTestCase):
         result.reports = case_reports
         result.log_summary()
 
-        print('=' * 20)
-        fpath = cls.log_fpath()
-        if fpath:
-            with open(fpath, 'a') as f:
-                f.write(copied_stream.get_value())
-
-        sys.stdout, sys.stderr = sys.__stdout__, sys.__stderr__
 
     @classmethod
     def _run_several(cls, name : str, reps : int):
