@@ -3,6 +3,7 @@ from __future__ import annotations
 import io
 import linecache
 import os
+import re
 import sys
 import traceback
 import types
@@ -86,7 +87,10 @@ class CaptureLogs:
         self.copied_stream = StoredStream(stdout=sys.stdout, stderr=sys.stderr)
 
     def get_stored(self) -> str:
-        return self.copied_stream.get_value()
+        ansi_escape = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
+        plain_value = self.copied_stream.get_value()
+        result = ansi_escape.sub('', plain_value)
+        return result
 
     def __enter__(self):
         sys.stdout, sys.stderr = self.copied_stream, self.copied_stream
