@@ -1,19 +1,14 @@
-import ctypes
 import linecache
-import multiprocessing
 import os
-import threading
-import time
 import tracemalloc
 import unittest
 import unittest.mock
 import warnings
-from abc import abstractmethod
 from logging import Logger
-from multiprocessing import Process, Value
 from unittest import TestSuite
 
-from .suiteresult import SuiteResuult
+from .result import SuiteResult
+
 
 # ----------------------------------------------
 
@@ -25,7 +20,7 @@ class Runner(unittest.TextTestRunner):
         self.test_name : str = test_name
         self.mute : bool = mute
 
-    def run(self, testsuite : TestSuite, tracemalloc_depth : int = 0, use_print : bool = False) -> SuiteResuult:
+    def run(self, testsuite : TestSuite, tracemalloc_depth : int = 0, use_print : bool = False) -> SuiteResult:
         if tracemalloc_depth > 0:
             tracemalloc.start(tracemalloc_depth)
 
@@ -34,13 +29,13 @@ class Runner(unittest.TextTestRunner):
             warnings.simplefilter("ignore")
             warnings.simplefilter("always", ResourceWarning)
 
-            result = SuiteResuult(logger=self.logger,
-                                  testsuite_name=self.test_name,
-                                  stream=self.stream,
-                                  descriptions=self.descriptions,
-                                  verbosity=2,
-                                  manual_mode=self.manual_mode,
-                                  use_print=use_print)
+            result = SuiteResult(logger=self.logger,
+                                 testsuite_name=self.test_name,
+                                 stream=self.stream,
+                                 descriptions=self.descriptions,
+                                 verbosity=2,
+                                 manual_mode=self.manual_mode,
+                                 use_print=use_print)
             result.startTestRun()
             testsuite(result)
             result.stopTestRun()
@@ -81,34 +76,3 @@ class Runner(unittest.TextTestRunner):
         return not_unittest and not_custom_unittest
 
 
-class BlockedTester:
-    def __init__(self):
-        self.shared_bool = Value(ctypes.c_bool, False)
-
-    def check_ok(self, case : str, delay : float) -> bool:
-        def do_run():
-            threading.Thread(target=self.blocked).start()
-            time.sleep(delay)
-            check_thread = threading.Thread(target=self.check_condition, args=(case,))
-            check_thread.start()
-            check_thread.join()
-            q.put('stop')
-
-        q = multiprocessing.Queue()
-        process = Process(target=do_run)
-        process.start()
-        q.get()
-        process.terminate()
-        return self.shared_bool.value
-
-
-    @abstractmethod
-    def blocked(self):
-        pass
-
-    def check_condition(self, case : str):
-        self.shared_bool.value = self.perform_check(case=case)
-
-    @abstractmethod
-    def perform_check(self, case : str) -> bool:
-        pass

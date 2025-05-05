@@ -1,28 +1,25 @@
 from __future__ import annotations
 
+import ctypes
 import inspect
-import logging
-import sys
+import multiprocessing
+import threading
 import time
 import unittest
 import unittest.mock
-from logging import Logger
+import unittest.mock
+from abc import abstractmethod
+from multiprocessing import Process, Value
 from typing import Optional, Callable
 
-from holytools.devtools.testing.case import CaseStatus, Report
-from holytools.devtools.testing.suiteresult import SuiteResuult
-from holytools.logging import LoggerFactory
-
+from holytools.devtools.testing.result import SuiteResult, Report, CaseStatus
+from .basetest import BaseTest
 from .runner import Runner
-from .suiteresult import UnitTestCase
-from ...logging.tools import StoredStream
 
 
 # ---------------------------------------------------------
 
-class Unittest(UnitTestCase):
-    _logger : Logger = None
-
+class Unittest(BaseTest):
     @classmethod
     def ready(cls) -> Unittest:
         instance = cls()
@@ -40,53 +37,47 @@ class Unittest(UnitTestCase):
         return results
 
     @classmethod
-    def execute_statistically(cls, reps : int, min_success_percent : float, test_names : Optional[list[str]] = None):
+    def execute_stats(cls, reps : int, min_success_percent : float, test_names : Optional[list[str]] = None):
         if not 0 <= min_success_percent <= 100:
             raise ValueError(f'Min success percent should be in [0,100], got {min_success_percent}')
 
         test_names = test_names or unittest.TestLoader().getTestCaseNames(cls)
-        case_reports = []
-
+        stat_reports : list[Report] = []
+        outcome_map : dict[str, list] = {}
         for tn in test_names:
-            current_case = cls(tn)
+            case = cls(tn)
+            report_name = f'{cls.__name__}.{tn}'
             start_time = time.time()
             suite_result = cls._run_several(reps=reps, name=tn)
+            runtime = round(time.time() - start_time, 3)
+
             outcomes = [True if c.status == CaseStatus.SUCCESS else False for c in suite_result.reports]
-
-            first_report = suite_result.reports[0]
-            if first_report.status == CaseStatus.ERROR:
-                suite_result.use_print = False
-                suite_result.log_test_start(case=current_case)
-                suite_result.log(first_report.get_view(), level=first_report.get_log_level())
-                case_reports.append(first_report)
-                continue
-
-            num_successful = sum(outcomes)
-            total = len(outcomes)
+            outcome_map[tn] = outcomes
             success_pc = 100*sum(outcomes) / len(outcomes)
 
-            suite_result.use_print = False
-            suite_result.log_test_start(case=current_case)
-            spaces = 13
-
-            status_arr = ['✓' if o else '✗' for o in outcomes]
-            suite_result.log(f'{"Result":<{spaces}}: {status_arr}')
-            suite_result.log(f'{"Success rate":<{spaces}}: {num_successful/total*100}%')
-
             status = CaseStatus.SUCCESS if success_pc >= min_success_percent else CaseStatus.FAIL
-            statistical_case = Report(name=f'{cls.__name__}.{tn}', status=status, runtime=round(time.time() - start_time,3))
-            status_msg = f'{"Status":<{spaces}}: {status}\n'
-            suite_result.log(msg=status_msg, level=statistical_case.get_log_level())
+            if suite_result.reports[0].status == CaseStatus.ERROR:
+                status = CaseStatus.ERROR
+            stats_report = Report(name=report_name, status=status, runtime=runtime)
+            stat_reports.append(stats_report)
 
-            case_reports.append(statistical_case)
+        result = SuiteResult(logger=cls.get_logger(), testsuite_name=cls.__name__)
+        spaces = 13
+        for c in stat_reports:
+            outcomes = outcome_map[c.name]
+            num_successful, total = sum(outcomes), len(outcomes)
+            
+            result.log_test_start(casename=c.name)
+            status_arr = ['✓' if o else '✗' for o in outcomes]
+            result.log(f'{"Result":<{spaces}}: {status_arr}')
+            result.log(f'{"Success rate":<{spaces}}: {num_successful/total*100}%')
+            result.log(msg=f'{"Status":<{spaces}}: {c.status}\n', level=c.get_log_level())
 
-        result = SuiteResuult(logger=cls.get_logger(), testsuite_name=cls.__name__)
-        result.reports = case_reports
+        result.reports = stat_reports
         result.log_summary()
 
-
     @classmethod
-    def _run_several(cls, name : str, reps : int):
+    def _run_several(cls, name : str, reps : int) -> SuiteResult:
         suite = unittest.TestSuite()
         current_case = cls(name)
         for _ in range(reps):
@@ -96,123 +87,6 @@ class Unittest(UnitTestCase):
         results = runner.run(testsuite=suite, use_print=True)
 
         return results
-
-    @classmethod
-    def get_logger(cls) -> Logger:
-        if not cls._logger:
-            cls._logger = LoggerFactory.get_logger(include_location=False, include_timestamp=False, name=cls.__name__, use_stdout=True, log_fpath=cls.log_fpath())
-        return cls._logger
-
-
-    @classmethod
-    def log_fpath(cls) -> Optional[str]:
-        return None
-
-    @classmethod
-    def log(cls, msg : str, level : int = logging.INFO):
-        cls.get_logger().log(msg=f'{msg}', level=level)
-
-    @classmethod
-    def warning(cls, msg : str, *args, **kwargs):
-        kwargs['level'] = logging.WARNING
-        cls._logger.log(msg=msg, *args, **kwargs)
-
-    @classmethod
-    def error(cls, msg : str, *args, **kwargs):
-        kwargs['level'] = logging.ERROR
-        cls._logger.log(msg=msg, *args, **kwargs)
-
-    @classmethod
-    def critical(cls, msg : str, *args, **kwargs):
-        kwargs['level'] = logging.CRITICAL
-        cls._logger.log(msg=msg, *args, **kwargs)
-
-    @classmethod
-    def info(cls, msg : str, *args, **kwargs):
-        kwargs['level'] = logging.INFO
-        cls._logger.log(msg=msg, *args, **kwargs)
-
-
-    # ---------------------------------------------------------
-    # assertions
-
-    def assertEqual(self, first : object, second : object, msg : Optional[str] = None):
-        if not first == second:
-            first_str = str(first).__repr__()
-            second_str = str(second).__repr__()
-            if msg is None:
-                msg = (f'Tested expressions should match:'
-                       f'\nFirst : {first_str} ({type(first)})'
-                       f'\nSecond: {second_str} ({type(second)})')
-            raise AssertionError(msg)
-
-    def assertSame(self, first : dict, second : dict, msg : Optional[str] = None):
-        """Checks whether contents of dicts first and second are the same"""
-        for key in first:
-            first_obj = first[key]
-            second_obj = second[key]
-            self.assertSameElementary(type(first_obj), type(second_obj))
-            if isinstance(first_obj, dict):
-                self.assertSame(first_obj, second_obj, msg=msg)
-            elif isinstance(first_obj, list):
-                for i in range(len(first_obj)):
-                    self.assertSameElementary(first_obj[i], second_obj[i])
-            else:
-                self.assertSameElementary(first_obj, second_obj)
-
-    def assertSameElementary(self, first : object, second : object):
-        if isinstance(first, float) and isinstance(second, float):
-            self.assertSameFloat(first, second)
-        else:
-            self.assertEqual(first, second)
-
-    @staticmethod
-    def assertSameFloat(first : float, second : float, msg : Optional[str] = None):
-        if first != first:
-            same_float = second != second
-        else:
-            same_float = first == second
-        if not same_float:
-            first_str = str(first).__repr__()
-            second_str = str(second).__repr__()
-            if msg is None:
-                msg = (f'Tested floats should match:'
-                       f'\nFirst : {first_str} ({type(first)})'
-                       f'\nSecond: {second_str} ({type(second)})')
-            raise AssertionError(msg)
-
-
-    def assertIn(self, member : object, container, msg : Optional[str] = None):
-        if not member in container:
-            member_str = str(member).__repr__()
-            container_str = str(container).__repr__()
-            if msg is None:
-                msg = f'{member_str} not in {container_str}'
-            raise AssertionError(msg)
-
-
-    def assertIsInstance(self, obj : object, cls : type, msg : Optional[str] = None):
-        if not isinstance(obj, cls):
-            obj_str = str(obj).__repr__()
-            cls_str = str(cls).__repr__()
-            if msg is None:
-                msg = f'{obj_str} not an instance of {cls_str}'
-            raise AssertionError(msg)
-
-
-    def assertTrue(self, expr : bool, msg : Optional[str] = None):
-        if not expr:
-            if msg is None:
-                msg = f'Tested expression should be true'
-            raise AssertionError(msg)
-
-
-    def assertFalse(self, expr : bool, msg : Optional[str] = None):
-        if expr:
-            if msg is None:
-                msg = f'Tested expression should be false'
-            raise AssertionError(msg)
-
 
     @staticmethod
     def patch_module(original: type | Callable, replacement: type | Callable):
@@ -235,4 +109,36 @@ class Unittest(UnitTestCase):
 
         return decorator
 
+
+class BlockedTester:
+    def __init__(self):
+        self.shared_bool = Value(ctypes.c_bool, False)
+
+    def check_ok(self, case : str, delay : float) -> bool:
+        def do_run():
+            threading.Thread(target=self.blocked).start()
+            time.sleep(delay)
+            check_thread = threading.Thread(target=self.check_condition, args=(case,))
+            check_thread.start()
+            check_thread.join()
+            q.put('stop')
+
+        q = multiprocessing.Queue()
+        process = Process(target=do_run)
+        process.start()
+        q.get()
+        process.terminate()
+        return self.shared_bool.value
+
+
+    @abstractmethod
+    def blocked(self):
+        pass
+
+    def check_condition(self, case : str):
+        self.shared_bool.value = self.perform_check(case=case)
+
+    @abstractmethod
+    def perform_check(self, case : str) -> bool:
+        pass
 
