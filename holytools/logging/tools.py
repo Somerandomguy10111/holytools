@@ -1,9 +1,9 @@
 from __future__ import annotations
+
 import io
 import linecache
 import os
 import sys
-import time
 import traceback
 import types
 from datetime import datetime
@@ -81,17 +81,17 @@ class LoggingTools:
         return  display_val
 
 
-class LogStorage:
-    def __init__(self, fpath : str):
-        self.fpath : str = fpath
+class CaptureLogs:
+    def __init__(self):
         self.copied_stream = StoredStream(stdout=sys.stdout, stderr=sys.stderr)
+
+    def get_stored(self) -> str:
+        return self.copied_stream.get_value()
 
     def __enter__(self):
         sys.stdout, sys.stderr = self.copied_stream, self.copied_stream
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        with open(self.fpath, 'a') as f:
-            f.write(self.copied_stream.get_value())
         sys.stdout, sys.stderr = sys.__stdout__, sys.__stderr__
 
 
