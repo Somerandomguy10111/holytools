@@ -38,11 +38,11 @@ class Unittest(UnitTestCase):
         return results
 
     @classmethod
-    def execute_statistically(cls, reps : int, min_success_percent : float):
+    def execute_statistically(cls, reps : int, min_success_percent : float, test_names : Optional[list[str]] = None):
         if not 0 <= min_success_percent <= 100:
             raise ValueError(f'Min success percent should be in [0,100], got {min_success_percent}')
 
-        test_names = unittest.TestLoader().getTestCaseNames(cls)
+        test_names = test_names or unittest.TestLoader().getTestCaseNames(cls)
         case_reports = []
 
         for tn in test_names:
@@ -53,7 +53,7 @@ class Unittest(UnitTestCase):
 
             first_report = suite_result.reports[0]
             if first_report.status == CaseStatus.ERROR:
-                suite_result.mute = False
+                suite_result.use_print = False
                 suite_result.log_test_start(case=current_case)
                 suite_result.log(first_report.get_view(), level=first_report.get_log_level())
                 case_reports.append(first_report)
@@ -63,7 +63,7 @@ class Unittest(UnitTestCase):
             total = len(outcomes)
             success_pc = 100*sum(outcomes) / len(outcomes)
 
-            suite_result.mute = False
+            suite_result.use_print = False
             suite_result.log_test_start(case=current_case)
             spaces = 13
 
@@ -91,8 +91,7 @@ class Unittest(UnitTestCase):
             suite.addTest(current_case)
 
         runner = Runner(logger=cls.get_logger(), test_name=cls.__name__)
-        results = runner.run(testsuite=suite,mute=True)
-
+        results = runner.run(testsuite=suite, use_print=True)
 
         return results
 
@@ -111,21 +110,25 @@ class Unittest(UnitTestCase):
     def log(cls, msg : str, level : int = logging.INFO):
         cls.get_logger().log(msg=f'{msg}', level=level)
 
-    def warning(self, msg : str, *args, **kwargs):
+    @classmethod
+    def warning(cls, msg : str, *args, **kwargs):
         kwargs['level'] = logging.WARNING
-        self._logger.log(msg=msg, *args, **kwargs)
+        cls._logger.log(msg=msg, *args, **kwargs)
 
-    def error(self, msg : str, *args, **kwargs):
+    @classmethod
+    def error(cls, msg : str, *args, **kwargs):
         kwargs['level'] = logging.ERROR
-        self._logger.log(msg=msg, *args, **kwargs)
+        cls._logger.log(msg=msg, *args, **kwargs)
 
-    def critical(self, msg : str, *args, **kwargs):
+    @classmethod
+    def critical(cls, msg : str, *args, **kwargs):
         kwargs['level'] = logging.CRITICAL
-        self._logger.log(msg=msg, *args, **kwargs)
+        cls._logger.log(msg=msg, *args, **kwargs)
 
-    def info(self, msg : str, *args, **kwargs):
+    @classmethod
+    def info(cls, msg : str, *args, **kwargs):
         kwargs['level'] = logging.INFO
-        self._logger.log(msg=msg, *args, **kwargs)
+        cls._logger.log(msg=msg, *args, **kwargs)
 
 
     # ---------------------------------------------------------

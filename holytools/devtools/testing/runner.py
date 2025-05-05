@@ -25,7 +25,7 @@ class Runner(unittest.TextTestRunner):
         self.test_name : str = test_name
         self.mute : bool = mute
 
-    def run(self, testsuite : TestSuite, tracemalloc_depth : int = 0, mute : bool = False) -> SuiteResuult:
+    def run(self, testsuite : TestSuite, tracemalloc_depth : int = 0, use_print : bool = False) -> SuiteResuult:
         if tracemalloc_depth > 0:
             tracemalloc.start(tracemalloc_depth)
 
@@ -40,7 +40,7 @@ class Runner(unittest.TextTestRunner):
                                   descriptions=self.descriptions,
                                   verbosity=2,
                                   manual_mode=self.manual_mode,
-                                  mute=mute)
+                                  use_print=use_print)
             result.startTestRun()
             testsuite(result)
             result.stopTestRun()

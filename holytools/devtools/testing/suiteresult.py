@@ -15,14 +15,18 @@ class SuiteResuult(TestResult):
     status_spaces = 10
     runtime_space = 10
 
-    def __init__(self, logger : logging.Logger, testsuite_name: str, manual_mode : bool = False, mute : bool = False, *args, **kwargs):
+    def __init__(self, logger : logging.Logger,
+                 testsuite_name: str,
+                 manual_mode : bool = False,
+                 use_print : bool = False,
+                 *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.logger = logger
         self.reports : list[Report] = []
         self.start_times : dict[str, float] = {}
         self.is_manual : bool = manual_mode
         self.testsuite_name = testsuite_name
-        self.mute : bool = mute
+        self.use_print : bool = use_print
 
     def startTestRun(self):
         super().startTestRun()
@@ -131,5 +135,7 @@ class SuiteResuult(TestResult):
         self.log(msg=f'------> {case.get_name()[:self.test_spaces]} ', level=logging.INFO)
 
     def log(self, msg : str, level : int = logging.INFO):
-        if not self.mute:
+        if self.use_print:
+            print(msg)
+        else:
             self.logger.log(msg=msg, level=level)

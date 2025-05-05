@@ -1,3 +1,5 @@
+from __future__ import annotations
+import io
 import linecache
 import os
 import sys
@@ -96,6 +98,30 @@ class LoggingTools:
             display_val = val
         return  display_val
 
+
+    @staticmethod
+    def get_copied_stream(stdout, stderr) -> CopiedStream:
+        return CopiedStream(stdout, stderr)
+
+
+class CopiedStream:
+    def __init__(self, stdout, stderr):
+        self.original_stdout = stdout
+        self.original_stderr = stderr
+        self.buffer = io.StringIO()
+
+    def write(self, data):
+        self.original_stdout.write(data)
+        self.original_stdout.flush()
+        self.buffer.write(data)
+
+    def flush(self):
+        self.original_stdout.flush()
+        self.original_stderr.flush()
+        self.buffer.flush()
+
+    def get_value(self):
+        return self.buffer.getvalue()
 
 
 if __name__ == "__main__":
