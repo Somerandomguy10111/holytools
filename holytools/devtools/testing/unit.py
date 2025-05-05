@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import inspect
 import logging
+import sys
 import time
 import unittest
 import unittest.mock
@@ -14,6 +15,7 @@ from holytools.logging import LoggerFactory
 
 from .runner import Runner
 from .suiteresult import UnitTestCase
+from ...logging.tools import StoredStream
 
 
 # ---------------------------------------------------------
@@ -44,6 +46,9 @@ class Unittest(UnitTestCase):
 
         test_names = test_names or unittest.TestLoader().getTestCaseNames(cls)
         case_reports = []
+
+        copied_stream = StoredStream(stdout=sys.stdout, stderr=sys.stderr)
+        sys.stdout, sys.stderr = copied_stream, copied_stream
 
         for tn in test_names:
             current_case = cls(tn)
@@ -78,10 +83,17 @@ class Unittest(UnitTestCase):
 
             case_reports.append(statistical_case)
 
-
         result = SuiteResuult(logger=cls.get_logger(), testsuite_name=cls.__name__)
         result.reports = case_reports
         result.log_summary()
+
+        print('=' * 20)
+        fpath = cls.log_fpath()
+        if fpath:
+            with open(fpath, 'a') as f:
+                f.write(copied_stream.get_value())
+
+        sys.stdout, sys.stderr = sys.__stdout__, sys.__stderr__
 
     @classmethod
     def _run_several(cls, name : str, reps : int):

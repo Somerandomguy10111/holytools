@@ -100,11 +100,11 @@ class LoggingTools:
 
 
     @staticmethod
-    def get_copied_stream(stdout, stderr) -> CopiedStream:
-        return CopiedStream(stdout, stderr)
+    def get_copied_stream(stdout, stderr) -> StoredStream:
+        return StoredStream(stdout, stderr)
 
 
-class CopiedStream:
+class StoredStream:
     def __init__(self, stdout, stderr):
         self.original_stdout = stdout
         self.original_stderr = stderr

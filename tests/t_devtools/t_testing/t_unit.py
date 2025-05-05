@@ -1,4 +1,5 @@
 import random
+import tempfile
 
 from holytools.devtools import Unittest
 from holytools.fileIO import FileIO
@@ -74,7 +75,13 @@ class Hider:
         def test_err(self):
             raise RuntimeError("This test always raises an error.")
 
+        @classmethod
+        def log_fpath(cls):
+            fpath = '/tmp/stats.txt'
+            return fpath
 
 if __name__ == "__main__":
     Hider.VariedTest.execute_statistically(reps=5, min_success_percent=80)
-    Hider.VariedTest.execute_all()
+    # Hider.VariedTest.execute_all()
+
+    print('\n')
