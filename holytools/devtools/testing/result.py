@@ -23,7 +23,6 @@ class SuiteResult(TestResult):
     def __init__(self, logger : logging.Logger,
                  testsuite_name: str,
                  manual_mode : bool = False,
-                 use_print : bool = False,
                  *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.logger = logger
@@ -31,7 +30,6 @@ class SuiteResult(TestResult):
         self.start_times : dict[str, float] = {}
         self.is_manual : bool = manual_mode
         self.testsuite_name = testsuite_name
-        self.use_print : bool = use_print
 
     def startTestRun(self):
         super().startTestRun()
@@ -136,10 +134,7 @@ class SuiteResult(TestResult):
         self.log(msg=f'------> {casename[:self.test_spaces]} ', level=logging.INFO)
 
     def log(self, msg : str, level : int = logging.INFO):
-        if self.use_print:
-            print(msg)
-        else:
-            self.logger.log(msg=msg, level=level)
+        self.logger.log(msg=msg, level=level)
 
 
 @dataclass

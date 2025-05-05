@@ -44,15 +44,15 @@ class Unittest(BaseTest):
         test_names = test_names or unittest.TestLoader().getTestCaseNames(cls)
         stat_reports : list[Report] = []
         outcome_map : dict[str, list] = {}
+
         for tn in test_names:
-            case = cls(tn)
             report_name = f'{cls.__name__}.{tn}'
             start_time = time.time()
             suite_result = cls._run_several(reps=reps, name=tn)
             runtime = round(time.time() - start_time, 3)
 
             outcomes = [True if c.status == CaseStatus.SUCCESS else False for c in suite_result.reports]
-            outcome_map[tn] = outcomes
+            outcome_map[report_name] = outcomes
             success_pc = 100*sum(outcomes) / len(outcomes)
 
             status = CaseStatus.SUCCESS if success_pc >= min_success_percent else CaseStatus.FAIL
@@ -84,7 +84,7 @@ class Unittest(BaseTest):
             suite.addTest(current_case)
 
         runner = Runner(logger=cls.get_logger(), test_name=cls.__name__)
-        results = runner.run(testsuite=suite, use_print=True)
+        results = runner.run(testsuite=suite)
 
         return results
 
