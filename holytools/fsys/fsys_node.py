@@ -62,20 +62,22 @@ class Directory(FsysNode):
         if not self._path_wrapper.is_dir():
             raise FileNotFoundError(f'Path {path} is not a directory')
 
-    def get_tree(self) -> str:
-        fpaths = self.get_all_subpaths()
+    def get_tree(self, include_root : bool = False) -> str:
+        fpaths = self.get_all_subpaths(absolute=include_root)
         structure_dict = self.to_dict(fpaths)
         return self.dict_to_tree(fs_dict=structure_dict)
 
-    def get_subfile_fpaths(self) -> list[str]:
+    def get_subfile_fpaths(self, absolute : bool = True) -> list[str]:
         subfile_paths = []
         for root, dirs, files in os.walk(self.get_path()):
             for file in files:
                 fpath = os.path.join(root, file)
                 subfile_paths.append(fpath)
+        if not absolute:
+            subfile_paths = [os.path.relpath(p, self.get_path()) for p in subfile_paths]
         return subfile_paths
 
-    def get_all_subpaths(self) -> list[str]:
+    def get_all_subpaths(self, absolute : bool = True) -> list[str]:
         all_paths = []
         for root, dirs, files in os.walk(self.get_path()):
             for d in dirs:
@@ -84,6 +86,9 @@ class Directory(FsysNode):
             for f in files:
                 fpath = os.path.join(root, f)
                 all_paths.append(fpath)
+        if not absolute:
+            all_paths = [os.path.relpath(p, self.get_path()) for p in all_paths]
+
         return all_paths
 
     @classmethod
