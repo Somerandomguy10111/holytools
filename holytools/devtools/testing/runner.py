@@ -7,7 +7,7 @@ import warnings
 from logging import Logger
 from unittest import TestSuite
 
-from .result import SuiteResult
+from .result import Result
 
 
 # ----------------------------------------------
@@ -20,7 +20,7 @@ class Runner(unittest.TextTestRunner):
         self.test_name : str = test_name
         self.mute : bool = mute
 
-    def run(self, testsuite : TestSuite, tracemalloc_depth : int = 0) -> SuiteResult:
+    def run(self, testsuite : TestSuite, tracemalloc_depth : int = 0) -> Result:
         if tracemalloc_depth > 0:
             tracemalloc.start(tracemalloc_depth)
 
@@ -29,12 +29,12 @@ class Runner(unittest.TextTestRunner):
             warnings.simplefilter("ignore")
             warnings.simplefilter("always", ResourceWarning)
 
-            result = SuiteResult(logger=self.logger,
-                                 testsuite_name=self.test_name,
-                                 stream=self.stream,
-                                 descriptions=self.descriptions,
-                                 verbosity=2,
-                                 manual_mode=self.manual_mode)
+            result = Result(logger=self.logger,
+                            testsuite_name=self.test_name,
+                            stream=self.stream,
+                            descriptions=self.descriptions,
+                            verbosity=2,
+                            manual_mode=self.manual_mode)
             result.startTestRun()
             testsuite(result)
             result.stopTestRun()

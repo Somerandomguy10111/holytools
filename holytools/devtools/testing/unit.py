@@ -12,7 +12,7 @@ from abc import abstractmethod
 from multiprocessing import Process, Value
 from typing import Optional, Callable
 
-from holytools.devtools.testing.result import SuiteResult, Report, CaseStatus
+from holytools.devtools.testing.result import Result, Report, CaseStatus
 from .basetest import BaseTest
 from .runner import Runner
 
@@ -61,7 +61,7 @@ class Unittest(BaseTest):
             stats_report = Report(name=report_name, status=status, runtime=runtime)
             stat_reports.append(stats_report)
 
-        result = SuiteResult(logger=cls.get_logger(), testsuite_name=cls.__name__)
+        result = Result(logger=cls.get_logger(), testsuite_name=cls.__name__)
         spaces = 13
         for c in stat_reports:
             outcomes = outcome_map[c.name]
@@ -77,7 +77,7 @@ class Unittest(BaseTest):
         result.log_summary()
 
     @classmethod
-    def _run_several(cls, name : str, reps : int) -> SuiteResult:
+    def _run_several(cls, name : str, reps : int) -> Result:
         suite = unittest.TestSuite()
         current_case = cls(name)
         for _ in range(reps):

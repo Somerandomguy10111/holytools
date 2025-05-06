@@ -15,7 +15,7 @@ from holytools.devtools.testing.basetest import BaseTest
 
 # ---------------------------------------------------------
 
-class SuiteResult(TestResult):
+class Result(TestResult):
     test_spaces = 50
     status_spaces = 10
     runtime_space = 10
