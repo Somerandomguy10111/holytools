@@ -2,7 +2,7 @@ import requests
 from flask import Flask, jsonify
 
 from holytools.devtools import Unittest
-from holytools.devtools.testing.runner import BlockedTester
+from holytools.devtools.testing.unit import BlockedTester
 
 # ------------------------------------------------------------------
 
@@ -23,8 +23,8 @@ class ServerTester(BlockedTester):
     def blocked(self):
         app.run(host=host, port=port)
 
-    def perform_check(self, case: str) -> bool:
-        _ = case
+    @staticmethod
+    def perform_check() -> bool:
         requests.get(url=f'http://{host}:{port}/toggle')
         return the_bool == True
 
@@ -32,7 +32,7 @@ class ServerTester(BlockedTester):
 class TestBlockedTester(Unittest):
     def test_run(self):
         tester = ServerTester()
-        self.assertTrue(tester.check_ok(delay=1, case=''))
+        self.assertTrue(tester.check_ok(check_func=tester.perform_check, delay=1))
 
 
 if __name__ == "__main__":

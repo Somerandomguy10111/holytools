@@ -80,8 +80,21 @@ class Hider:
             fpath = '/tmp/stats.txt'
             return fpath
 
+class TestUnittestLogging(Unittest):
+    def test_pass(self):
+        pass
+
+    def test_info(self):
+        self.info(msg=f'This is an info message')
+
+    def test_error(self):
+        self.error(msg=f'This is an error msg')
+
+    def test_log(self):
+        self.log(msg=f'This is log message')
+
 if __name__ == "__main__":
-    Hider.VariedTest.execute_stats(reps=5, min_success_percent=50)
+    # Hider.VariedTest.execute_stats(reps=5, min_success_percent=50)
     # Hider.VariedTest.execute_all()
 
-    print('\n')
+    TestUnittestLogging.execute_all()

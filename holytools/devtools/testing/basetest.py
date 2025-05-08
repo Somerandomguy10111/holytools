@@ -43,24 +43,23 @@ class BaseTest(unittest.TestCase):
 
     @classmethod
     def warning(cls, msg : str, *args, **kwargs):
-        kwargs['level'] = logging.WARNING
-        cls._logger.log(msg=msg, *args, **kwargs)
+        _, __ = args, kwargs
+        cls.log(msg=msg, level=logging.WARNING)
 
     @classmethod
     def error(cls, msg : str, *args, **kwargs):
-        kwargs['level'] = logging.ERROR
-        cls._logger.log(msg=msg, *args, **kwargs)
+        _, __ = args, kwargs
+        cls.log(msg=msg, level=logging.ERROR)
 
     @classmethod
     def critical(cls, msg : str, *args, **kwargs):
-        kwargs['level'] = logging.CRITICAL
-        cls._logger.log(msg=msg, *args, **kwargs)
+        _, __ = args, kwargs
+        cls.log(msg=msg, level=logging.CRITICAL)
 
     @classmethod
     def info(cls, msg : str, *args, **kwargs):
-        kwargs['level'] = logging.INFO
-        cls._logger.log(msg=msg, *args, **kwargs)
-
+        _, __ = args, kwargs
+        cls.log(msg=msg, level=logging.INFO)
 
     # ---------------------------------------------------------
     # assertions
