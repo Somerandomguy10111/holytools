@@ -10,7 +10,7 @@ import unittest.mock
 import unittest.mock
 from abc import abstractmethod
 from multiprocessing import Process, Value
-from typing import Optional, Callable
+from typing import Optional, Callable, Any
 
 from holytools.devtools.testing.result import Result, Report, CaseStatus
 from .basetest import BaseTest
@@ -114,11 +114,11 @@ class BlockedTester:
     def __init__(self):
         self.shared_bool = Value(ctypes.c_bool, False)
 
-    def check_ok(self, case : str, delay : float) -> bool:
+    def check_ok(self, check_func : Callable[..., bool], delay : float) -> bool:
         def do_run():
             threading.Thread(target=self.blocked).start()
             time.sleep(delay)
-            check_thread = threading.Thread(target=self.check_condition, args=(case,))
+            check_thread = threading.Thread(target=self.check_condition, args=(check_func,))
             check_thread.start()
             check_thread.join()
             q.put('stop')
@@ -135,10 +135,6 @@ class BlockedTester:
     def blocked(self):
         pass
 
-    def check_condition(self, case : str):
-        self.shared_bool.value = self.perform_check(case=case)
-
-    @abstractmethod
-    def perform_check(self, case : str) -> bool:
-        pass
+    def check_condition(self, func : Callable[[Any], bool]):
+        self.shared_bool.value = func
 

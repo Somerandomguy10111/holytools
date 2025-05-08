@@ -33,7 +33,6 @@ class BaseTest(unittest.TestCase):
             cls._logger = LoggerFactory.get_logger(include_location=False, include_timestamp=False, name=cls.__name__, use_stdout=True, log_fpath=cls.log_fpath())
         return cls._logger
 
-
     @classmethod
     def log_fpath(cls) -> Optional[str]:
         return None
