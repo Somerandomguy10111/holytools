@@ -1,6 +1,6 @@
 [project]
 name = "holytools"
-version = "0.9.17"
+version = "0.9.18"
 authors = [{name = "Daniel Hollarek", email = "daniel.hollarek@googlemail.com"}]
 description = "Collection of very general python utilities "
 readme = "readme.md"
@@ -17,3 +17,4 @@ test = ["flask"]
 
 [project.scripts]
 cred = "holytools.configs.cred:main"
+ipconfig = "holytools.network.ip:main"

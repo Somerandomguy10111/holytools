@@ -65,15 +65,17 @@ class IpProvider:
         if error:
             raise Exception(f"Error executing nmcli: {error.decode()}")
 
-        ipconfig = ''
+        ipconfig_view = ''
         sections = "".join(output.decode()).split("\n\n")
 
         for section in sections:
             if section.strip():
                 new_adapter = Adapter.from_nmcli_output(section)
-                ipconfig += f'\n\n{new_adapter}'
+                ipconfig_view += f'{new_adapter}\n\n'
 
-        return ipconfig
+        ipconfig_view = ipconfig_view.rstrip()
+
+        return ipconfig_view
 
     @staticmethod
     def get_free_port() -> int:
@@ -82,6 +84,9 @@ class IpProvider:
             socknum = s.getsockname()[1]
         return socknum
 
+def main():
+    print(IpProvider.get_ipconfig())
+
 
 if __name__ == "__main__":
-    print(IpProvider.get_ipconfig())
+    main()
