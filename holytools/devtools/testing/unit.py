@@ -32,9 +32,9 @@ class Unittest(BaseTest):
         suite = unittest.TestLoader().loadTestsFromTestCase(cls)
         runner = Runner(logger=cls.get_logger(), is_manual=manual_mode, test_name=cls.__name__)
         tracemalloc_depth = 10 if trace_resourcewarning else 0
-        results = runner.run(testsuite=suite, tracemalloc_depth=tracemalloc_depth)
+        result = runner.run(testsuite=suite, tracemalloc_depth=tracemalloc_depth)
 
-        return results
+        return result
 
     @classmethod
     def execute_stats(cls, reps : int, min_success_percent : float, test_names : Optional[list[str]] = None):

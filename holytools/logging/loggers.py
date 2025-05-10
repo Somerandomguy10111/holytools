@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import logging
 import sys
+import uuid
 from dataclasses import dataclass
 from enum import Enum
 from io import StringIO
@@ -43,6 +44,12 @@ class LoggerFactory:
 
         return logger
 
+    @classmethod
+    def get_silent_logger(cls) -> Logger:
+        logger = cls.get_logger(name=str(uuid.uuid4()))
+        for h in logger.handlers:
+            logger.removeHandler(h)
+        return logger
 
 class LoggerOverseer:
     @staticmethod

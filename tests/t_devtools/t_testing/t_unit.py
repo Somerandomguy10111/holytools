@@ -1,9 +1,12 @@
+import logging
+import os
 import random
-import tempfile
+import sys
 
 from holytools.devtools import Unittest
 from holytools.fileIO import FileIO
-import os
+from holytools.logging import LoggingTools, LoggerFactory
+
 
 # -------------------------------------------
 
@@ -52,35 +55,8 @@ class TestPatchMechanism(Unittest):
         result = os.path.abspath("anything")
         self.assertEqual(result, "/fake/path")
 
-class Hider:
-    class VariedTest(Unittest):
-        def test_always(self):
-            pass
 
-        def test_often(self):
-            if random.random() < 0.25:
-                self.fail("This test sometimes fails (~20% of the time).")
-
-        def test_equal(self):
-            if random.random() < 0.5:
-                self.fail("This test fails 50% of the time.")
-
-        def test_sometimes(self):
-            if random.random() < 0.75:
-                self.fail("This test often fails (~80% of the time).")
-
-        def test_never(self):
-            self.fail("This test always fails (100% failure).")
-
-        def test_err(self):
-            raise RuntimeError("This test always raises an error.")
-
-        @classmethod
-        def log_fpath(cls):
-            fpath = '/tmp/stats.txt'
-            return fpath
-
-class TestUnittestLogging(Unittest):
+class TestUnittest(Unittest):
     def test_pass(self):
         pass
 
@@ -93,8 +69,51 @@ class TestUnittestLogging(Unittest):
     def test_log(self):
         self.log(msg=f'This is log message')
 
+    def test_execute_all(self):
+        class ThisUnittest(Unittest):
+            def test_ok(self):
+                _ = self
+                print(f'All clear, boss!')
+
+        integrity = ThisUnittest.execute_all()
+        self.assertTrue(integrity == True)
+
+    def test_execute_stats(self):
+        class TestStatisticalExecution(Unittest):
+            def test_always(self):
+                pass
+
+            def test_often(self):
+                if random.random() < 0.25:
+                    self.fail("This test sometimes fails (~20% of the time).")
+
+            def test_equal(self):
+                if random.random() < 0.5:
+                    self.fail("This test fails 50% of the time.")
+
+            def test_sometimes(self):
+                if random.random() < 0.75:
+                    self.fail("This test often fails (~80% of the time).")
+
+            def test_never(self):
+                self.fail("This test always fails (100% failure).")
+
+            def test_err(self):
+                raise RuntimeError("This test always raises an error.")
+
+            @classmethod
+            def log_fpath(cls):
+                fpath = '/tmp/stats.txt'
+                return fpath
+
+        sys.stdout, sys.stderr = None, None
+        TestStatisticalExecution._logger = LoggerFactory.get_silent_logger()
+        TestStatisticalExecution.execute_stats(reps=5, min_success_percent=50)
+        sys.stdout, sys.stderr = sys.__stdout__, sys.__stderr__
+
+
 if __name__ == "__main__":
     # Hider.VariedTest.execute_stats(reps=5, min_success_percent=50)
     # Hider.VariedTest.execute_all()
 
-    TestUnittestLogging.execute_all()
+    TestUnittest.execute_all()
