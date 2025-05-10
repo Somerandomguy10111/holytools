@@ -28,7 +28,7 @@ class Unittest(BaseTest):
         return instance
 
     @classmethod
-    def execute_all(cls, manual_mode : bool = True, trace_resourcewarning : bool = False):
+    def execute_all(cls, manual_mode : bool = True, trace_resourcewarning : bool = False) -> bool:
         suite = unittest.TestLoader().loadTestsFromTestCase(cls)
         runner = Runner(logger=cls.get_logger(), is_manual=manual_mode, test_name=cls.__name__)
         tracemalloc_depth = 10 if trace_resourcewarning else 0
@@ -37,7 +37,7 @@ class Unittest(BaseTest):
         return result.integrity()
 
     @classmethod
-    def execute_stats(cls, reps : int, min_success_percent : float, test_names : Optional[list[str]] = None):
+    def execute_stats(cls, reps : int, min_success_percent : float, test_names : Optional[list[str]] = None) -> bool:
         if not 0 <= min_success_percent <= 100:
             raise ValueError(f'Min success percent should be in [0,100], got {min_success_percent}')
 
@@ -75,6 +75,8 @@ class Unittest(BaseTest):
 
         result.reports = stat_reports
         result.log_summary()
+
+        return result.integrity()
 
     @classmethod
     def _run_several(cls, name : str, reps : int) -> Result:
