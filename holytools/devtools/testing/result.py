@@ -124,11 +124,15 @@ class Result(TestResult):
         CROSS = '❌'
 
         if num_unsuccessful == 0:
-            final_status = f"{GREEN}\n{CHECKMARK} {num_total}/{num_total} tests ran successfully!{RESET}"
+            final_status_msg = f"{GREEN}\n{CHECKMARK} {num_total}/{num_total} tests ran successfully!{RESET}"
         else:
-            final_status = f"{RED}\n{CROSS} {num_unsuccessful}/{num_total} tests had errors or failures!{RESET}"
+            final_status_msg = f"{RED}\n{CROSS} {num_unsuccessful}/{num_total} tests had errors or failures!{RESET}"
 
-        return final_status
+        return final_status_msg
+
+    def integrity(self):
+        unsuccessful_cases = [c for c in self.reports if c.status != CaseStatus.SUCCESS]
+        return len(unsuccessful_cases) == 0
 
     def log_test_start(self, casename : str):
         self.log(msg=f'------> {casename[:self.test_spaces]} ', level=logging.INFO)

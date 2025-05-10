@@ -34,7 +34,7 @@ class Unittest(BaseTest):
         tracemalloc_depth = 10 if trace_resourcewarning else 0
         result = runner.run(testsuite=suite, tracemalloc_depth=tracemalloc_depth)
 
-        return result
+        return result.integrity()
 
     @classmethod
     def execute_stats(cls, reps : int, min_success_percent : float, test_names : Optional[list[str]] = None):
