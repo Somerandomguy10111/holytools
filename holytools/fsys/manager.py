@@ -5,25 +5,42 @@ import os
 
 # -------------------------------------------
 
-class ResourceManager:
+class FsysManager:
     def __init__(self, root_dirpath : str):
         if not os.path.isdir(root_dirpath):
             raise ValueError(f'Failed to initialize {self.__class__.__name__}: Root directory {root_dirpath} does not exist')
         self._root_dirpath : str = root_dirpath
-        self._subdir_paths: list[str] = []
-        self._fpaths : list[str] = []
+        self.dirpaths: list[str] = []
+        self.fpaths : list[str] = []
 
     def add_dir(self, relative_path: str) -> str:
         dirpath = self._get_relative_path(relative_path=relative_path)
         if not os.path.isdir(dirpath):
             os.makedirs(dirpath, exist_ok=True)
-        self._subdir_paths.append(dirpath)
+        self.dirpaths.append(dirpath)
         return dirpath
 
     def add_file(self, relative_path: str) -> str:
         fpath = self._get_relative_path(relative_path=relative_path)
-        self._fpaths.append(fpath)
+        self.fpaths.append(fpath)
         return fpath
+
+    def add_tree(self, root_dirpath : str, tree : dict):
+        for name, value in tree.items():
+            path = os.path.join(root_dirpath, name)
+            relpath = os.path.relpath(path=path, start=self._root_dirpath)
+
+            if isinstance(value, dict):
+                self.add_dir(relative_path=relpath)
+                self.add_tree(root_dirpath=path, tree=value)
+            elif isinstance(value, str):
+                with open(path,'w') as f:
+                    f.write(value)
+                self.add_file(relative_path=relpath)
+            elif value is None:
+                self.add_file(relative_path=relpath)
+            else:
+                raise ValueError(f"Invalid value: {value}")
 
     # -------------------------------------------
 
@@ -35,3 +52,5 @@ class ResourceManager:
         if self._root_dirpath is None:
             raise ValueError(f'Root directory not set for {self.__class__.__name__}')
         return self._root_dirpath
+
+

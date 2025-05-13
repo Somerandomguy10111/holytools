@@ -2,7 +2,7 @@ import os
 import tempfile
 
 from holytools.devtools import Unittest
-from holytools.fsys.fsys_node import Directory, File
+from holytools.fsys.node import Directory, File
 
 
 # -------------------------------------------------------------

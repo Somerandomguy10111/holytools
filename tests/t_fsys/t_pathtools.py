@@ -2,14 +2,14 @@ import os
 import tempfile
 
 from holytools.devtools import Unittest
-from holytools.fsys import PathTools, ResourceManager
+from holytools.fsys import PathTools, FsysManager
 
 
 class TestPathTools(Unittest):
     def setUp(self):
         self.tmp_dirpath = tempfile.mktemp()
         os.makedirs(self.tmp_dirpath)
-        self.location_manager = ResourceManager(root_dirpath=self.tmp_dirpath)
+        self.location_manager = FsysManager(root_dirpath=self.tmp_dirpath)
 
     def test_ensure_suffix(self):
         self.assertEqual(PathTools.ensure_suffix('testfile', 'txt'), 'testfile.txt')
