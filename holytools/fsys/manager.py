@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+from typing import Optional
 
 
 # -------------------------------------------
@@ -25,7 +26,10 @@ class FsysManager:
         self.fpaths.append(fpath)
         return fpath
 
-    def add_tree(self, root_dirpath : str, tree : dict):
+    def add_tree(self, tree : dict, root_dirpath : Optional[str] = None):
+        if not root_dirpath:
+            root_dirpath = self.get_root_dirpath()
+
         for name, value in tree.items():
             path = os.path.join(root_dirpath, name)
             relpath = os.path.relpath(path=path, start=self._root_dirpath)
