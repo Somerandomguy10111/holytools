@@ -41,9 +41,11 @@ class TestFsysNode(Unittest):
 
     def test_get_tree(self):
         tree = self.root_node.get_tree(include_root=True)
-        expected_expression = f'{os.path.basename(self.test_dir)}/ -> tmp/'
-        print(f'- Expected expression: {expected_expression}')
+        expected_expression = f'{os.path.basename(self.test_dir)}/'
         print(f'- Tree:\n{tree}')
+
+        self.assertTrue(f'🗎 sub3.png' in tree)
+        self.assertTrue(f'🗀 dir2/' in tree)
         self.assertTrue(expected_expression in tree)
 
     def test_get_subnodes(self):
@@ -52,6 +54,10 @@ class TestFsysNode(Unittest):
 
         subnode_paths = self.root_node.get_all_subpaths()
         self.assertEqual(len(subnode_paths), self.num_total_nodes)
+        print(f'- Subnode paths')
+        for n in subnode_paths:
+            print(n)
+
 
     def test_dir_properties(self):
         self.assertTrue(self.root_node.get_name() == os.path.basename(self.test_dir))

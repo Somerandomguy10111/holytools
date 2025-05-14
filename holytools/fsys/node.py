@@ -105,14 +105,11 @@ class Directory(FsysNode):
                 total_str += f'{indentation}... (Max folder elements displayed = {max_children})\n'
                 break
 
-            parent_name = os.path.basename(parent_dirpath)
-            parent_indicator = f'-> {parent_name}/' if parent_name else ''
-
-            fpath = os.path.join(parent_dirpath, k)
+            fpath = os.path.join(f'/{parent_dirpath}', k)
             is_file = os.path.isfile(fpath)
             symbol = f'🗎' if is_file else '🗀'
             conditional_backslash = '' if is_file else '/'
-            total_str += (f'{indentation}{symbol} {k}{conditional_backslash} {parent_indicator}\n'
+            total_str += (f'{indentation}{symbol} {k}{conditional_backslash}\n'
                           f'{cls.dict_to_tree(v, indent=indent + 1, parent_dirpath=fpath)}')
         if indent == 0:
             total_str = total_str.rstrip()

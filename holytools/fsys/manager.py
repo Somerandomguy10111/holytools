@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import os
 from typing import Optional
+from holytools.fsys.node import Directory
 
 
 # -------------------------------------------
@@ -46,6 +47,10 @@ class FsysManager:
             else:
                 raise ValueError(f"Invalid value: {value}")
 
+    def view_tree(self) -> str:
+        directory = Directory(path=self._root_dirpath)
+        return directory.get_tree()
+
     # -------------------------------------------
 
     def _get_relative_path(self, relative_path: str) -> str:
@@ -56,5 +61,6 @@ class FsysManager:
         if self._root_dirpath is None:
             raise ValueError(f'Root directory not set for {self.__class__.__name__}')
         return self._root_dirpath
+
 
 
