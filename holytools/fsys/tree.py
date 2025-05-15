@@ -4,12 +4,12 @@ from typing import Optional
 
 class TreeGenerator:
     @classmethod
-    def dict_to_tree(cls, fsys_dict: dict, desc_map : Optional[dict[str, str]] = None, fileID_map : Optional[dict[str, str]] = None,
-                          indent: int = 0, parent_dirpath : str = '/', max_children: int = 10) -> str:
+    def dict_to_tree(cls, fsys_dict: dict, desc_map : Optional[dict[str, str]] = None, path_to_fileID : Optional[dict[str, int]] = None,
+                     indent: int = 0, parent_dirpath : str = '/', max_children: int = 10) -> str:
         if desc_map is None:
             desc_map = {}
-        if fileID_map is None:
-            fileID_map = {}
+        if path_to_fileID is None:
+            path_to_fileID = {}
 
         total_str = ''
         if not fsys_dict:
@@ -28,23 +28,30 @@ class TreeGenerator:
             symbol = f'🗎' if is_file else '🗀'
             conditional_backslash = '' if is_file else '/'
             conditional_description = f'{indentation}{desc_map[fpath]}\n' if fpath in desc_map else ''
-            conditional_fileID = f' | FileID = {fileID_map[fpath]}' if fpath in fileID_map else ''
+            conditional_fileID = f' | FileID = {path_to_fileID[fpath]}' if fpath in path_to_fileID else ''
 
             total_str += (f'{indentation}{symbol} {k}{conditional_backslash}{conditional_fileID}\n'
                           f'{conditional_description}'
-                          f'{cls.dict_to_tree(v, indent=indent + 1, parent_dirpath=fpath, desc_map=desc_map, fileID_map=fileID_map)}')
+                          f'{cls.dict_to_tree(v, indent=indent + 1, parent_dirpath=fpath, desc_map=desc_map, path_to_fileID=path_to_fileID)}')
         if indent == 0:
             total_str = total_str.rstrip()
         return total_str
 
     @staticmethod
-    def to_dict(fpaths: list[str]) -> dict:
+    def to_dict(paths: list[str]) -> dict:
         tree_dict = {}
-        for path in fpaths:
-            parts = path.split('/')
+        for fp in paths:
+            parts = fp.split('/')
             node = tree_dict
-            for p in parts:
+            for k, p in enumerate(parts):
+                item = TreeGenerator.read_file(fpath=fp) if k == len(parts)-1 and os.path.isfile(fp) else {}
                 if not p in node:
-                    node[p] = {}
+                    node[p] = item
                 node = node[p]
         return tree_dict
+
+    @staticmethod
+    def read_file(fpath : str) -> str:
+        with open(fpath, 'r') as f:
+            content = f.read()
+        return content

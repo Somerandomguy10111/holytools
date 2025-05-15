@@ -1,3 +1,4 @@
+import json
 import os
 import tempfile
 
@@ -70,6 +71,10 @@ class TestNode(FsysTest):
 
 class TestTreeGeneration(FsysTest):
     def test_get_tree(self):
+        the_dict = TreeGenerator.to_dict(paths=self.root_node.get_subfile_fpaths())
+        print(f'- Dict = {json.dumps(the_dict, indent=2)}')
+
+
         tree = self.root_node.get_tree(include_root=True)
         expected_expression = f'{os.path.basename(self.root_dirpath)}/'
         print(f'- Root Tree:\n{tree}')
@@ -80,7 +85,7 @@ class TestTreeGeneration(FsysTest):
 
     def test_get_described_tree(self):
         fpaths = self.root_node.get_subfile_fpaths()
-        fsys_dict = TreeGenerator.to_dict(fpaths=fpaths)
+        fsys_dict = TreeGenerator.to_dict(paths=fpaths)
         description_map = {os.path.join(self.root_dirpath, 'file1.txt') : 'This is a file'}
 
         tree = TreeGenerator.dict_to_tree(fsys_dict=fsys_dict, desc_map=description_map)
@@ -89,12 +94,13 @@ class TestTreeGeneration(FsysTest):
 
     def test_enumerated_tree(self):
         fpaths = self.root_node.get_subfile_fpaths()
-        fsys_dict = TreeGenerator.to_dict(fpaths=fpaths)
-        fileID_map = {os.path.join(self.root_dirpath, 'file1.txt') : '1'}
+        fsys_dict = TreeGenerator.to_dict(paths=fpaths)
+        path_to_fileID = {os.path.join(self.root_dirpath, 'file1.txt') : '1'}
 
-        tree = TreeGenerator.dict_to_tree(fsys_dict=fsys_dict, fileID_map=fileID_map)
+        tree = TreeGenerator.dict_to_tree(fsys_dict=fsys_dict,path_to_fileID=path_to_fileID)
         print(f'- Enumerated tree:\n{tree}')
         self.assertTrue(f'🗎 file1.txt | FileID = 1' in tree)
+
 
 if __name__ == '__main__':
     TestTreeGeneration.execute_all()
