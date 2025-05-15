@@ -8,16 +8,12 @@ from holytools.fsys.tree import TreeGenerator
 
 # -------------------------------------------------------------
 
-class TestFsysNode(Unittest):
+class FsysTest(Unittest):
     num_hard_files = 9
     num_hard_folders = 3
     num_total_dat_files = 5
     num_total_files = num_hard_files+1
     num_total_nodes= num_total_files+num_hard_folders
-
-    @classmethod
-    def setUpClass(cls):
-        pass
 
     def setUp(self):
         self.root_dirpath = tempfile.mkdtemp()
@@ -40,24 +36,8 @@ class TestFsysNode(Unittest):
         os.symlink(os.path.join(self.root_dirpath, 'dir1', 'sub1.dat'), os.path.join(self.root_dirpath, 'symlink_sub1.dat'))
         self.root_node = Directory(path=self.root_dirpath)
 
-    def test_get_tree(self):
-        tree = self.root_node.get_tree(include_root=True)
-        expected_expression = f'{os.path.basename(self.root_dirpath)}/'
-        print(f'- Root Tree:\n{tree}')
 
-        self.assertTrue(f'🗎 sub3.png' in tree)
-        self.assertTrue(f'🗀 dir2/' in tree)
-        self.assertTrue(expected_expression in tree)
-
-    def test_get_described_tree(self):
-        fpaths = self.root_node.get_subfile_fpaths()
-        fsys_dict = TreeGenerator.to_dict(fpaths=fpaths)
-        description_map = {os.path.join(self.root_dirpath, 'file1.txt') : 'This is a file'}
-
-        tree = TreeGenerator.dict_to_tree(fsys_dict=fsys_dict, desc_map=description_map)
-        print(f'- Described tree:\n{tree}')
-        self.assertTrue(f'🗎 file1.txt\n					This is a file' in tree)
-
+class TestNode(FsysTest):
     def test_get_subnodes(self):
         subfile_paths = self.root_node.get_subfile_fpaths()
         self.assertEqual(len(subfile_paths), self.num_total_files)
@@ -88,5 +68,33 @@ class TestFsysNode(Unittest):
         self.assertIsInstance(zip_bytes, bytes)
 
 
+class TestTreeGeneration(FsysTest):
+    def test_get_tree(self):
+        tree = self.root_node.get_tree(include_root=True)
+        expected_expression = f'{os.path.basename(self.root_dirpath)}/'
+        print(f'- Root Tree:\n{tree}')
+
+        self.assertTrue(f'🗎 sub3.png' in tree)
+        self.assertTrue(f'🗀 dir2/' in tree)
+        self.assertTrue(expected_expression in tree)
+
+    def test_get_described_tree(self):
+        fpaths = self.root_node.get_subfile_fpaths()
+        fsys_dict = TreeGenerator.to_dict(fpaths=fpaths)
+        description_map = {os.path.join(self.root_dirpath, 'file1.txt') : 'This is a file'}
+
+        tree = TreeGenerator.dict_to_tree(fsys_dict=fsys_dict, desc_map=description_map)
+        print(f'- Described tree:\n{tree}')
+        self.assertTrue(f'🗎 file1.txt\n			This is a file' in tree)
+
+    def test_enumerated_tree(self):
+        fpaths = self.root_node.get_subfile_fpaths()
+        fsys_dict = TreeGenerator.to_dict(fpaths=fpaths)
+        fileID_map = {os.path.join(self.root_dirpath, 'file1.txt') : '1'}
+
+        tree = TreeGenerator.dict_to_tree(fsys_dict=fsys_dict, fileID_map=fileID_map)
+        print(f'- Enumerated tree:\n{tree}')
+        self.assertTrue(f'🗎 file1.txt | FileID = 1' in tree)
+
 if __name__ == '__main__':
-    TestFsysNode.execute_all()
+    TestTreeGeneration.execute_all()
