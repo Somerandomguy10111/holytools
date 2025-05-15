@@ -3,6 +3,7 @@ import tempfile
 
 from holytools.devtools import Unittest
 from holytools.fsys.node import Directory, File
+from holytools.fsys.tree import TreeGenerator
 
 
 # -------------------------------------------------------------
@@ -19,34 +20,43 @@ class TestFsysNode(Unittest):
         pass
 
     def setUp(self):
-        self.test_dir = tempfile.mkdtemp()
+        self.root_dirpath = tempfile.mkdtemp()
         self.files = ['file1.txt', 'file2.txt']
         self.subdirs = ['.hiddendir','dir1', 'dir2']
         self.subfiles = {'dir1': ['sub1.dat', 'sub2.dat', 'sub3.dat', '.hiddenfile.dat'],
                          'dir2': ['sub1.png', 'sub2.png', 'sub3.png']}
 
         for d in self.subdirs:
-            os.makedirs(os.path.join(self.test_dir, d))
+            os.makedirs(os.path.join(self.root_dirpath, d))
 
         for the_file in self.files:
-            open(os.path.join(self.test_dir, the_file), 'a').close()  # Create empty files
+            open(os.path.join(self.root_dirpath, the_file), 'a').close()  # Create empty files
 
         for subdir, subfiles in self.subfiles.items():
-            subdir_path = os.path.join(self.test_dir, subdir)
+            subdir_path = os.path.join(self.root_dirpath, subdir)
             for subfile in subfiles:
                 open(os.path.join(subdir_path, subfile), 'a').close()
 
-        os.symlink(os.path.join(self.test_dir, 'dir1', 'sub1.dat'), os.path.join(self.test_dir, 'symlink_sub1.dat'))
-        self.root_node = Directory(path=self.test_dir)
+        os.symlink(os.path.join(self.root_dirpath, 'dir1', 'sub1.dat'), os.path.join(self.root_dirpath, 'symlink_sub1.dat'))
+        self.root_node = Directory(path=self.root_dirpath)
 
     def test_get_tree(self):
         tree = self.root_node.get_tree(include_root=True)
-        expected_expression = f'{os.path.basename(self.test_dir)}/'
-        print(f'- Tree:\n{tree}')
+        expected_expression = f'{os.path.basename(self.root_dirpath)}/'
+        print(f'- Root Tree:\n{tree}')
 
         self.assertTrue(f'🗎 sub3.png' in tree)
         self.assertTrue(f'🗀 dir2/' in tree)
         self.assertTrue(expected_expression in tree)
+
+    def test_get_described_tree(self):
+        fpaths = self.root_node.get_subfile_fpaths()
+        fsys_dict = TreeGenerator.to_dict(fpaths=fpaths)
+        description_map = {os.path.join(self.root_dirpath, 'file1.txt') : 'This is a file'}
+
+        tree = TreeGenerator.dict_to_tree(fsys_dict=fsys_dict, desc_map=description_map)
+        print(f'- Described tree:\n{tree}')
+        self.assertTrue(f'🗎 file1.txt\n					This is a file' in tree)
 
     def test_get_subnodes(self):
         subfile_paths = self.root_node.get_subfile_fpaths()
@@ -59,17 +69,17 @@ class TestFsysNode(Unittest):
             print(n)
 
     def test_dir_properties(self):
-        self.assertTrue(self.root_node.get_name() == os.path.basename(self.test_dir))
+        self.assertTrue(self.root_node.get_name() == os.path.basename(self.root_dirpath))
         self.assertTrue(isinstance(self.root_node.get_last_modified_epochtime(), float))
 
     def test_file(self):
-        dat_fpath = os.path.join(self.test_dir, 'dir1', 'sub1.dat')
+        dat_fpath = os.path.join(self.root_dirpath, 'dir1', 'sub1.dat')
         file = File(path=dat_fpath)
         self.assertTrue(file.get_suffix() == 'dat')
 
     def test_hidden(self):
         self.assertTrue(self.root_node.is_hidden() == False)
-        hidden_dir = Directory(path=os.path.join(self.test_dir, '.hiddendir'))
+        hidden_dir = Directory(path=os.path.join(self.root_dirpath, '.hiddendir'))
         self.assertTrue(hidden_dir.is_hidden() == True)
 
     def test_zip(self):

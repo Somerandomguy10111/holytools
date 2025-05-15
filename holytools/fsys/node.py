@@ -1,8 +1,14 @@
+import os
+import shutil
+import stat
+import tempfile
 from pathlib import Path as PathWrapper
-import tempfile, shutil
-import os, stat
 from typing import Optional
 
+from holytools.fsys.tree import TreeGenerator
+
+
+# ----------------------------------------------------
 
 class FsysNode:
     def __init__(self, path : str):
@@ -64,8 +70,8 @@ class Directory(FsysNode):
 
     def get_tree(self, include_root : bool = False) -> str:
         fpaths = self.get_all_subpaths(absolute=include_root)
-        structure_dict = self.to_dict(fpaths)
-        return self.dict_to_tree(fs_dict=structure_dict)
+        structure_dict = TreeGenerator.to_dict(fpaths)
+        return TreeGenerator.dict_to_tree(fsys_dict=structure_dict)
 
     def get_subfile_fpaths(self, absolute : bool = True) -> list[str]:
         subfile_paths = []
@@ -91,41 +97,7 @@ class Directory(FsysNode):
 
         return all_paths
 
-    @classmethod
-    def dict_to_tree(cls, fs_dict: dict, indent: int = 0, parent_dirpath : str = '', max_children: int = 10) -> str:
-        total_str = ''
-        if not fs_dict:
-            return total_str
 
-        items = fs_dict.items()
-        for n, (k, v) in enumerate(items):
-            indentation = '\t' * indent
-
-            if n == max_children:
-                total_str += f'{indentation}... (Max folder elements displayed = {max_children})\n'
-                break
-
-            fpath = os.path.join(f'/{parent_dirpath}', k)
-            is_file = os.path.isfile(fpath)
-            symbol = f'🗎' if is_file else '🗀'
-            conditional_backslash = '' if is_file else '/'
-            total_str += (f'{indentation}{symbol} {k}{conditional_backslash}\n'
-                          f'{cls.dict_to_tree(v, indent=indent + 1, parent_dirpath=fpath)}')
-        if indent == 0:
-            total_str = total_str.rstrip()
-        return total_str
-
-    @staticmethod
-    def to_dict(fpaths: list[str]) -> dict:
-        tree_dict = {}
-        for path in fpaths:
-            parts = path.split('/')
-            node = tree_dict
-            for p in parts:
-                if not p in node:
-                    node[p] = {}
-                node = node[p]
-        return tree_dict
 
 class File(FsysNode):
     def __init__(self, path : str):
@@ -139,6 +111,7 @@ class File(FsysNode):
             return None
         else:
             return parts[-1]
+
 
 
 if __name__ == "__main__":
