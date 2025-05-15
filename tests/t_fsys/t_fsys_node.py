@@ -58,7 +58,6 @@ class TestFsysNode(Unittest):
         for n in subnode_paths:
             print(n)
 
-
     def test_dir_properties(self):
         self.assertTrue(self.root_node.get_name() == os.path.basename(self.test_dir))
         self.assertTrue(isinstance(self.root_node.get_last_modified_epochtime(), float))
