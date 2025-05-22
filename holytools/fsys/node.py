@@ -2,11 +2,9 @@ import os
 import shutil
 import stat
 import tempfile
+from abc import abstractmethod
 from pathlib import Path as PathWrapper
 from typing import Optional
-
-from holytools.fsys.tree import TreeGenerator
-
 
 # ----------------------------------------------------
 
@@ -61,6 +59,10 @@ class FsysNode:
     def get_size_in_MB(self) -> float:
         return os.path.getsize(self.get_path()) / (1024 * 1024)
 
+    @abstractmethod
+    def get_tree(self, *args, **kwargs) -> str:
+        pass
+
 
 class Directory(FsysNode):
     def __init__(self, path : str):
@@ -68,10 +70,18 @@ class Directory(FsysNode):
         if not self._path_wrapper.is_dir():
             raise FileNotFoundError(f'Path {path} is not a directory')
 
-    def get_tree(self, include_root : bool = False) -> str:
-        fpaths = self.get_all_subpaths(absolute=include_root)
-        structure_dict = TreeGenerator.to_dict(fpaths)
-        return TreeGenerator.dict_to_tree(fsys_dict=structure_dict)
+    def get_tree(self, indent : int = 0, max_children : int = 10) -> str:
+        indentation = '\t' * indent
+        total_str = f'{indentation}🗀 {self.get_name()}/'
+
+
+        subpaths = [os.path.join(self.get_path(),name) for name in os.listdir(self.get_path())]
+        files = [File(path=p) for p in subpaths if os.path.isfile(p)]
+        directories = [Directory(path=p) for p in subpaths if os.path.isdir(p)]
+
+        for node in files+directories:
+            total_str += f'\n{node.get_tree(indent=indent+1)}'
+        return total_str
 
     def get_subfile_fpaths(self, absolute : bool = True) -> list[str]:
         subfile_paths = []
@@ -112,6 +122,9 @@ class File(FsysNode):
         else:
             return parts[-1]
 
+    def get_tree(self, indent : int = 0, max_children : int = 10) -> str:
+        indentation = '\t' * indent
+        return f'{indentation}🗎 {self.get_name()}'
 
 
 if __name__ == "__main__":
