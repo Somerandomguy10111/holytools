@@ -70,14 +70,13 @@ class Directory(FsysNode):
         if not self._path_wrapper.is_dir():
             raise FileNotFoundError(f'Path {path} is not a directory')
 
-    def get_tree(self, indent : int = 0, max_children : int = 10) -> str:
+    def get_tree(self, indent : int = 0, max_children : int = 10, *args, **kwargs) -> str:
         indentation = '\t' * indent
         total_str = f'{indentation}🗀 {self.get_name()}/'
 
-
         subpaths = [os.path.join(self.get_path(),name) for name in os.listdir(self.get_path())]
         files = [File(path=p) for p in subpaths if os.path.isfile(p)]
-        directories = [Directory(path=p) for p in subpaths if os.path.isdir(p)]
+        directories = [self.__class__(path=p) for p in subpaths if os.path.isdir(p)]
 
         for node in files+directories:
             total_str += f'\n{node.get_tree(indent=indent+1)}'
@@ -122,7 +121,7 @@ class File(FsysNode):
         else:
             return parts[-1]
 
-    def get_tree(self, indent : int = 0, max_children : int = 10) -> str:
+    def get_tree(self, indent : int = 0, max_children : int = 10, *args, **kwargs) -> str:
         indentation = '\t' * indent
         return f'{indentation}🗎 {self.get_name()}'
 
