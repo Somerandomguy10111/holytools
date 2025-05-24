@@ -3,7 +3,8 @@ import os
 import tempfile
 
 from holytools.devtools import Unittest
-from holytools.fsys.node import Directory, File
+from holytools.fileIO import BinaryFile, ExampleFiles
+from holytools.fsys.node import Directory, File, FsysNode
 
 
 # -------------------------------------------------------------
@@ -76,7 +77,17 @@ class TestNode(FsysTest):
         self.assertTrue(f'🗀 dir2/' in tree)
         self.assertTrue(expected_expression in tree)
 
+    def test_binary_size(self):
+        text_fpath = ExampleFiles.lend_txt().fpath
+        png_fpath = ExampleFiles.lend_png().fpath
 
+        bio = BinaryFile(text_fpath)
+
+        bytes_count_mb = len(bio.read())/10**6
+        fsize= FsysNode(path=png_fpath).get_size_in_MB()
+        lower = int(fsize)
+        upper = int(fsize+1)
+        self.assertTrue(lower <= bytes_count_mb <= upper)
 
 if __name__ == '__main__':
     TestNode.execute_all()

@@ -8,24 +8,14 @@ import io
 # ---------------------------------------------------------
 
 
-class TestFile(Unittest):
-    @classmethod
-    def setUpClass(cls):
-        pass
-
+class FileTest(Unittest):
     def setUp(self):
         self.text_fpath = ExampleFiles.lend_txt().fpath
         self.jpg_fpath = ExampleFiles.lend_jpg().fpath
         self.png_fpath = ExampleFiles.lend_png().fpath
 
-    def test_binary_size(self):
-        bio = BinaryFile(self.text_fpath)
-        bytes_count_mb = len(bio.read())/10**6
-        fsize= FsysNode(path=self.png_fpath).get_size_in_MB()
-        lower = int(fsize)
-        upper = int(fsize+1)
-        self.assertTrue(lower <= bytes_count_mb <= upper)
 
+class TestImage(FileTest):
     def test_valid_image_read(self):
         image_io = ImageFile(fpath=self.png_fpath)
         with image_io.read() as result:
@@ -37,6 +27,14 @@ class TestFile(Unittest):
             with image_io.read() as _:
                 pass
 
+    def test_image_view(self):
+        if not self.is_manual_mode:
+            self.skipTest(f'View can only be tested manually')
+        image_io = ImageFile(fpath=self.png_fpath)
+        image_io.view()
+
+
+class TestPlaintext(FileTest):
     def test_text_read(self):
         tio = PlaintextFile(fpath=self.text_fpath)
         content = tio.read()
@@ -56,11 +54,7 @@ class TestFile(Unittest):
             bio.view()
             self.assertIn("4f 6e", fake_out.getvalue())
 
-    def test_image_view(self):
-        if not self.is_manual_mode:
-            self.skipTest(f'View can only be tested manually')
-        image_io = ImageFile(fpath=self.png_fpath)
-        image_io.view()
+    def test_
 
 
 class TestImageConverter(Unittest):
@@ -110,4 +104,4 @@ class TestImageConverter(Unittest):
 
 
 if __name__ == '__main__':
-    TestImageConverter.execute_all()
+    TestPlaintext.execute_all()
