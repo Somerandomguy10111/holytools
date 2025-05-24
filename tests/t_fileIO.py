@@ -59,8 +59,14 @@ class TestPlaintext(FileTest):
         s1 = tio.read_section(name='s1')
         s2 = tio.read_section(name='s2')
 
-        self.assertEqual(s1, 'first')
+        self.assertEqual(s1, 'first #1')
         self.assertEqual(s2, 'second')
+
+    def test_substitution(self):
+        tio = PlaintextFile(fpath=self.text_fpath)
+        s1 = tio.read_section(name='s1', sub=['dragon'])
+
+        self.assertEqual(s1, 'first dragon')
 
 
 class TestImageConverter(Unittest):

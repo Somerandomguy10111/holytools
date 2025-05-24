@@ -1,3 +1,5 @@
+from typing import Optional
+
 from .fileio import FileIO
 
 class PlaintextFile(FileIO):
@@ -29,7 +31,7 @@ class PlaintextFile(FileIO):
             text = f.read()
         return text
 
-    def read_section(self, name : str, delimiter : str = '##'):
+    def read_section(self, name : str, sub : Optional[list[str]] = None, delimiter : str = '##'):
         file_content = self.read()
         lines = file_content.split('\n')
         lines = [l for l in lines if not l == '']
@@ -44,5 +46,11 @@ class PlaintextFile(FileIO):
             segment_content = '\n'.join(content_lines)
             segement_map[segment_name] = segment_content
 
-        return segement_map[name].rstrip('\n')
+        section_content = segement_map[name].rstrip('\n')
+        if sub is None:
+            sub = []
+        for j, s in enumerate(sub):
+            section_content = section_content.replace(f'#{j+1}', s)
+
+        return section_content
 
