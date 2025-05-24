@@ -54,7 +54,13 @@ class TestPlaintext(FileTest):
             bio.view()
             self.assertIn("4f 6e", fake_out.getvalue())
 
-    def test_
+    def test_read_section(self):
+        tio = PlaintextFile(fpath=self.text_fpath)
+        s1 = tio.read_section(name='s1')
+        s2 = tio.read_section(name='s2')
+
+        self.assertEqual(s1, 'first')
+        self.assertEqual(s2, 'second')
 
 
 class TestImageConverter(Unittest):

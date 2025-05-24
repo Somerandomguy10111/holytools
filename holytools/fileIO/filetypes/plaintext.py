@@ -29,16 +29,20 @@ class PlaintextFile(FileIO):
             text = f.read()
         return text
 
-    def read_section(self, name : str, delimiter : str):
+    def read_section(self, name : str, delimiter : str = '##'):
         file_content = self.read()
-        segments = file_content.split(delimiter)
+        lines = file_content.split('\n')
+        lines = [l for l in lines if not l == '']
+        file_content = '\n'.join(lines)
+
+        segments = file_content.split(delimiter)[1:]
 
         segement_map : dict[str, str] = {}
         for s in segments:
-            segment_name = s.split('\n')[0]
+            segment_name = s.split('\n')[0].strip()
             content_lines = s.split('\n')[1:]
             segment_content = '\n'.join(content_lines)
             segement_map[segment_name] = segment_content
 
-        return segement_map[name]
+        return segement_map[name].rstrip('\n')
 
