@@ -43,7 +43,6 @@ class FileConfigs(BaseConfigs):
     def _populate_map(self):
         if not os.path.isfile(self._config_fpath):
             self.log(msg=f'File {self._config_fpath} could not be found, configs are empty', level=LogLevel.WARNING)
-            return self._map
 
         content = self.read()
         lines = content.split(f'\n')

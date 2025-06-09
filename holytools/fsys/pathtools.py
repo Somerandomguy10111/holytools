@@ -24,11 +24,18 @@ class PathTools:
 
     @staticmethod
     def prune_suffix(fpath : str) -> str:
-        parts = fpath.split('.')
-        if len(parts) > 1:
-            return '.'.join(parts[:-1])
-        else:
-            return fpath
+        fname = os.path.basename(fpath)
+        parts = fname.split('.')
+
+        new_fname = fname
+        is_hidden = fname.startswith('.')
+        if len(parts) > 1 and not is_hidden:
+            new_fname = parts[0]
+        if len(parts) > 2 and is_hidden:
+            new_fname = ".".join(parts[:-1])
+
+        dirpath = os.path.dirname(fpath)
+        return os.path.join(dirpath, new_fname)
 
     @staticmethod
     def ensure_suffix(fpath: str, suffix : str) -> str:

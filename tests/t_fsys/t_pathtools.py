@@ -34,6 +34,17 @@ class TestPathTools(Unittest):
         self.assertEqual(d1, os.path.join(self.tmp_dirpath, 'testdir_1'))
         self.assertEqual(d2, os.path.join(self.tmp_dirpath, 'testdir_2'))
 
+    def test_prune_suffix(self):
+        no_suffix_one = '/home/daniel/.aquila/testdir/b9bfea4d65332432714c'
+        no_suffix_two = '/home/daniel/testfile'
+        hidden_suffix = '/home/daniel/.file.py'
+        with_suffix = '/home/daniel/testfile.txt'
+
+        self.assertEqual(PathTools.prune_suffix(no_suffix_one), no_suffix_one)
+        self.assertEqual(PathTools.prune_suffix(no_suffix_two), no_suffix_two)
+        self.assertEqual(PathTools.prune_suffix(hidden_suffix), '/home/daniel/.file')
+        self.assertEqual(PathTools.prune_suffix(with_suffix), '/home/daniel/testfile')
+
 
 if __name__ == '__main__':
     # TestFsysNode.execute_all()

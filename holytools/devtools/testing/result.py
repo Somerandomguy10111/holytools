@@ -86,6 +86,7 @@ class Result(TestResult):
         else:
             self.log(msg=f'Couldnt find start time of test {test_id}. Current start_times : {self.start_times}',
                      level=logging.ERROR)
+            return None
 
     # ---------------------------------------------------------
     # logging
