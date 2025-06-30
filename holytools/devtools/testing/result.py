@@ -26,7 +26,7 @@ class Result(TestResult):
                  *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.logger = logger
-        self.reports : list[Report] = []
+        self.case_reports : list[CaseReport] = []
         self.start_times : dict[str, float] = {}
         self.is_manual : bool = manual_mode
         self.testsuite_name = testsuite_name
@@ -73,9 +73,9 @@ class Result(TestResult):
         self.start_times[case.id()] = time.time()
 
     def on_case_finish(self, case : BaseTest, status: str, err : Optional[tuple] = None):
-        report = Report(name=case.get_name(), status=status, runtime=self._get_runtime(case), err=err)
+        report = CaseReport(name=case.get_name(), status=status, runtime=self._get_runtime(case), err=err)
         self.log(msg=report.get_view(), level=report.get_log_level())
-        self.reports.append(report)
+        self.case_reports.append(report)
 
 
     def _get_runtime(self, test : TestCase) -> Optional[float]:
@@ -93,7 +93,7 @@ class Result(TestResult):
 
     def log_summary(self):
         self.log(self.get_header(msg=' Summary ', seperator='-'))
-        for case in self.reports:
+        for case in self.case_reports:
             level = case.get_log_level()
             name_msg = f'{case.name[:self.test_spaces - 4]:<{self.test_spaces}}'
             status_msg = f'{case.status:<{self.status_spaces}}'
@@ -114,8 +114,8 @@ class Result(TestResult):
 
 
     def get_final_status(self) -> str:
-        num_total = len(self.reports)
-        unsuccessful_cases = [c for c in self.reports if c.status != CaseStatus.SUCCESS]
+        num_total = len(self.case_reports)
+        unsuccessful_cases = [c for c in self.case_reports if c.status != CaseStatus.SUCCESS]
         num_unsuccessful = len(unsuccessful_cases)
 
         RED = '\033[91m'
@@ -132,7 +132,7 @@ class Result(TestResult):
         return final_status_msg
 
     def integrity(self):
-        unsuccessful_cases = [c for c in self.reports if c.status != CaseStatus.SUCCESS]
+        unsuccessful_cases = [c for c in self.case_reports if c.status != CaseStatus.SUCCESS]
         return len(unsuccessful_cases) == 0
 
     def log_test_start(self, casename : str):
@@ -143,7 +143,7 @@ class Result(TestResult):
 
 
 @dataclass
-class Report:
+class CaseReport:
     runtime : float
     name : str
     status : str

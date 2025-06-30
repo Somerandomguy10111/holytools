@@ -12,7 +12,7 @@ from abc import abstractmethod
 from multiprocessing import Process, Value
 from typing import Optional, Callable, Any
 
-from holytools.devtools.testing.result import Result, Report, CaseStatus
+from holytools.devtools.testing.result import Result, CaseReport, CaseStatus
 from .basetest import BaseTest
 from .runner import Runner
 
@@ -42,7 +42,7 @@ class Unittest(BaseTest):
             raise ValueError(f'Min success percent should be in [0,100], got {min_success_percent}')
 
         test_names = test_names or unittest.TestLoader().getTestCaseNames(cls)
-        stat_reports : list[Report] = []
+        stat_reports : list[CaseReport] = []
         outcome_map : dict[str, list] = {}
 
         for tn in test_names:
@@ -51,14 +51,14 @@ class Unittest(BaseTest):
             suite_result = cls._run_several(reps=reps, name=tn)
             runtime = round(time.time() - start_time, 3)
 
-            outcomes = [True if c.status == CaseStatus.SUCCESS else False for c in suite_result.reports]
+            outcomes = [True if c.status == CaseStatus.SUCCESS else False for c in suite_result.case_reports]
             outcome_map[report_name] = outcomes
             success_pc = 100*sum(outcomes) / len(outcomes)
 
             status = CaseStatus.SUCCESS if success_pc >= min_success_percent else CaseStatus.FAIL
-            if suite_result.reports[0].status == CaseStatus.ERROR:
+            if suite_result.case_reports[0].status == CaseStatus.ERROR:
                 status = CaseStatus.ERROR
-            stats_report = Report(name=report_name, status=status, runtime=runtime)
+            stats_report = CaseReport(name=report_name, status=status, runtime=runtime)
             stat_reports.append(stats_report)
 
         result = Result(logger=cls.get_logger(), testsuite_name=cls.__name__)
@@ -73,7 +73,7 @@ class Unittest(BaseTest):
             result.log(f'{"Success rate":<{spaces}}: {num_successful/total*100}%')
             result.log(msg=f'{"Status":<{spaces}}: {c.status}\n', level=c.get_log_level())
 
-        result.reports = stat_reports
+        result.case_reports = stat_reports
         result.log_summary()
 
         return result.integrity()
