@@ -1,23 +1,27 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Callable
+from typing import Callable, Optional
 
 # -------------------------------------------
 
 
 tree_str = """a
     b
-        a1
-        a2
-    c"""
+        a
+        c
+            b
+            b2
+    c
+        a3"""
 
 
 @dataclass
 class Node:
-    def __init__(self, name : str):
+    def __init__(self, name : str, parent : Optional[Node]):
         self.name : str = name
         self.children : list[Node] = []
+        self.parent : Node = parent
 
     def get_descendants(self):
         desc : list[Node] = [x for x in self.children]
@@ -29,7 +33,7 @@ class Node:
     def from_str(cls, s : str) -> Node:
         lines = s.split('\n')
 
-        root = Node(name=lines[0])
+        root = Node(name=lines[0], parent=None)
         ancestors : list[Node] = [root]
 
         for l in lines[1:]:
@@ -45,8 +49,8 @@ class Node:
             while indent < len(ancestors):
                 ancestors.pop()
 
-            node = Node(name=sl)
             parent = ancestors[-1]
+            node = Node(name=sl, parent=parent)
             parent.children.append(node)
             ancestors.append(node)
 
@@ -58,24 +62,32 @@ class Node:
             tree += f'\n{c.get_tree(indent=indent+1)}'
         return tree
 
-    def get_pruned(self, is_relevant : Callable[[Node], bool]) -> list[Node]:
+    def make_pruned(self, is_relevant : Callable[[Node], bool]) -> list[Node]:
         pruned_children = []
         for c in self.children:
-            pruned_children += c.get_pruned(is_relevant=is_relevant)
+            pruned_children += c.make_pruned(is_relevant=is_relevant)
 
         if is_relevant(self):
-            new = Node(self.name)
+            new = Node(name=self.name, parent=self.parent)
             new.children = pruned_children
             return [new]
         else:
             return pruned_children
 
+    def distribute_duplicates(self, node_map : dict[str, Node]):
+        if not self.name in node_map:
+            new = Node(name=self.name, parent=self.parent)
+            node_map[self.name] = new
+            if self.parent:
+                node_map[self.parent.name].children.append(new)
+
+        for c in self.children:
+            c.distribute_duplicates(node_map=node_map)
+
+        return node_map
 
 
-example_node = Node.from_str(s=tree_str)
-# print(example_node.get_tree())
-
-
-pruned = example_node.get_pruned(is_relevant=lambda node : node.name.startswith('a'))
-for p in pruned:
-    print(p.get_tree())
+if __name__ == "__main__":
+    example_node = Node.from_str(s=tree_str)
+    example_map = example_node.distribute_duplicates(node_map={})
+    print(example_map[example_node.name].get_tree())
