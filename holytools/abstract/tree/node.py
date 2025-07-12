@@ -18,10 +18,9 @@ tree_str = """a
 
 @dataclass
 class Node:
-    def __init__(self, name : str, parent : Optional[Node]):
+    def __init__(self, name : str):
         self.name : str = name
         self.children : list[Node] = []
-        self.parent : Node = parent
 
     def get_descendants(self):
         desc : list[Node] = [x for x in self.children]
@@ -33,7 +32,7 @@ class Node:
     def from_str(cls, s : str) -> Node:
         lines = s.split('\n')
 
-        root = Node(name=lines[0], parent=None)
+        root = Node(name=lines[0])
         ancestors : list[Node] = [root]
 
         for l in lines[1:]:
@@ -50,7 +49,7 @@ class Node:
                 ancestors.pop()
 
             parent = ancestors[-1]
-            node = Node(name=sl, parent=parent)
+            node = Node(name=sl)
             parent.children.append(node)
             ancestors.append(node)
 
@@ -68,26 +67,25 @@ class Node:
             pruned_children += c.make_pruned(is_relevant=is_relevant)
 
         if is_relevant(self):
-            new = Node(name=self.name, parent=self.parent)
+            new = Node(name=self.name)
             new.children = pruned_children
             return [new]
         else:
             return pruned_children
 
-    def distribute_duplicates(self, node_map : dict[str, Node]):
+    def distribute_unique(self, node_map : dict[str, Node], parent : Optional[Node] = None):
         if not self.name in node_map:
-            new = Node(name=self.name, parent=self.parent)
+            new = Node(name=self.name)
             node_map[self.name] = new
-            if self.parent:
-                node_map[self.parent.name].children.append(new)
+            if parent:
+                node_map[parent.name].children.append(new)
 
         for c in self.children:
-            c.distribute_duplicates(node_map=node_map)
-
-        return node_map
+            c.distribute_unique(node_map=node_map, parent=node_map[self.name])
 
 
 if __name__ == "__main__":
+    nm = {}
     example_node = Node.from_str(s=tree_str)
-    example_map = example_node.distribute_duplicates(node_map={})
-    print(example_map[example_node.name].get_tree())
+    example_node.distribute_unique(node_map=nm)
+    print(nm[example_node.name].get_tree())
