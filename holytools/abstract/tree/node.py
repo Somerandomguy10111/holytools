@@ -1,24 +1,16 @@
 from __future__ import annotations
-from dataclasses import dataclass, field
-from typing import Optional, Callable
 
-from typing import Optional
-from abc import abstractmethod, ABC
+from dataclasses import dataclass
+from typing import Callable
 
 # -------------------------------------------
 
 
-tree_str = """root
-    a
-        a
-        a
-        b
-            c
+tree_str = """a
     b
-        a
-            a
-        a
-        d"""
+        a1
+        a2
+    c"""
 
 
 @dataclass
@@ -66,6 +58,24 @@ class Node:
             tree += f'\n{c.get_tree(indent=indent+1)}'
         return tree
 
+    def get_pruned(self, is_relevant : Callable[[Node], bool]) -> list[Node]:
+        pruned_children = []
+        for c in self.children:
+            pruned_children += c.get_pruned(is_relevant=is_relevant)
+
+        if is_relevant(self):
+            new = Node(self.name)
+            new.children = pruned_children
+            return [new]
+        else:
+            return pruned_children
+
+
 
 example_node = Node.from_str(s=tree_str)
-print(example_node.get_tree())
+# print(example_node.get_tree())
+
+
+pruned = example_node.get_pruned(is_relevant=lambda node : node.name.startswith('a'))
+for p in pruned:
+    print(p.get_tree())
