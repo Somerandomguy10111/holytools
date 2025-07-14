@@ -5,28 +5,12 @@ from typing import Callable, Optional
 
 # -------------------------------------------
 
-
-tree_str = """a
-    b
-        a
-        c
-            b
-            b2
-    c
-        a3"""
-
-
 @dataclass
 class TreeNode:
     name : str
 
     def __post_init__(self):
         self.children : list[TreeNode] = []
-
-    def make_copy(self) -> TreeNode:
-        new = TreeNode(name=self.name)
-        new.children = self.children
-        return new
 
     @classmethod
     def from_str(cls, s : str) -> TreeNode:
@@ -55,30 +39,48 @@ class TreeNode:
 
         return root
 
+    # -------------------------------------------
+    # Updates
+
     def make_pruned[T](self : T | TreeNode, is_relevant : Callable[[TreeNode], bool]) -> list[T]:
         pruned_children = []
         for c in self.children:
             pruned_children += c.make_pruned(is_relevant=is_relevant)
 
         if is_relevant(self):
-            new = self.make_copy()
+            new = self.make_empty_copy()
             new.children = pruned_children
             return [new]
         else:
             return pruned_children
 
-    def distribute_unique(self, node_map : dict[str, TreeNode], parent : Optional[TreeNode] = None):
+    def make_unique(self, node_map : Optional[dict[str, TreeNode]] = None, parent : Optional[TreeNode] = None):
+        if node_map is None:
+            node_map = {}
         if not self.name in node_map:
-            new = TreeNode(name=self.name)
+            new = self.make_empty_copy()
             node_map[self.name] = new
             if parent:
                 node_map[parent.name].children.append(new)
 
         for c in self.children:
-            c.distribute_unique(node_map=node_map, parent=node_map[self.name])
+            c.make_unique(node_map=node_map, parent=node_map[self.name])
+
+        return node_map[self.name]
+
+    def make_empty_copy(self) -> TreeNode:
+        new = TreeNode(name=self.name)
+        new.children = []
+        return new
 
     # -----------------------------------------------------
     # Properties
+
+    def get_tree(self, indent : int   = 0):
+        tree = '|\t' * indent +  self.get_fullname()
+        for c in self.children:
+            tree += f'\n{c.get_tree(indent=indent+1)}'
+        return tree
 
     def get_fullname(self) -> str:
         return self.name
@@ -89,16 +91,19 @@ class TreeNode:
             desc += c.get_descendants()
         return desc
 
-    def get_tree(self, indent : int   = 0):
-        tree = '|\t' * indent +  self.get_fullname()
-        for c in self.children:
-            tree += f'\n{c.get_tree(indent=indent+1)}'
-        return tree
-
 
 
 if __name__ == "__main__":
     nm = {}
+    tree_str = """a
+        b
+            a
+            c
+                b
+                b2
+        c
+            a3"""
+
     example_node = TreeNode.from_str(s=tree_str)
-    example_node.distribute_unique(node_map=nm)
-    print(nm[example_node.name].get_tree())
+    unique_node = example_node.make_unique()
+    print(unique_node.get_tree())
