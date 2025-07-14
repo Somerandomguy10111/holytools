@@ -42,10 +42,10 @@ class TreeNode:
     # -------------------------------------------
     # Updates
 
-    def make_pruned[T](self : T | TreeNode, is_relevant : Callable[[TreeNode], bool]) -> list[T]:
+    def make_pruned_subtree[T](self : T | TreeNode, is_relevant : Callable[[TreeNode], bool]) -> list[T]:
         pruned_children = []
         for c in self.children:
-            pruned_children += c.make_pruned(is_relevant=is_relevant)
+            pruned_children += c.make_pruned_subtree(is_relevant=is_relevant)
 
         if is_relevant(self):
             new = self.make_empty_copy()
@@ -54,7 +54,7 @@ class TreeNode:
         else:
             return pruned_children
 
-    def make_unique(self, node_map : Optional[dict[str, TreeNode]] = None, parent : Optional[TreeNode] = None):
+    def make_unique_subtree(self, node_map : Optional[dict[str, TreeNode]] = None, parent : Optional[TreeNode] = None) -> TreeNode:
         if node_map is None:
             node_map = {}
         if not self.name in node_map:
@@ -64,7 +64,7 @@ class TreeNode:
                 node_map[parent.name].children.append(new)
 
         for c in self.children:
-            c.make_unique(node_map=node_map, parent=node_map[self.name])
+            c.make_unique_subtree(node_map=node_map, parent=node_map[self.name])
 
         return node_map[self.name]
 
@@ -96,14 +96,14 @@ class TreeNode:
 if __name__ == "__main__":
     nm = {}
     tree_str = """a
-        b
-            a
-            c
-                b
-                b2
+    b
+        a
         c
-            a3"""
+            b
+            b2
+    c
+        a3"""
 
     example_node = TreeNode.from_str(s=tree_str)
-    unique_node = example_node.make_unique()
+    unique_node = example_node.make_unique_subtree()
     print(unique_node.get_tree())
