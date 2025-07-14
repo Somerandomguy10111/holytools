@@ -40,35 +40,39 @@ class TreeNode:
         return root
 
     # -------------------------------------------
-    # Updates
+    # Tree manipulation
 
-    def make_pruned_subtree[T](self : T | TreeNode, is_relevant : Callable[[TreeNode], bool]) -> list[T]:
+    def create_pruned_subtree[T](self : T | TreeNode, is_relevant : Callable[[TreeNode], bool]) -> list[T]:
         pruned_children = []
         for c in self.children:
-            pruned_children += c.make_pruned_subtree(is_relevant=is_relevant)
+            pruned_children += c.create_pruned_subtree(is_relevant=is_relevant)
 
         if is_relevant(self):
-            new = self.make_empty_copy()
+            new = self.mk_empty_copy()
             new.children = pruned_children
             return [new]
         else:
             return pruned_children
 
-    def make_unique_subtree(self, node_map : Optional[dict[str, TreeNode]] = None, parent : Optional[TreeNode] = None) -> TreeNode:
+    def create_unique_subtree(self, node_map : Optional[dict[str, TreeNode]] = None, parent : Optional[TreeNode] = None) -> TreeNode:
         if node_map is None:
             node_map = {}
-        if not self.name in node_map:
-            new = self.make_empty_copy()
-            node_map[self.name] = new
+        uid = self.get_id()
+        if not uid in node_map:
+            new = self.mk_empty_copy()
+            node_map[uid] = new
             if parent:
-                node_map[parent.name].children.append(new)
+                node_map[parent.get_id()].children.append(new)
 
         for c in self.children:
-            c.make_unique_subtree(node_map=node_map, parent=node_map[self.name])
+            c.create_unique_subtree(node_map=node_map, parent=node_map[uid])
 
-        return node_map[self.name]
+        return node_map[uid]
 
-    def make_empty_copy(self) -> TreeNode:
+    def get_id(self) -> str:
+        return self.name
+
+    def mk_empty_copy(self) -> TreeNode:
         new = TreeNode(name=self.name)
         new.children = []
         return new
@@ -76,21 +80,29 @@ class TreeNode:
     # -----------------------------------------------------
     # Properties
 
-    def get_tree(self, indent : int   = 0):
-        tree = '|\t' * indent +  self.get_fullname()
+    def get_tree(self, indent : int   = 0, node_to_idx : Optional[dict[str, int]] = None):
+        conditional_idx = f' | ID = {node_to_idx[self.get_id()]}' if not node_to_idx is None else ''
+        tree = '|\t' * indent +  self.get_fullname() + conditional_idx
         for c in self.children:
-            tree += f'\n{c.get_tree(indent=indent+1)}'
+            tree += f'\n{c.get_tree(indent=indent+1, node_to_idx=node_to_idx)}'
         return tree
 
     def get_fullname(self) -> str:
         return self.name
+
+    def get_node_to_idx(self) -> dict[str, int]:
+        idx_to_node = self.get_idx_to_node()
+        return {node.get_id() : j for j, node in idx_to_node.items()}
+
+    def get_idx_to_node[T](self : T | TreeNode) -> dict[int, T]:
+        all_nodes = [self] + self.get_descendants()
+        return {j : node for j, node in enumerate(all_nodes)}
 
     def get_descendants(self):
         desc : list[TreeNode] = [x for x in self.children]
         for c in self.children:
             desc += c.get_descendants()
         return desc
-
 
 
 if __name__ == "__main__":
@@ -105,5 +117,7 @@ if __name__ == "__main__":
         a3"""
 
     example_node = TreeNode.from_str(s=tree_str)
-    unique_node = example_node.make_unique_subtree()
+    unique_node = example_node.create_unique_subtree()
     print(unique_node.get_tree())
+    example_idx_to_node = unique_node.get_node_to_idx()
+    print(unique_node.get_tree(node_to_idx=example_idx_to_node))
