@@ -50,7 +50,7 @@ if __name__ == "__main__":
     text_mouse = TextMouse()
     while True:
         view = text_mouse.get_view()
-        view.show()
+        view.get_view()
         num = int(input(f'Click on cell:'))
         text_mouse.click(num)
         time.sleep(1)

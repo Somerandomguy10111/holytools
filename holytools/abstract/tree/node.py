@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import copy
 from dataclasses import dataclass
-from typing import Callable, Optional
+from typing import Callable, Optional, Any
 
 
 # -------------------------------------------
@@ -12,7 +12,7 @@ class TreeNode:
     name : str
 
     def __post_init__(self):
-        self.children : list[TreeNode] = []
+        self.children : list[TreeNode | Any] = []
 
     @classmethod
     def from_str(cls, s : str) -> TreeNode:
