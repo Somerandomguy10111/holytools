@@ -43,7 +43,7 @@ class TreeNode:
     # -------------------------------------------
     # Tree manipulation
 
-    def create_pruned_subtree[T](self : T | TreeNode, is_relevant : Callable[[TreeNode], bool]) -> list[T]:
+    def create_pruned_subtree[T](self : T | TreeNode, is_relevant : Callable[[T | TreeNode], bool]) -> list[T]:
         pruned_children = []
         for c in self.children:
             pruned_children += c.create_pruned_subtree(is_relevant=is_relevant)
