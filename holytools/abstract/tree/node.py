@@ -107,7 +107,7 @@ class TreeNode:
     def get_tree(self, indent : int   = 0, node_to_idx : Optional[dict[str, int]] = None):
         idx = node_to_idx.get(self.get_id()) if not node_to_idx is None else None
         conditional_idx = f' | ID = {idx}' if not idx is None else ''
-        indentation = '\t' * indent
+        indentation = '|\t' * indent
 
         tree = (f'{indentation}{self.get_fullname()}{conditional_idx}'
                 f'{self.get_desc()}')
