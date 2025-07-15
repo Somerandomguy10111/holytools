@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Callable, Optional
 
+
 # -------------------------------------------
 
 @dataclass
@@ -77,18 +78,8 @@ class TreeNode:
         new.children = []
         return new
 
-    # -----------------------------------------------------
-    # Properties
-
-    def get_tree(self, indent : int   = 0, node_to_idx : Optional[dict[str, int]] = None):
-        conditional_idx = f' | ID = {node_to_idx[self.get_id()]}' if not node_to_idx is None else ''
-        tree = '|\t' * indent +  self.get_fullname() + conditional_idx
-        for c in self.children:
-            tree += f'\n{c.get_tree(indent=indent+1, node_to_idx=node_to_idx)}'
-        return tree
-
-    def get_fullname(self) -> str:
-        return self.name
+    # ------------------------------------------------
+    # Navigation
 
     def get_node_to_idx(self) -> dict[str, int]:
         idx_to_node = self.get_idx_to_node()
@@ -96,14 +87,40 @@ class TreeNode:
 
     def get_idx_to_node[T](self : T | TreeNode) -> dict[int, T]:
         all_nodes = [self] + self.get_descendants()
+        all_nodes = [x for x in all_nodes if x.is_indexable()]
+
         return {j : node for j, node in enumerate(all_nodes)}
 
-    def get_descendants(self):
+    def is_indexable(self) -> bool:
+        _ = self
+        return True
+
+    def get_descendants[T](self : T | TreeNode) -> list[T]:
         desc : list[TreeNode] = [x for x in self.children]
         for c in self.children:
             desc += c.get_descendants()
         return desc
 
+    # -----------------------------------------------------
+    # Properties
+
+    def get_tree(self, indent : int   = 0, node_to_idx : Optional[dict[str, int]] = None):
+        idx = node_to_idx.get(self.get_id()) if not node_to_idx is None else None
+        conditional_idx = f' | ID = {idx}' if not idx is None else ''
+        indentation = '\t' * indent
+
+        tree = (f'{indentation}{self.get_fullname()}{conditional_idx}'
+                f'{self.get_desc()}')
+        for c in self.children:
+            tree += f'\n{c.get_tree(indent=indent+1, node_to_idx=node_to_idx)}'
+        return tree
+
+    def get_desc(self) -> str:
+        _ = self
+        return ''
+
+    def get_fullname(self) -> str:
+        return self.name
 
 if __name__ == "__main__":
     nm = {}
