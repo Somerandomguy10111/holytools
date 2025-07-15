@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import copy
 from dataclasses import dataclass
 from typing import Callable, Optional
 
@@ -74,8 +75,9 @@ class TreeNode:
         return self.name
 
     def mk_empty_copy(self) -> TreeNode:
-        new = TreeNode(name=self.name)
+        new = copy.deepcopy(self)
         new.children = []
+
         return new
 
     # ------------------------------------------------
@@ -106,11 +108,15 @@ class TreeNode:
 
     def get_tree(self, indent : int   = 0, node_to_idx : Optional[dict[str, int]] = None):
         idx = node_to_idx.get(self.get_id()) if not node_to_idx is None else None
-        conditional_idx = f' | ID = {idx}' if not idx is None else ''
-        indentation = '|\t' * indent
+        desc = self.get_desc()
 
-        tree = (f'{indentation}{self.get_fullname()}{conditional_idx}'
-                f'{self.get_desc()}')
+        marked_indent = '|\t' * indent
+        conditional_idx = f' | ID = {idx}' if not idx is None else ''
+        conditional_desc = f'\n{marked_indent}{desc}' if desc else ''
+
+        tree = (f'{marked_indent}{self.get_fullname()}{conditional_idx}'
+                f'{conditional_desc}')
+
         for c in self.children:
             tree += f'\n{c.get_tree(indent=indent+1, node_to_idx=node_to_idx)}'
         return tree
