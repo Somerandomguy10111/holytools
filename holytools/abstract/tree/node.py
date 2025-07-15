@@ -98,10 +98,11 @@ class TreeNode:
         return True
 
     def get_descendants[T](self : T | TreeNode) -> list[T]:
-        desc : list[TreeNode] = [x for x in self.children]
+        descendants : list[TreeNode] = []
         for c in self.children:
-            desc += c.get_descendants()
-        return desc
+            descendants.append(c)
+            descendants += c.get_descendants()
+        return descendants
 
     # -----------------------------------------------------
     # Properties
