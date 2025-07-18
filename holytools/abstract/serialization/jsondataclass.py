@@ -12,17 +12,15 @@ from PIL.Image import Image
 from holytools.abstract.serialization.serializable import Serializable
 from holytools.fileIO import ImageConverter
 
-BasicSerializable = (bool | int | float | str | Serializable | Decimal | datetime | date | time | Enum | Image | None)
+BasicSerializable = (bool | int | float | str | Decimal | datetime | date | time | Enum | Image | None | Serializable)
 
 # -------------------------------------------
 
 @dataclass
 class JsonDataclass(Serializable):
     """Enables serialization of dataclasses with following attributes:
-    - Basic serializable types as defined above:
-        - Serialization: get_basic_entry()
-        - Deserialization: make_basic()
-    - Lists, tuples or dicts of basic serializable types"""
+        - Basic serializable types as defined above
+        - Lists, tuples or dicts of basic serializable types"""
     def __init__(self, *args, **kwargs):
         _, __ = args, kwargs
         if not dataclasses.is_dataclass(self):
@@ -55,6 +53,10 @@ class JsonDataclass(Serializable):
             raise TypeError(f'{cls} is not a dataclass. from_json can only be used with dataclasses')
 
         json_dict = orjson.loads(json_str)
+        return cls.from_dict(json_dict=json_dict)
+
+    @classmethod
+    def from_dict(cls, json_dict : dict):
         type_hints = get_type_hints(cls)
         init_dict = {}
         for key, value in json_dict.items():
@@ -69,30 +71,32 @@ class JsonDataclass(Serializable):
             origin = get_origin(dtype)
             if origin == list:
                 item_type = TypeAnalzer.get_inner_types(dtype)[0]
-                restored_value = [cls.make_basic(basic_cls=item_type, s=x) for x in value]
+                restored_value = [cls.make_basic_obj(basic_cls=item_type, entry=x) for x in value]
             elif origin == tuple:
                 item_types = TypeAnalzer.get_inner_types(dtype)
-                restored_value = tuple([cls.make_basic(basic_cls=item_type, s=s) for item_type, s in zip(item_types, value)])
+                restored_value = tuple([cls.make_basic_obj(basic_cls=item_type, entry=s) for item_type, s in zip(item_types, value)])
             elif origin == dict or dtype == dict:
                 key_type, value_type = TypeAnalzer.get_inner_types(dtype)
-                key_list = [cls.make_basic(basic_cls=key_type, s=x) for x in value[0]]
-                value_list = [cls.make_basic(basic_cls=value_type, s=x) for x in value[1]]
+                key_list = [cls.make_basic_obj(basic_cls=key_type, entry=x) for x in value[0]]
+                value_list = [cls.make_basic_obj(basic_cls=value_type, entry=x) for x in value[1]]
                 restored_value = {key: value for key, value in zip(key_list, value_list)}
             else:
-                restored_value = cls.make_basic(basic_cls=dtype, s=value)
+                restored_value = cls.make_basic_obj(basic_cls=dtype, entry=value)
             init_dict[key] = restored_value
 
         return cls(**init_dict)
 
     @staticmethod
-    def get_basic_entry(obj) -> (str | int | NoneType):
+    def get_basic_entry(obj) -> (str | int | dict | NoneType):
         if not isinstance(obj, BasicSerializable):
             raise TypeError(f'Object {obj} is not a basic serializable type')
 
         if obj is None:
             entry = None
-        elif isinstance(obj, Serializable):
+        elif isinstance(obj, JsonDataclass):
             entry = obj.to_dict()
+        elif isinstance(obj, Serializable):
+            entry = obj.to_str()
         elif isinstance(obj, Enum):
             entry = obj.name
         elif isinstance(obj, float) and obj != obj:
@@ -101,12 +105,14 @@ class JsonDataclass(Serializable):
             entry = ImageConverter.to_base64_str(image=obj)
         elif isinstance(obj, bool):
              entry = bool(int(obj))
+        elif isinstance(obj, Decimal):
+             entry = str(obj)
         else:
-            entry = str(obj)
+            entry = obj
         return entry
 
     @staticmethod
-    def make_basic(basic_cls, s : str):
+    def make_basic_obj(basic_cls, entry : str | int | float | dict):
         castable_classes = ['str', 'int', 'float', 'bool', 'Decimal', 'UUID', 'Path']
         converters = {
             datetime: datetime.fromisoformat,
@@ -115,15 +121,17 @@ class JsonDataclass(Serializable):
         }
 
         if basic_cls in converters:
-            instance = converters[basic_cls](s)
+            instance = converters[basic_cls](entry)
         elif basic_cls.__name__ in castable_classes:
-            instance = basic_cls(s)
+            instance = basic_cls(entry)
         elif issubclass(basic_cls, Enum):
-            instance =  basic_cls[s]
+            instance =  basic_cls[entry]
+        elif issubclass(basic_cls, JsonDataclass):
+            instance = basic_cls.from_dict(json_dict=entry)
         elif issubclass(basic_cls, Serializable):
-            instance = basic_cls.from_str(s)
+            instance = basic_cls.from_str(entry)
         elif basic_cls == Image:
-            instance = ImageConverter.from_base64_str(s)
+            instance = ImageConverter.from_base64_str(entry)
         elif basic_cls == NoneType:
             instance = None
         else:
