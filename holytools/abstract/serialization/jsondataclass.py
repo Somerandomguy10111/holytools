@@ -29,6 +29,10 @@ class JsonDataclass(Serializable):
             raise TypeError(f'{self.__class__} must be a dataclass to be Jsonifyable')
 
     def to_str(self) -> str:
+        json_dict = self.to_dict()
+        return orjson.dumps(json_dict).decode("utf-8")
+
+    def to_dict(self) -> dict:
         defined_fields = set([f.name for f in dataclasses.fields(self) if f.init])
         json_dict = {}
         for attr, value in [(attr, value) for attr, value in self.__dict__.items() if attr in defined_fields]:
@@ -43,8 +47,7 @@ class JsonDataclass(Serializable):
             else:
                 entry = self.get_basic_entry(obj=value)
             json_dict[attr] = entry
-        
-        return orjson.dumps(json_dict).decode("utf-8")
+        return json_dict
 
     @classmethod
     def from_str(cls, json_str: str):
@@ -89,7 +92,7 @@ class JsonDataclass(Serializable):
         if obj is None:
             entry = None
         elif isinstance(obj, Serializable):
-            entry = obj.to_str()
+            entry = obj.to_dict()
         elif isinstance(obj, Enum):
             entry = obj.name
         elif isinstance(obj, float) and obj != obj:
