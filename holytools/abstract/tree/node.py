@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import copy
+import uuid
 from dataclasses import dataclass
 from typing import Callable, Optional, Any, Self
 
@@ -11,6 +12,7 @@ class TreeNode:
     name : str
 
     def __post_init__(self):
+        self.uuid : str = str(uuid.uuid4())
         self.children : list[TreeNode | Any] = []
 
     @classmethod
@@ -53,16 +55,18 @@ class TreeNode:
             new.children = new_children
         return new
 
-    def create_unique(self, node_map : Optional[dict[str, TreeNode]] = None, parent : Optional[TreeNode] = None) -> TreeNode:
+    def create_unique(self, node_map : Optional[dict[str, TreeNode]] = None,
+                      parent : Optional[TreeNode] = None,
+                      unique_id : Callable[[Self], str] = lambda node : node.uuid) -> TreeNode:
         if node_map is None:
             node_map = {}
 
-        uid = self.get_id()
+        uid = unique_id(self)
         if not uid in node_map:
             new = self.mk_empty_copy()
             node_map[uid] = new
             if parent:
-                node_map[parent.get_id()].children.append(new)
+                node_map[unique_id(parent)].children.append(new)
 
         for c in self.children:
             c.create_unique(node_map=node_map, parent=node_map[uid])
@@ -79,16 +83,13 @@ class TreeNode:
 
     def get_nodeid_to_idx(self) -> dict[str, int]:
         idx_to_node = self.get_idx_to_node()
-        return {node.get_id() : j for j, node in idx_to_node.items()}
+        return {node.uuid : j for j, node in idx_to_node.items()}
 
     def get_idx_to_node(self) -> dict[int, Self]:
         all_nodes = [self] + self.get_descendants()
         all_nodes = [x for x in all_nodes if x.is_indexable()]
 
         return {j : node for j, node in enumerate(all_nodes)}
-
-    def get_id(self) -> str:
-        return self.name
 
     def is_indexable(self) -> bool:
         _ = self
@@ -105,7 +106,7 @@ class TreeNode:
     # Properties
 
     def get_tree(self, indent : int   = 0, nodeid_to_idx : Optional[dict[str, int]] = None):
-        idx = nodeid_to_idx.get(self.get_id()) if not nodeid_to_idx is None else None
+        idx = nodeid_to_idx.get(self.uuid) if not nodeid_to_idx is None else None
         desc = self.get_desc()
 
         marked_indent = '|\t' * indent
