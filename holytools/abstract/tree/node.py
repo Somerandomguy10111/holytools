@@ -4,9 +4,6 @@ import copy
 from dataclasses import dataclass
 from typing import Callable, Optional, Any, Self
 
-from cryptography.utils import cached_property
-
-
 # -------------------------------------------
 
 @dataclass
