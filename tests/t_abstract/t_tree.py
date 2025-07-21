@@ -37,5 +37,13 @@ class TestTreeNode(Unittest):
         unique_tree = root.create_unique()
         print(f'-Unique tree: {unique_tree.get_tree()}')
 
+    def test_enumerated_tree(self):
+        root = TreeNode.from_str(self.tree_str)
+        nodeid_to_idx = root.get_nodeid_to_idx()
+
+        tree = root.get_tree(nodeid_to_idx=nodeid_to_idx)
+        print(f'-Enumerated tree: {tree}')
+        self.assertIn('|	|	grandchild2 | ID = 3', tree)
+
 if __name__ == "__main__":
     TestTreeNode.execute_all()
