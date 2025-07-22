@@ -1,13 +1,15 @@
 import os
+import tempfile
+import venv
 
 # ----------------------------------------------
 
-class RepoAnalysis:
+class RepoTools:
     @staticmethod
     def get_sourcefpaths(repo_dirpath: str) -> list[str]:
         fpaths = []
         for parent_dirpath, folders, files in os.walk(repo_dirpath):
-            ignored_dirpaths = RepoAnalysis.ignored_dirpaths()
+            ignored_dirpaths = RepoTools.ignored_dirpaths()
             if any([x in parent_dirpath for x in ignored_dirpaths]):
                 continue
 
@@ -35,3 +37,15 @@ class RepoAnalysis:
     @staticmethod
     def ignored_dirpaths() -> list[str]:
         return ['build', '.venv']
+
+    @staticmethod
+    def setup_env(repo_dirpath : str):
+        venv_dirpath = os.path.join(repo_dirpath, '.venv')
+        venv.EnvBuilder(with_pip=True).create(venv_dirpath)
+
+
+if __name__ == '__main__':
+    tmp_fpath = tempfile.mktemp()
+    RepoTools.setup_env(repo_dirpath=tmp_fpath)
+    v_dirpath = RepoTools.find_venv(repo_dirpath=tmp_fpath)
+    print(v_dirpath)

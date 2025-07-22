@@ -1,7 +1,7 @@
 import os
 import sysconfig
 
-from holytools.devtools.envs.codebase import RepoAnalysis
+from holytools.devtools.envs.repo import RepoTools
 
 # -----------------------------------------------------------------------
 
@@ -26,7 +26,7 @@ class EnvPaths:
 
     @staticmethod
     def get_sitepackages_dirpath(repo_dirpath : str) -> str:
-        venv_dirpath = RepoAnalysis.find_venv(repo_dirpath=repo_dirpath)
+        venv_dirpath = RepoTools.find_venv(repo_dirpath=repo_dirpath)
         lib_dirpath = os.path.join(venv_dirpath, 'lib')
         pyfolder = os.listdir(lib_dirpath)[0]
         packages_dirpath = os.path.join(lib_dirpath, pyfolder, 'site-packages')
