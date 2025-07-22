@@ -1,6 +1,8 @@
 import os
-import tempfile
 import venv
+
+from git import Repo
+
 
 # ----------------------------------------------
 
@@ -21,6 +23,18 @@ class RepoTools:
         return fpaths
 
     @staticmethod
+    def ignored_dirpaths() -> list[str]:
+        return ['build', '.venv']
+
+    # --------------------------------
+    # Virtual environment
+
+    @staticmethod
+    def setup_env(repo_dirpath : str):
+        venv_dirpath = os.path.join(repo_dirpath, '.venv')
+        venv.EnvBuilder(with_pip=True).create(venv_dirpath)
+
+    @staticmethod
     def find_venv(repo_dirpath : str) -> str:
         child_names = os.listdir(repo_dirpath)
         child_paths = [os.path.join(repo_dirpath, n) for n in child_names]
@@ -34,18 +48,30 @@ class RepoTools:
 
         raise FileNotFoundError(f'No virtual environment found in {repo_dirpath}. ')
 
-    @staticmethod
-    def ignored_dirpaths() -> list[str]:
-        return ['build', '.venv']
+    # ------------------------------------------------------------------------------
+    # Git
 
     @staticmethod
-    def setup_env(repo_dirpath : str):
-        venv_dirpath = os.path.join(repo_dirpath, '.venv')
-        venv.EnvBuilder(with_pip=True).create(venv_dirpath)
+    def get_root_dirpath(path : str) -> str:
+        repo = RepoTools.get_repo(path=path)
+        return repo.git.rev_parse('--show-toplevel')
+
+    @staticmethod
+    def get_remote_url(path : str) -> str:
+        repo = RepoTools.get_repo(path=path)
+        if not repo.remotes:
+            raise ValueError(f'No remotes found for repository at {path}.')
+        url = repo.remotes.origin.url
+        ssh_prefix = 'git@github.com:'
+        if url.startswith(ssh_prefix):
+            remote_repopath =  url.removeprefix(ssh_prefix)
+            url = f'https://github.com/{remote_repopath}'
+        return url
+
+    @staticmethod
+    def get_repo(path: str) -> Repo:
+        return Repo(os.path.abspath(path), search_parent_directories=True)
 
 
 if __name__ == '__main__':
-    tmp_fpath = tempfile.mktemp()
-    RepoTools.setup_env(repo_dirpath=tmp_fpath)
-    v_dirpath = RepoTools.find_venv(repo_dirpath=tmp_fpath)
-    print(v_dirpath)
+    pass

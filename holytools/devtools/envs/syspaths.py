@@ -7,13 +7,13 @@ from holytools.devtools.envs.repo import RepoTools
 
 class EnvPaths:
     @staticmethod
-    def get_env_sypaths(repo_dirpath : str) -> list[str]:
+    def get_library_syspaths(repo_dirpath : str) -> list[str]:
         stdlib_dirpath = EnvPaths.get_stdlib_dirpath()
         dynlib_dirpath = EnvPaths.get_dynlib_dirpath()
         sitepackages_dirpath = EnvPaths.get_sitepackages_dirpath(repo_dirpath=repo_dirpath)
         localinstalls = EnvPaths.get_editable_locations(repo_dirpath=repo_dirpath)
 
-        return [repo_dirpath, stdlib_dirpath, dynlib_dirpath, sitepackages_dirpath] + localinstalls
+        return [stdlib_dirpath, dynlib_dirpath, sitepackages_dirpath] + localinstalls
 
     @staticmethod
     def get_stdlib_dirpath() -> str:
