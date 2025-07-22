@@ -51,16 +51,20 @@ class RepoTools:
     # ------------------------------------------------------------------------------
     # Git
 
-    @staticmethod
-    def get_root_dirpath(path : str) -> str:
-        repo = RepoTools.get_repo(path=path)
-        return repo.git.rev_parse('--show-toplevel')
+    @classmethod
+    def get_remote_link(cls, path : str) -> str:
+        repo = cls.get_repo(path=path)
+        repo_url = cls.get_remote_url(repo=repo)
+
+        repo_dirpath = cls.get_root_dirpath(repo=repo)
+        relpath = os.path.relpath(path, repo_dirpath)
+        return f'{repo_url}/blob/main/{relpath}'
+
 
     @staticmethod
-    def get_remote_url(path : str) -> str:
-        repo = RepoTools.get_repo(path=path)
+    def get_remote_url(repo : Repo) -> str:
         if not repo.remotes:
-            raise ValueError(f'No remotes found for repository at {path}.')
+            raise ValueError(f'No remotes found given repo at {RepoTools.get_root_dirpath(repo=repo)}.')
         url = repo.remotes.origin.url
         ssh_prefix = 'git@github.com:'
         if url.startswith(ssh_prefix):
@@ -69,9 +73,13 @@ class RepoTools:
         return url
 
     @staticmethod
+    def get_root_dirpath(repo : Repo) -> str:
+        return repo.git.rev_parse('--show-toplevel')
+
+    @staticmethod
     def get_repo(path: str) -> Repo:
         return Repo(os.path.abspath(path), search_parent_directories=True)
 
 
 if __name__ == '__main__':
-    pass
+    print(RepoTools.get_remote_link(path=__file__))
