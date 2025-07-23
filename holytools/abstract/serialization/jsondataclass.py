@@ -39,9 +39,7 @@ class JsonDataclass(Serializable):
             elif isinstance(value, tuple):
                 entry = tuple([self.get_basic_entry(x) for x in value])
             elif isinstance(value, dict):
-                key_list = [self.get_basic_entry(k) for k in value.keys()]
-                value_list = [self.get_basic_entry(v) for v in value.values()]
-                entry = (key_list, value_list)
+                entry = {self.get_basic_entry(k) : self.get_basic_entry(v) for k,v in value.items()}
             else:
                 entry = self.get_basic_entry(obj=value)
             json_dict[attr] = entry
@@ -77,8 +75,8 @@ class JsonDataclass(Serializable):
                 restored_value = tuple([cls.make_basic_obj(basic_cls=item_type, entry=s) for item_type, s in zip(item_types, value)])
             elif origin == dict or dtype == dict:
                 key_type, value_type = TypeAnalzer.get_inner_types(dtype)
-                key_list = [cls.make_basic_obj(basic_cls=key_type, entry=x) for x in value[0]]
-                value_list = [cls.make_basic_obj(basic_cls=value_type, entry=x) for x in value[1]]
+                key_list = [cls.make_basic_obj(basic_cls=key_type, entry=x) for x in value.keys()]
+                value_list = [cls.make_basic_obj(basic_cls=value_type, entry=x) for x in value.values()]
                 restored_value = {key: value for key, value in zip(key_list, value_list)}
             else:
                 restored_value = cls.make_basic_obj(basic_cls=dtype, entry=value)
