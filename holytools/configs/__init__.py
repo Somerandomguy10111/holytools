@@ -1,1 +1,1 @@
-from .configs import FileConfigs, BaseConfigs
+from .fileconfigs import FileConfigs, BaseConfigs
