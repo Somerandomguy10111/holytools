@@ -1,0 +1,40 @@
+import time, requests, datetime
+
+URL = "http://ipv4.download.thinkbroadband.com/5MB.zip"
+NUM_Mbits = 5 * 8
+TIMEOUT_SECONDS = 20
+LOG_FPATH = None
+
+
+class ConnectionMeter:
+    def __init__(self):
+        self.last_download_successful : bool = True
+        self.last_start = None
+        self.last_stop = None
+        log(f'- Running connectivity test with {NUM_Mbits} Mb file downloads')
+
+    def meter(self):
+        while True:
+            self.run_check()
+
+    def run_check(self):
+        start_time = time.time()
+        try:
+            self.download()
+            elapsed_time = time.time() - start_time
+            mbps = NUM_Mbits / elapsed_time
+            current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            log(f"[{current_time}]: Download succeded with {mbps:.2f} Mbps after {round(elapsed_time,2)} seconds")
+        except:
+            current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            log(f'[{current_time}]: Download failed or connection time out after {TIMEOUT_SECONDS} seconds')
+
+    def download(self):
+        requests.get(URL, timeout=TIMEOUT_SECONDS)
+        self.last_download_successful = True
+        self.last_stop = time.time()
+
+
+
+meter = ConnectionMeter()
+meter.meter()
